@@ -1,11 +1,17 @@
 好的教程：
-使用gdb调试c++程序 - 高胖 - 博客园
-https://www.cnblogs.com/gaopang/p/11588683.html
-
+使用gdb调试c++程序 - 高胖 - 博客园 
+https://www.cnblogs.com/gaopang/p/11588683.html  使用gdb调试的教程
+gdb 调试常用命令 
+https://www.cnblogs.com/tzj-kernel/p/14909077.html gdb参数介绍
+gdb官网手册
+https://sourceware.org/gdb/documentation/
+gdb基本命令(非常详细)
+https://blog.csdn.net/yinjiabin/article/details/7732931
 ----------------------------------------------------------------------
 生成core文件的条件
-1、ulimit -c unlimited 解除数据段长度限制（当前终端生效）
-2、有装core文件的文件夹，系统默认的会因为权限问题无法生成
+1、编译时要有-g参数
+2、ulimit -c unlimited 解除数据段长度限制（当前终端生效）
+3、有装core文件的文件夹，系统默认的会因为权限问题无法生成
    查看当前core文件的生成路径：cat /proc/sys/kernel/core_pattern
    改变生成路径：
    ① /etc/sysctl.conf  最后一行增加 kernel.core_pattern= ${path} 以指定corefile生成路径，reboot后生效
@@ -13,6 +19,18 @@ https://www.cnblogs.com/gaopang/p/11588683.html
 
 打开core文件：gdb ${filepath} ${corefile}
 
+详细指令方式打开： gdb -c ${corefile} -e ${filepath} --symbols ${filepath} --readnow
+   gdb启动参数：
+   --args或-args 向可执行文件传递参数 【gdb --args a.out arg1 arg2 ... 向a.out可执行文件传递参数 arg1 arg2 ...】
+   -p或--pid     指定attach进程      【gdb -p 进程PID】
+   attach        指定attach进程      【gdb attach 进程PID】
+   -c或-c=（--core或者--core=） 指定coredump文件 【gdb a.out --core core.27503】
+   -e            指定可执行文件名
+   -d            指定目录加入到源文件搜索路径
+   --cd	        指定目录作为路径运行gdb
+   -s（--symbols) 指定文件读取符号表
+   -q	gdb        启动时，关掉提示或者打印信息 【gdb  -q a.out】
+   -r(--readnow)     立即读入每一个符号文件的符号表,而不是默认的那种在需要时才渐次读入的方式。这将是初始阶段慢一点, 而以后执行将更快
 ----------------------------------------------------------------------
 把gdb的打印输出到文件 3种
 1： gdb xxx | tee -a "file"
