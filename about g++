@@ -1,0 +1,1 @@
+使用Linux线程库时，用g++编译需要加 -lpthread
