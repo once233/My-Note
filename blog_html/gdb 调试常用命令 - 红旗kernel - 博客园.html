@@ -1,0 +1,2768 @@
+<!DOCTYPE html>
+<!-- saved from url=(0050)https://www.cnblogs.com/tzj-kernel/p/14909077.html -->
+<html lang="zh-cn" style="--olcb-folder-code-block-max-height:80vh;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin-when-cross-origin">
+    <meta name="description" content="notice：coredump章节、汇编章节还需要完善 预备知识： 1、注意使用gdb时，最好带上-g参数编译可执行文件。否则出现(No debugging symbols found in a.ou">
+    <meta property="og:description" content="notice：coredump章节、汇编章节还需要完善 预备知识： 1、注意使用gdb时，最好带上-g参数编译可执行文件。否则出现(No debugging symbols found in a.ou">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>gdb  调试常用命令 - 红旗kernel - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="https://common.cnblogs.com/favicon.svg" type="image/svg+xml">
+    
+    <style>#home :not(.cnblogs_code):not(.cnblogs_Highlighter)>pre:not([highlighted]):not([class*="brush:"]) code:not(.hljs), :not(.cnblogs_code):not(.cnblogs_Highlighter)>pre:not([highlighted]):not([class*="brush:"]) code:not(.hljs) {background: rgb(245, 245, 245);
+        padding: 12px;
+        border: 1px solid rgb(204, 204, 204);
+        border-radius: 3px;
+        border-color: transparent;
+        color: rgb(68, 68, 68);
+        font-family: "Courier New", sans-serif;
+        font-size: 12px</style><link rel="stylesheet" href="./gdb 调试常用命令 - 红旗kernel - 博客园_files/blog-common.min.css">
+    
+
+    <link id="MainCss" rel="stylesheet" href="./gdb 调试常用命令 - 红旗kernel - 博客园_files/bundle-anothereon001.min.css">
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="./gdb 调试常用命令 - 红旗kernel - 博客园_files/cnblogs.css">
+    <link type="text/css" rel="stylesheet" href="./gdb 调试常用命令 - 红旗kernel - 博客园_files/custom.css">
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="./gdb 调试常用命令 - 红旗kernel - 博客园_files/bundle-anothereon001-mobile.min.css">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/tzj-kernel/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/tzj-kernel/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/tzj-kernel/wlwmanifest.xml">
+    <script type="text/javascript" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/encoder.js.下载"></script><script type="text/javascript" async="" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/analytics.js.下载"></script><script>
+        var currentBlogId = 688106;
+        var currentBlogApp = 'tzj-kernel';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'AnotherEon001';
+        var visitorUserId = '';
+        var hasCustomScript = true;
+        try {
+            if (hasCustomScript && document.referrer && document.referrer.indexOf('baidu.com') >= 0) {
+                Object.defineProperty(document, 'referrer', { value: '' });
+                Object.defineProperty(Document.prototype, 'referrer', { get: function(){ return ''; } });
+            }
+        } catch(error) { }
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+    </script>
+        <script>
+            var currentPostDateAdded = '2021-06-20 22:36';
+        </script>
+    <script src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/jquery-2.2.0.min.js.下载"></script>
+    <script src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/blog-common.min.js.下载"></script><style>.medium-zoom-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 300ms;
+  will-change: opacity;
+}
+
+.medium-zoom--opened .medium-zoom-overlay {
+  cursor: pointer;
+  cursor: zoom-out;
+  opacity: 1;
+}
+
+.medium-zoom-image {
+  cursor: pointer;
+  cursor: zoom-in;
+  /*
+    The `transition` is marked as "!important" for the animation to happen
+    even though it's overriden by another inline `transition` style attribute.
+
+    This is problematic with frameworks that generate inline styles on their
+    images (e.g. Gatsby).
+
+    See https://github.com/francoischalifour/medium-zoom/issues/110
+   */
+  transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) !important;
+}
+
+.medium-zoom-image--hidden {
+  visibility: hidden;
+}
+
+.medium-zoom-image--opened {
+  position: relative;
+  cursor: pointer;
+  cursor: zoom-out;
+  will-change: transform;
+}
+</style><script id="hljs-script" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/highlight.min.js.下载" type="text/javascript" defer=""></script>
+    
+
+    
+<meta http-equiv="origin-trial" content="Az6AfRvI8mo7yiW5fLfj04W21t0ig6aMsGYpIqMTaX60H+b0DkO1uDr+7BrzMcimWzv/X7SXR8jI+uvbV0IJlwYAAACFeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A+USTya+tNvDPaxUgJooz+LaVk5hPoAxpLvSxjogX4Mk8awCTQ9iop6zJ9d5ldgU7WmHqBlnQB41LHHRFxoaBwoAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A7FovoGr67TUBYbnY+Z0IKoJbbmRmB8fCyirUGHavNDtD91CiGyHHSA2hDG9r9T3NjUKFi6egL3RbgTwhhcVDwUAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><script src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/pubads_impl_2023011901.js.下载" async=""></script><link rel="preload" href="./gdb 调试常用命令 - 红旗kernel - 博客园_files/f(6).txt" as="script"><script type="text/javascript" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/f(6).txt"></script></head>
+<body class="skin-anothereon001 no-navbar">
+<a name="top"></a>
+<div id="top_nav" class="navbar forpc navbar-custom">
+    <nav id="nav_main" class="navbar-main">
+        <ul id="nav_left" class="navbar-list navbar-left">
+            <li class="navbar-branding">
+                <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                    <img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/logo.svg" alt="博客园Logo">
+                </a>
+            </li>
+            <li>
+                <a href="https://www.cnblogs.com/" onclick="countClicks(&#39;skin-navbar-sitehome&#39;)">首页</a>
+            </li>
+            <li>
+                <a href="https://news.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-news&#39;)">新闻</a>
+            </li>
+            <li>
+                <a href="https://q.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-q&#39;)">博问</a>
+            </li>
+            <li>
+                <a id="nav_brandzone" href="https://brands.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-brands&#39;)">专区</a>
+            </li>
+            <li>
+                <a href="https://ing.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-ing&#39;)">闪存</a>
+            </li>
+            <li>
+                <a href="https://edu.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-edu&#39;)">班级</a>
+            </li>
+        </ul>
+        <ul id="nav_right" class="navbar-list navbar-right">
+            <li>
+                <form id="zzk_search" class="navbar-search" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                    <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3">
+                    <button type="submit" id="zzk_search_button">
+                        <img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/search.svg" alt="搜索">
+                    </button>
+                </form>
+            </li>
+            <li id="navbar_login_status" class="navbar-list">
+                <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔" style="display: none;">
+                    <img id="new_post_icon" class="navbar-icon" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/newpost.svg" alt="写随笔">
+                </a>
+                <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客" style="display: none;">
+                    <img id="myblog_icon" class="navbar-icon" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/myblog.svg" alt="我的博客">
+                </a>
+                <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息" style="display: none;">
+                    <img id="msg_icon" class="navbar-icon" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/message.svg" alt="短消息">
+                    <span id="msg_count" style="display: none"></span>
+                </a>
+                <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                    <img class="navbar-icon" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/lite-mode-on.svg" alt="简洁模式">
+                </a>
+                <div id="user_info" class="navbar-user-info dropdown" style="display: none;">
+                    <a class="dropdown-button" href="https://home.cnblogs.com/">
+                        <img id="user_icon" class="navbar-avatar" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/avatar-default.svg" alt="用户头像">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                        <a href="https://home.cnblogs.com/">我的园子</a>
+                        <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                        <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/lite-mode-check.svg" class="hide"><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                        <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                    </div>
+                </div>
+                <a class="navbar-anonymous" href="https://account.cnblogs.com/signup" style="display: inline;">注册</a>
+                <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()" style="display: inline;">登录</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div id="page_begin_html">
+<script type="text/javascript">
+/*
+    功能：生成博客目录的JS工具
+    测试：IE8，火狐，google测试通过
+    一明
+    2020-4-19
+*/
+var BlogDirectory = {
+    /*
+        获取元素位置，距浏览器左边界的距离（left）和距浏览器上边界的距离（top）
+    */
+    getElementPosition:function (ele) {        
+        var topPosition = 0;
+        var leftPosition = 0;
+        while (ele){              
+            topPosition += ele.offsetTop;
+            leftPosition += ele.offsetLeft;        
+            ele = ele.offsetParent;     
+        }  
+        return {top:topPosition, left:leftPosition}; 
+    },
+
+    /*
+    获取滚动条当前位置
+    */
+    getScrollBarPosition:function () {
+        var scrollBarPosition = document.body.scrollTop || document.documentElement.scrollTop;
+        return  scrollBarPosition;
+    },
+    
+    /*
+    移动滚动条，finalPos 为目的位置，internal 为移动速度
+    */
+    moveScrollBar:function(finalpos, interval) {
+
+        //若不支持此方法，则退出
+        if(!window.scrollTo) {
+            return false;
+        }
+
+        //窗体滚动时，禁用鼠标滚轮
+        window.onmousewheel = function(){
+            return false;
+        };
+          
+        //清除计时
+        if (document.body.movement) { 
+            clearTimeout(document.body.movement); 
+        } 
+
+        var currentpos =BlogDirectory.getScrollBarPosition();//获取滚动条当前位置
+
+        var dist = 0; 
+        if (currentpos == finalpos) {//到达预定位置，则解禁鼠标滚轮，并退出
+            window.onmousewheel = function(){
+                return true;
+            }
+            return true; 
+        } 
+        if (currentpos < finalpos) {//未到达，则计算下一步所要移动的距离
+            dist = Math.ceil((finalpos - currentpos)/10); 
+            currentpos += dist; 
+        } 
+        if (currentpos > finalpos) { 
+            dist = Math.ceil((currentpos - finalpos)/10); 
+            currentpos -= dist; 
+        }
+        
+        var scrTop = BlogDirectory.getScrollBarPosition();//获取滚动条当前位置
+        window.scrollTo(0, currentpos);//移动窗口
+        if(BlogDirectory.getScrollBarPosition() == scrTop)//若已到底部，则解禁鼠标滚轮，并退出
+        {
+            window.onmousewheel = function(){
+                return true;
+            }
+            return true;
+        }
+        
+        //进行下一步移动
+        var repeat = "BlogDirectory.moveScrollBar(" + finalpos + "," + interval + ")"; 
+        document.body.movement = setTimeout(repeat, interval); 
+    },
+    
+    htmlDecode:function (text){
+        var temp = document.createElement("div");
+        temp.innerHTML = text;
+        var output = temp.innerText || temp.textContent;
+        temp = null;
+        return output;
+    },
+
+    /*
+    创建博客目录，
+    id表示包含博文正文的 div 容器的 id，
+    mt 和 st 分别表示主标题和次级标题的标签名称（如 H2、H3，大写或小写都可以！），
+    interval 表示移动的速度
+    */
+    createBlogDirectory:function (id, mt, st, interval){
+         //获取博文正文div容器
+        var elem = document.getElementById(id);
+        if(!elem) return false;
+        //获取div中所有元素结点
+        var nodes = elem.getElementsByTagName("*");
+        //创建博客目录的div容器
+        var divSideBar = document.createElement('DIV');
+        divSideBar.className = 'uprightsideBar';
+        divSideBar.setAttribute('id', 'uprightsideBar');
+        var divSideBarTab = document.createElement('DIV');
+        divSideBarTab.setAttribute('id', 'sideBarTab');
+        divSideBar.appendChild(divSideBarTab);
+        var h2 = document.createElement('H2');
+        divSideBarTab.appendChild(h2);
+        var txt = document.createTextNode('目录导航');
+        h2.appendChild(txt);
+        var divSideBarContents = document.createElement('DIV');
+        divSideBarContents.style.display = 'none';
+        divSideBarContents.setAttribute('id', 'sideBarContents');
+        divSideBar.appendChild(divSideBarContents);
+        //创建自定义列表
+        var dlist = document.createElement("dl");
+        divSideBarContents.appendChild(dlist);
+        var num = 0;//统计找到的mt和st
+        mt = mt.toUpperCase();//转化成大写
+        st = st.toUpperCase();//转化成大写
+        //遍历所有元素结点
+        for(var i=0; i<nodes.length; i++)
+        {
+            var tits = ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'];
+            if(tits.indexOf(nodes[i].nodeName) !== -1)    
+            { // nodes[i].nodeName == mt|| nodes[i].nodeName == st
+                //获取标题文本
+                var nodetext = nodes[i].innerHTML.replace(/<\/?[^>]+>/g,"");//innerHTML里面的内容可能有HTML标签，所以用正则表达式去除HTML的标签
+                //nodetext = nodetext.replace(/ /ig, "");//替换掉所有的 
+                nodetext = BlogDirectory.htmlDecode(nodetext);
+                //插入锚        
+                nodes[i].setAttribute("id", "blogTitle" + num);
+                var item;
+                switch(nodes[i].nodeName)
+                {
+                    case 'H1':    //若为主标题 
+                        item = document.createElement("dt");
+                        break;
+                    case 'H3':
+                        item = document.createElement("dd");
+                        item.setAttribute('class', 'indent3');//通过CSS样式定义距离
+                        break;
+                    case 'H4':
+                        item = document.createElement("dd");
+                        item.setAttribute('class', 'indent4');
+                        break;
+                    case 'H5':
+                        item = document.createElement("dd");
+                        item.setAttribute('class', 'indent5');
+                        break;
+                    case 'H6':
+                        item = document.createElement("dd");
+                        item.setAttribute('class', 'indent6');
+                        break;
+                    default:    //若为子标题
+                        item = document.createElement("dd");
+                        break;
+                }
+                
+                //创建锚链接
+                var itemtext = document.createTextNode(nodetext);
+                item.appendChild(itemtext);
+                item.setAttribute("name", num);
+                item.onclick = function(){        //添加鼠标点击触发函数
+                    var pos = BlogDirectory.getElementPosition(document.getElementById("blogTitle" + this.getAttribute("name")));
+                    if(!BlogDirectory.moveScrollBar(pos.top, interval)) return false;
+                };       
+                
+                //将自定义表项加入自定义列表中
+                dlist.appendChild(item);
+                num++;
+            }
+        }
+        
+        if(num == 0) return false; 
+        /*鼠标进入时的事件处理*/
+        divSideBarTab.onmouseenter = function(){
+            divSideBarContents.style.display = 'block';
+        }
+        /*鼠标离开时的事件处理*/
+        divSideBar.onmouseleave = function() {
+            divSideBarContents.style.display = 'none';
+        }
+
+        document.body.appendChild(divSideBar);
+    }
+    
+};
+
+window.onload=function(){
+    /*页面加载完成之后生成博客目录*/
+    BlogDirectory.createBlogDirectory("cnblogs_post_body","h1","h2",20);
+}
+</script>
+
+</div>
+
+<div id="wrapper">
+<div id="header">
+
+<div id="top">
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/tzj-kernel/">红旗kernel</a>
+</h1>
+<div id="subtitle"></div>
+</div>
+<div id="sub"><div class="BlogStats">随笔 - 28, 文章 - 0, 评论 - 2, 阅读 - 
+<span title="总阅读数: 6946">
+6946</span></div>
+
+</div>
+
+
+
+
+</div>
+<div id="main_container">
+<div id="main_content">
+<div id="content">
+	<div id="post_detail">
+    <div class="post">
+        <h2>
+            
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/tzj-kernel/p/14909077.html">
+    <span role="heading" aria-level="2">gdb  调试常用命令</span>
+    
+</a><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button>
+
+        </h2>
+        <div class="postbody">
+            <div id="cnblogs_post_body" class="blogpost-body blogpost-body-html">
+<p>&nbsp;</p>
+<p><strong>notice：coredump章节、汇编章节还需要完善</strong><strong><br></strong></p>
+<h2 id="blogTitle0"><span style="background-color: rgba(0, 204, 255, 1)"><strong>预备知识：</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<p><strong>1、</strong>注意使用gdb时，最好带上-g参数编译可执行文件。否则出现(No debugging symbols found in a.out)</p>
+<div class="cnblogs_code">
+<pre>gcc -g main.c -o a.out</pre>
+</div>
+<p>2、查看命令行可带参数帮助</p>
+<div class="cnblogs_code">
+<pre>gdb --help</pre>
+</div>
+<p>3、查看命令行可使用命令及详情</p>
+<div class="cnblogs_code">
+<pre>(gdb) help all       //查看所有命令
+(gdb) help break  //查看break 使用，其他命令也可单独help</pre>
+</div>
+<p>4、gdb 长选项 -和--都可以&nbsp;</p>
+<div class="cnblogs_code">
+<pre>gdb --help 和 gdb -help 都可以</pre>
+</div>
+<p>5、gdb 使用的命令不必完整，只需命令的前面几个字母即可（只要无歧义），可以tab补全</p>
+<p>6、回车会重复执行上一次命令</p>
+<p>7、查看gdb版本</p>
+<div class="cnblogs_code">
+<pre><span>(gdb) show version
+或者gdb -v</span></pre>
+</div>
+<p>&nbsp;</p>
+<h2 id="blogTitle1"><span style="background-color: rgba(0, 204, 255, 1)"><strong>1、gdb 命令行可带参数</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>参数</td>
+<td>作用</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>
+<p>--args或-args</p>
+</td>
+<td>向可执行文件传递参数</td>
+<td>
+<p>gdb --args a.out xxx 111</p>
+<p>向a.out可执行文件传递参数 xxx和111</p>
+</td>
+<td>
+<p><span class="token keyword">set args&nbsp;xxx 111</span></p>
+<p><span class="token keyword">show args</span></p>
+</td>
+</tr>
+<tr>
+<td>
+<p>-p或--pid</p>
+<p>attach</p>
+</td>
+<td>指定attach进程</td>
+<td>
+<p>gdb -p 进程PID</p>
+<p>gdb attach&nbsp;进程PID</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>-c或-c=</p>
+<p>--core或者--core=</p>
+</td>
+<td>指定coredump文件</td>
+<td>
+<p>gdb a.out core.27503</p>
+<p>gdb a.out --core core.27503</p>
+<p>gdb a.out --core=core.27503</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>-e</p>
+</td>
+<td>指定可执行文件名</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>-d</p>
+</td>
+<td>指定目录加入到源文件搜索路径</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>--cd</td>
+<td>指定目录作为路径运行gdb</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>指定文件读取符号表</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>-q</td>
+<td>gdb 启动时，关掉提示或者打印信息</td>
+<td>gdb&nbsp; -q a.out</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<h2 id="blogTitle2"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2、gdb 调试可使用命令及参数</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<h3 id="blogTitle3"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.1 断点</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>
+<p>break</p>
+<p>或b</p>
+</td>
+<td>设置断点</td>
+<td>
+<p>break&nbsp;local-break</p>
+<p>break&nbsp;local-break&nbsp;if if-command</p>
+<p>local-break格式为：</p>
+<p>　　函数名（function-name）</p>
+<p>　　文件名:行号（b&nbsp; main.c:5）</p>
+<p>　　文件名:函数名（b&nbsp; main.c:main）</p>
+<p>　　函数A:A调用的函数B(b main:test_b)</p>
+<p>　　+offset-number 以当前程序暂停位置为准，向后+&nbsp;offset-number 行设置break 点</p>
+<p>　　-offset-number 以当前程序暂停位置为准，向前- offset-number 行设置break 点</p>
+<p>　　beadk&nbsp;&nbsp;*address</p>
+<p>if-command格式为：</p>
+<p>　　shell 脚本 （例如&nbsp;break&nbsp;main if argc == 5 断到main时都判断 argc == 5 ，为真才停住）</p>
+</td>
+<td>
+<p>print 函数名 得到函数地址</p>
+<p>ignore break-number count-number</p>
+</td>
+</tr>
+<tr>
+<td>
+<p>info&nbsp;break或i&nbsp;b</p>
+</td>
+<td>查看所有断点</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>delete或 d</p>
+</td>
+<td>删除断点</td>
+<td>&nbsp;
+<p>delete&nbsp;break-number-xxx</p>
+<p>或者&nbsp;d&nbsp;break-number-xxx</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>tbreak或tb</p>
+</td>
+<td>设置断点，但只生效一次</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>save breakpoints&nbsp; file-name</p>
+</td>
+<td>保存断点到file-name</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>source file-name</p>
+</td>
+<td>加载保存的gdb断点</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>ignore break-number count-number</p>
+</td>
+<td>设置断点，但是忽略断点多少次，接下来count-number次编号的断点触发都不会让程序中断，只有count-number+1次触发的中断才会让程序中断</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>command</p>
+</td>
+<td>当运行到某断点时，执行某指定的脚本或程序</td>
+<td>
+<p>command command-number</p>
+<p>当运行到断点时，执行的命令（commands 即可输入gdb命令等，end表示退出输入）</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre>//在程序入口处打断点
+readlef -h a.out 中  ertry point addrss   //获取程序入口
+gdb 查看 info  files  中  entry point        //获取程序入口
+<span>
+b *<span>程序起始地址
+然后  run</span></span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<h3 id="blogTitle4"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.2 运行/调试/退出程序</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>step</td>
+<td>&nbsp;单步执行
+<p><strong>（<strong>区别：</strong>step会进入有符号表的下一行函数内部，next不会进入）</strong></p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>next</td>
+<td>&nbsp;单步执行</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>run或r</p>
+</td>
+<td>从头运行可执行文件</td>
+<td>
+<p>run para_1 para_2 para_3</p>
+<p>run可以直接携带参数</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>start</td>
+<td>
+<p>直接运行程序</p>
+<p>调试没有调试信息程序，直接运行是无效的。找不到main入口。</p>
+<p>调试没有调试信息的可参考：<a href="https://www.cnblogs.com/tzj-kernel/p/14909077.html#appendix_1" rel="noopener">调试无调试信息程序</a></p>
+</td>
+<td>
+<p>&nbsp;</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>continue或c</p>
+</td>
+<td>继续运行可执行程序</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>quit或q</p>
+</td>
+<td>&nbsp;退出gdb</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>finish</p>
+</td>
+<td>执行完当前函数</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>return</p>
+</td>
+<td>函数不会继续执行，直接按照指定的返回值xxx返回</td>
+<td>return 返回值xxx</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>call&nbsp; 或 print</p>
+</td>
+<td>直接调用函数执行</td>
+<td>call&nbsp; xxxx_func()</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>set args</p>
+</td>
+<td>设置可执行文件运行参数</td>
+<td>
+<p>set args&nbsp;xxx 111</p>
+<p>（参数会保留，直接清空则使用set args&nbsp;&nbsp;）</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>show args</p>
+</td>
+<td>查看可执行文件携带参数</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>set</p>
+</td>
+<td>改变变量的值</td>
+<td>
+<p>set main::string_test="xxxxx" 改变main函数中字符串string_test</p>
+<p>或通过内存地址改变变量（字符串）</p>
+<p>p &amp;p1 查看p1类型变量 (char (*)[4]) 0x80477a4</p>
+<p>set {char [4]}0x80477a4 = "xxxxx"</p>
+<p>设置变量的值 set var var_param = 3 或者</p>
+<p>set{para_type}para_address=para_number</p>
+<p>修改寄存器的值 set var $eax = 3</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>jump</p>
+</td>
+<td>
+<p>跳转到指定地址执行（PC寄存器保存程序下一条要执行的指令，通过修改这个寄存器的值，可以修改程序执行的流程）</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="blogTitle5"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.3 函数/堆栈/帧</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>
+<p>相关命令</p>
+</td>
+</tr>
+<tr>
+<td>
+<p>backtrace或bt</p>
+</td>
+<td>打印此时的堆栈情况</td>
+<td>&nbsp;backtrace full（显示所以局部变量值）</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>info frame</td>
+<td>显示函数堆栈帧</td>
+<td>&nbsp;</td>
+<td>
+<p>&nbsp;</p>
+</td>
+</tr>
+<tr>
+<td>frame</td>
+<td>切到第几个栈帧上</td>
+<td>
+<p>frame&nbsp; number。切到第几个栈帧上，</p>
+<p>frame&nbsp; &nbsp;address 切到指定栈地址上</p>
+<p>（bt可以查看到内层的函数在第几个栈帧上）</p>
+</td>
+<td>
+<p>info frame</p>
+</td>
+</tr>
+<tr>
+<td>up&nbsp;</td>
+<td>向上切换栈帧。默认up 1，可以指定up n</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>down</td>
+<td>向下切换栈帧，默认 down 1，可以指定 down n</td>
+<td>&nbsp;</td>
+<td>&nbsp;<br><br></td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</tr>
+<tr>
+<td>up-silently</td>
+<td>安静向上切换栈帧，不打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</tr>
+<tr>
+<td>down-silently</td>
+<td>安静向下切换栈帧，不打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</tr>
+<tr>
+<td>debug entry-values</td>
+<td>
+<p>可以输出正常堆栈，以及尾调用关系</p>
+<p>(<a href="https://www.cnblogs.com/tzj-kernel/p/14909077.html#appendix_2" rel="noopener">尾调用</a>会被优化)</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</tr>
+<tr>
+<td>P func2:pointer</td>
+<td>
+<p>打印某函数内部的变量（打印某栈帧中变量）</p>
+<p>或先切换到该栈帧（函数）中，然后打印</p>
+
+
+
+
+
+
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+
+
+
+</tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</tbody>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</table></div>
+<h3 id="blogTitle6"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.4 打</strong><strong>印/查看</strong><strong>命令</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">gdb中直接显示的打印静态变量，可能不一定是正确的，(全局变量和局部变量重名情况)可以直接指定文件 p xxx.c::xxx_para</span></pre>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td colspan="2">命令</td>
+<td>含义</td>
+<td>
+<p>示例（打印变量a）</p>
+</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td rowspan="13">
+<p>print</p>
+<p>或者p</p>
+</td>
+<td>
+<p>变量</p>
+<p>（可强转变量类型）</p>
+</td>
+<td>
+<p>直接打印变量</p>
+<p>默认10进制</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>/x</td>
+<td>十六进程打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>/o</td>
+<td>8进程打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>/u</td>
+<td>无符号打印(10进制)</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>/d</td>
+<td>有符号打印(10进制)</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>/t</td>
+<td>二进制打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>/c</td>
+<td>字符打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>/s</td>
+<td>字符串打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>/f</td>
+<td>浮点打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>/a</td>
+<td>16进制打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>array@length</td>
+<td>打印array数组的前length个变量的值</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>p array[index]@number或p *array@number</td>
+<td>打印数组中任意元素连续元素的值</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>func2:pointer</td>
+<td>打印某函数内部的变量（打印某栈帧中变量）</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td colspan="2">命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td rowspan="3">x/nfu</td>
+<td>n</td>
+<td>按照u类型为单位，输出指定地址n个</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>f</td>
+<td>输出格式进制：x(16)、o(8)、d(10)、h(2)、s(字符)</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>u</td>
+<td>
+<p>单个单元长度：b(一个byte)、h(两个byte)、</p>
+<p>w（四个byte）、g(8个byte)</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td colspan="2">$_</td>
+<td>
+<p>保存着x命令最后检测的内存地址(很多命令都会调用x命令检查内存)</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td colspan="2">$__</td>
+<td>保存着x命令最后检测的内存地址的值</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<div class="table-wrapper">
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>set print pretty on/off</td>
+<td>每行打印一个结构体成员</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set print array on/off</td>
+<td>设置数组打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set print array-indexes on/off</td>
+<td>
+<p>设置数组下标</p>
+<p>（数组默认不打印索引下标）</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set print union on/off</td>
+<td>设置打印联合体</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set print elements number-of-elements</td>
+<td>
+<p>设置数组最大限制数</p>
+<p>（缺省最多打印200个元素）</p>
+</td>
+<td>
+<p>set print elements 0</p>
+<p>（设置为0，等效于不设置限制）</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>set print elements unlimited</p>
+</td>
+<td>
+<p>不设置限制</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>set print object on</p>
+</td>
+<td>
+<p>如果缺省按照派生类打印</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>set pagination off</p>
+</td>
+<td>
+<p>设置gdb不提示，直接输出全部内容</p>
+<p>（当单次输出内容较多时，gdb会打印部分内容，并提示是否输出后面内容）</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>list或l</td>
+<td>
+<p>打印代码</p>
+<p>（list 可以带行号、函数、指定行号范围（1、10）、向前向后打印（-、+））</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>where</p>
+</td>
+<td>显示当前行号以及所处函数</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义&nbsp;</td>
+<td>示例&nbsp;</td>
+<td>相关命令&nbsp;</td>
+</tr>
+<tr>
+<td>backtrace full</td>
+<td>打印函数的局部变量</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>backtrace full n</td>
+<td>从内向外显示n个栈帧</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>backtrace full -n</td>
+<td>从外向内显示n个栈帧</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>info locals</td>
+<td>打印当前函数局部变量</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>whatis xxx_para</td>
+<td>查看某一个变量类型</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>ptype xxx_para</td>
+<td>查看更详细的信息类型</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>info variables xxx_para</td>
+<td>查看定义变量的文件</td>
+<td>
+<p>info variables ^xxx_para$</p>
+<p>（可以通配查找）</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>mallocinfo</td>
+<td>打印程序动态分配的内存</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<h3 id="blogTitle7"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.5 coredump文件</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义&nbsp;</td>
+<td>示例&nbsp;</td>
+<td>相关命令&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;generate-core-file 或 gcore</td>
+<td>被调试进程主动产生core dump文件</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;core</td>
+<td>
+<p>&nbsp;在gdb中指定coredump文件</p>
+<p>（一般前面先file&nbsp;可执行文件）</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>gdb&nbsp;可执行文件&nbsp;coredump的文件</td>
+<td>
+<p>解析coredump文件</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="blogTitle8"><span style="color: rgba(0, 0, 0, 1); background-color: rgba(0, 204, 255, 1)"><strong style="font-size: 1.17em">2.6 进程/线程</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">gdb调试多进程时候默认追踪父进程，子进程独立运行
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">info threads 
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">显示信息：
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">第一项ID：gdb标识每个线程的唯一ID，
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">第二项 Target id：linux 对每一个线程的标识ID
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">第三项 Frame ：显示的是线程执行到哪个函数，理解为GDB。前面带*表示的是current thread，及gdb attach进程时，默认attach的线程。</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>info thread</td>
+<td>列出当前进程的线程</td>
+<td>
+<p>&nbsp;info threads</p>
+<p>或info threads th-pid</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>&nbsp;thread&nbsp;</td>
+<td>&nbsp;切换到指定线程</td>
+<td>thread 线程-PID&nbsp;&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>info proc mappings</td>
+<td>查看进程的内存映射信息&nbsp;&nbsp;</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>info files或info target</td>
+<td>查看进程的内存映射信息以及库情况</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>attach</td>
+<td>跟踪进程</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>detach</td>
+<td>脱离进程</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set follow-fork-mode child&nbsp;</td>
+<td>调试子进程</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set detach-on-fork off&nbsp;</td>
+<td>同时调试父子进程(默认detach-on-fork 是on的状态）在调试一个进程时，另外一个进程处于挂起</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>info inferiors&nbsp;</td>
+<td>查看进程情况 ,显示*表示正在调试进程</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>inferiors info-number&nbsp;</td>
+<td>切换到调试进程去</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set schedule-multiplen on&nbsp;</td>
+<td>父子进程同时运行，默认 schdule-multiple 是off的</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set print thread-events off</td>
+<td>线程产生和退出时的打印提示信息</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set scheduler-locking on</td>
+<td>gdb调试多线程程序时，只允许一个调试线程运行，其他处于暂停状态（默认是off状态）</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>$_thread</td>
+<td>用来保存当前正在调试的线程号(gdb 7.2引入)</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>add-inferior [ -copies n ] [ -exec executable ]</td>
+<td>gdb 同时调试多个程序,加载可执行文件 ,n 默认是1</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>maint info program-spaces&nbsp;</td>
+<td>打印当前所有被调试的进程信息(调试多个进程)</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>$_exitcode</td>
+<td>记录调试程序正常退出的exit code</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<h3 id="blogTitle9"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.7 观察点/异常捕获</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">观察点有软件和硬件两种，软件实现的观察点会导致程序运行较慢。
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">如果支持硬件观察点，则设置观察点时会打印Hardware watchpoint 2: i
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">系统调用和编号的映射关系为 include/asm/unisted.h</span></pre>
+</div>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>watch</td>
+<td>当一个变量的值发生变化时，程序会停止下来</td>
+<td>
+<p>watch para_a</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set can-use-hw-watchpoint</td>
+<td>不使用硬件观察点</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>info watchpoint</td>
+<td>罗列当前所有的观察点</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>disable</td>
+<td>去使能观察点</td>
+<td>disable&nbsp;para_a</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>enable</td>
+<td>使能观察点</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>删除观察点</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>watch 观察表达式 thread thread-number&nbsp;</td>
+<td>设置观察点，只有特定线程才生效（这种只能使用硬件观察）</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>rwatch或rw</td>
+<td>设置读观察点，当发生读时，会暂停住（这种只能使用硬件观察）</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>awatch 或aw</td>
+<td>设置写观察点（这种只能使用硬件观察）</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>catchpoint或catch</td>
+<td>异常捕获</td>
+<td>
+<p>catch syscall [name | number] 系统调用的名字或者</p>
+<p>系统调用编号<br>	</p>
+<p>catch 函数名</p>
+<p>catch signal signal-number</p>
+<p>catch syscall ：为所有的系统调用设置catchpoint</p>
+<p>	其他可以help catch  </p>
+
+
+
+
+</td>
+<td>&nbsp;</td>
+
+
+
+
+</tr>
+<tr>
+<td>tcatch</td>
+<td>设置 catchpoint 只生效一次</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+
+
+
+
+</tr>
+
+
+
+
+</tbody>
+
+
+
+
+</table></div>
+<p>&nbsp;</p>
+<h3 id="blogTitle10"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.8 日志相关</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<div class="cnblogs_code">
+<pre>//gdb中，默认是不保存历史命令的，可以通过如下命令设置成保存历史命令。</pre>
+</div>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>set history filename file_name</td>
+<td>
+<p>设置历史命令保存在文件file_name中</p>
+<p>（默认保存在.gdb_history）</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set history save on&nbsp;</td>
+<td>设置保存历史命令</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set logging on</td>
+<td>
+<p>执行gdb的过程记录下来</p>
+<p>（默认的日志文件是gdb.txt）</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set logging file file-name</td>
+<td>
+<p>改变日志记录文件为file-name</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set logging overwrite on</td>
+<td>让输出覆盖之前的日志文件</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set logging redirect on</td>
+<td>gdb的日志不会打印在终端</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="blogTitle11"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.9 汇编/寄存器</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">若需预处理器宏信息，需要带 -g3编译 p NAME
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">gdb默认显示汇编指令格式为AT&amp;T格式
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">break 不会把端点设置在汇编指令层次函数的开头，会停留在第三条汇编指令（汇编调用函数会先push 栈，再移动栈指针，再call）
+</span><span style="color: rgba(0, 128, 0, 1)">//</span><span style="color: rgba(0, 128, 0, 1)">如果要把断点设置在汇编指令层次函数的开头，则使用b *func</span></pre>
+</div>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>info&nbsp;registers</td>
+<td>列出寄存器</td>
+<td>&nbsp;打印单个寄存器的值： info registers reg-name 或者 p $eax</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>info all-registers</td>
+<td>可以看到包括浮点寄存器和向量寄存器的内容</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>display</td>
+<td>&nbsp;查看汇编指令</td>
+<td>display /3i $pc 显示当程序停止时，将要执行的汇编指令（一次看几条）</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>disassemble main</td>
+<td>查看main函数的汇编</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set disassembly-flavor</td>
+<td>设置汇编指令格式</td>
+<td>
+<p>set disassembly-flavor intel 改为intel 格式</p>
+<p>set disassembly-flavor att 改为AT&amp;T</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>set disassemble-next-line</td>
+<td>设置反汇编后续代码</td>
+<td>
+<p>set disassemble-next-line on (任意情况都反汇编)</p>
+<p>set disassemble-net-line auto 在没有源码的情况下才反汇编</p>
+<p>set disassemble-net-line off</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>disassemble</td>
+<td>反汇编代码</td>
+<td>
+<p>disassemble /m func函数&nbsp; 将函数代码和汇编指令映射起来（每一条c语句都对应了汇编）</p>
+<p>disassemble 代码开始地址，代码结束地址。可以查看指定起始地址的代码的汇编代码（查看某一行对应的地址范围info line 13）</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<h3 id="blogTitle12"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.10 信号</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令（对收到的信号处理）</td>
+<td>&nbsp;</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td rowspan="3">handle signal_xxx</td>
+<td>stop/nostop</td>
+<td>
+<p>设置信号发生时，是否暂停程序</p>
+<p>设置stop，默认print。设置noprint ，默认nostop</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>print/noprint</td>
+<td>设置信号发生时，是否打印</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>pass/nopass</td>
+<td>
+<p>设置信号发生时，是否把信号丢给程序处理</p>
+<p>nopass表示不给程序。<strong>三种选项可一同设置</strong></p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span>info signals 
+Signal        Stop      Print   Pass to program Description
+SIGHUP        Yes       Yes     Yes             Hangup
+
+//Signal：表示信号量
+//stop：表示被调试程序有信号（SIGHUP）发生时，gdb是否会暂停程序
+//Print：表示被调试程序有信号（SIGHUP）发生时，gdb是否会打印相关信息
+//Pass to program： gdb是否会把这个信号发送给被调试程序</span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td colspan="2">命令（主动触发信号处理）&nbsp;</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td colspan="2">signal signal_xxxx&nbsp;</td>
+<td>发送信号signal_xxxx给进程</td>
+<td>
+<p>signal 0</p>
+<p>可以使程序从新运行，但不发信号给进程</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td colspan="2">$_siginfo</td>
+<td>
+<p>在gdb把信号丢给程序之前，</p>
+<p>可以通过$_siginfo 变量读取一些额外信号信息</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="blogTitle13"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.11 脚本/GDB配置文件</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<p>&nbsp;gdb 启动时读取home目录和当前目录下的配置文件，执行里面的命令（.gdbinit文件）</p>
+<div class="cnblogs_code"><div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/copycode.gif" alt="复制代码"></a></span></div>
+<pre><span># 常见列入 .gdbinit文件的配置，可自行配置
+# 保存历史命令
+set history filename ~/<span>.gdb_history
+set<span> history save on
+
+# 退出时不显示提示信息
+set<span> confirm off
+
+# 按照派生类型打印对象
+set print object<span> on
+
+# 打印数组的索引下标
+set print array-<span>indexes on
+
+# 每行打印一个结构体成员
+set print pretty on</span></span></span></span></span></span></pre>
+<div class="cnblogs_code_toolbar"><span class="cnblogs_code_copy"><a href="javascript:void(0);" onclick="copyCnblogsCode(this)" title="复制代码"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/copycode.gif" alt="复制代码"></a></span></div></div>
+<p>&nbsp;</p>
+<div class="cnblogs_code">
+<pre>//gdb 支持的脚本文件:一种为gdb自身命令的脚本，.gdbinit gdb启动时会执行里面的命令;第二种gdb还支持其他语言的脚本</pre>
+</div>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td colspan="2">命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td colspan="2">
+<p>shell 或&nbsp;!ls 或&nbsp;,ls</p>
+</td>
+<td>执行shell脚本</td>
+<td>shell cat 1.txt</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td rowspan="3">set script-extension</td>
+<td>off</td>
+<td>所有的脚本文件都解析成gdb的命令脚本</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>soft</td>
+<td>
+<p>根据脚本文件扩展名决定如何解析脚本。</p>
+<p>如果gdb支持解析这种脚本语言（比如python），就按这种语言解析，否则就按命令脚本解析；</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>strict</td>
+<td>
+<p>根据脚本文件扩展名决定如何解析脚本。</p>
+<p>如果gdb支持解析这种脚本语言（比如python），就按这种语言解析，否则不解析；</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td colspan="2">show script-extension</td>
+<td>
+<p>查看GDB解析脚本文件格式</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<h3 id="blogTitle14"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.12 lib库/源文件</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<p>带*的表示库缺少调试信息</p>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>
+<p>info files</p>
+</td>
+<td>列出当前文件</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>info share</p>
+<p>或info sharedlibrary regex</p>
+</td>
+<td>
+<p>显示程序加载的共享链接库信息</p>
+<p>regex为正则表达式</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>directory</p>
+</td>
+<td>
+<p>gdb不能找到源文件位置，可以使用directory命令设置源文件的路径</p>
+</td>
+<td>directory&nbsp;源文件</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>set substitute-path</p>
+</td>
+<td>
+<p>当源文件路径改变时，设置新的源文件路径</p>
+</td>
+<td>set substitute-path 旧的路径 新的路径</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table></div>
+<p>&nbsp;</p>
+<h3 id="blogTitle15"><span style="background-color: rgba(0, 204, 255, 1)"><strong>2.13&nbsp;其他</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h3>
+<div class="table-wrapper"><table border="0">
+<tbody>
+<tr>
+<td>命令</td>
+<td>含义</td>
+<td>示例</td>
+<td>相关命令</td>
+</tr>
+<tr>
+<td>
+<p>make CFLAGS="-g -O0"</p>
+</td>
+<td>gdb里面可直接make编译程序</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>&nbsp;cd</p>
+</td>
+<td>
+<p>切换工作目录（路径）</p>
+</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>pwd</p>
+</td>
+<td>
+<p>查看当前工作目录（路径）</p>
+</td>
+<td>directory&nbsp;源文件</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>set prompt</p>
+</td>
+<td>
+<p>设置命令提示符（debug调试前面显示设置的字符），区分多个gdb。格</p>
+</td>
+<td>
+<p>set prompt (main gdb)&nbsp;</p>
+<p>（<strong>结尾有空</strong>）</p>
+</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>set env</p>
+</td>
+<td>&nbsp;设置被调试程序的环境变量</td>
+<td>&nbsp;set env LD_PRELOAD=/lib/libpthread.so.0</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>show version</p>
+</td>
+<td>查看gdb版本信息</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>show copying</p>
+</td>
+<td>查看gdb版权信息</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>show warranty</p>
+</td>
+<td>查看gdb版权信息</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>set confirm off&nbsp;</p>
+</td>
+<td>把退出时提示信息(Quit anyway?(y or n))关掉</td>
+<td>&nbsp;</td>
+<td>&nbsp;</td>
+</tr>
+<tr>
+<td>
+<p>tty</p>
+</td>
+<td>
+<p>为程序指定单独终端</p>
+<p>(gdb默认输出输入为同一个终端。)</p>
+</td>
+<td>
+<p>gdb -tty /dev/pts/2 ./a.out&nbsp;<br>或者tty /dev/pts/2</p>
+
+
+
+
+</td>
+<td>&nbsp;</td>
+
+
+
+
+</tr>
+
+
+
+
+</tbody>
+
+
+
+
+</table></div>
+<h2 id="blogTitle16">&nbsp;</h2>
+<p>&nbsp;</p>
+<h2 id="blogTitle17"><span style="background-color: rgba(0, 204, 255, 1)"><strong>3、附件：</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<p><a name="appendix_1" rel="noopener"></a><strong>1、调试无调试信息程序</strong></p>
+<p>在程序入口处打断点</p>
+<p>获取程序入口地址：</p>
+<div class="cnblogs_code">
+<pre>readlef -h a.out 中 ertry point addrss</pre>
+</div>
+<p>或者&nbsp;gdb 中 info files 中 entry point 可获取</p>
+<p>直接 b *程序起始地址，然后 run</p>
+<p>&nbsp;<strong>2、<a name="appendix_2" rel="noopener"></a>尾调用（tail call）</strong></p>
+<p>一个函数的最后一条指令是调用另外一个函数时，开启编译优化后，编译器尝尝将最后一个被调用的函数返回值直接作为调用者的返回值。</p>
+<p>&nbsp;3、gdb 打印不全</p>
+<div class="cnblogs_code">
+<pre>---Type &lt;<span style="color: rgba(0, 0, 255, 1)">return</span>&gt; to <span style="color: rgba(0, 0, 255, 1)">continue</span>, or q &lt;<span style="color: rgba(0, 0, 255, 1)">return</span>&gt; to quit---</pre>
+</div>
+<p>set pagination off</p>
+<p>&nbsp;</p>
+<h2 id="blogTitle18"><span style="background-color: rgba(0, 204, 255, 1)"><strong>4、参考：</strong></span><button class="cnblogs-toc-button" title="显示目录导航" aria-expanded="false"></button></h2>
+<p>https://wizardforcel.gitbooks.io/100-gdb-tips/content/set-program-args.html</p>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo"><div id="BlogPostCategory">
+    分类: 
+            <a href="https://www.cnblogs.com/tzj-kernel/category/1989883.html" target="_blank">GCC/GDB/KDB</a></div>
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(14909077,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow(&#39;c175fbf3-4d53-40fd-67bc-08d8d71b3f30&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/tzj-kernel/" target="_blank"><img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/20210301231624.png" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/tzj-kernel/">红旗kernel</a><br>
+            <a href="https://home.cnblogs.com/u/tzj-kernel/followers/">粉丝 - <span class="follower-count">0</span></a>
+            <a href="https://home.cnblogs.com/u/tzj-kernel/followees/">关注 - <span class="following-count">15</span></a><br>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow" class="follow-tip">
+                <a href="javascript:void(0);" onclick="follow(&#39;c175fbf3-4d53-40fd-67bc-08d8d71b3f30&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(14909077,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">0</span>
+    </div>
+    <div class="buryit" onclick="votePost(14909077,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/tzj-kernel/p/14908745.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/tzj-kernel/p/14908745.html" data-featured-image="" title="发布于 2021-06-20 21:59">readme</a>
+    <br>
+    <a href="https://www.cnblogs.com/tzj-kernel/p/14928834.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/tzj-kernel/p/14928834.html" data-featured-image="" title="发布于 2021-06-24 22:19">pstack </a>
+
+</div>
+</div>
+        </div>
+        <p class="postfoot">
+            posted on 
+<span id="post-date">2021-06-20 22:36</span>&nbsp;
+<a href="https://www.cnblogs.com/tzj-kernel/">红旗kernel</a>&nbsp;
+阅读(<span id="post_view_count">484</span>)&nbsp;
+评论(<span id="post_comment_count">0</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=14909077" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(14909077);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: &#39;&#39;, targetType: &#39;blogPost&#39;, targetId: &#39;14909077&#39;, targetLink: &#39;https://www.cnblogs.com/tzj-kernel/p/14909077.html&#39;, title: &#39;gdb  调试常用命令&#39; })">举报</a>
+        </p>
+    </div>
+</div>
+
+
+<script>
+    var cb_entryId = 14909077, cb_entryCreatedDate = '2021-06-20 22:36', cb_postType = 1, cb_postTitle = 'gdb  调试常用命令';
+    var allowComments = true, cb_blogId = 688106, cb_blogApp = 'tzj-kernel', cb_blogUserGuid = 'c175fbf3-4d53-40fd-67bc-08d8d71b3f30';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");
+    updatePostStats(
+            [cb_entryId],
+            function(id, count) { $("#post_view_count").text(count) },
+            function(id, count) { $("#post_comment_count").text(count) })
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="https://www.cnblogs.com/tzj-kernel/p/14909077.html#" onclick="return RefreshPage();">刷新页面</a><a href="https://www.cnblogs.com/tzj-kernel/p/14909077.html#top">返回顶部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><div class="login_tips">
+    登录后才能查看或发表评论，立即 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return account.login(&#39;!comments&#39;);">登录</a> 或者
+    <a href="https://www.cnblogs.com/">逛逛</a> 博客园首页
+</div>
+</div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"><a href="https://click.aliyun.com/m/1000365553/" target="_blank" onclick="gtag(&#39;event&#39;, &#39;click&#39;, {&#39;event_category&#39;: &#39;ad&#39;, &#39;event_label&#39;: &#39;T2-阿里云-新人特惠&#39;})">【推荐】阿里云新人特惠，爆款云服务器2核4G低至0.46元/天</a><br><a href="https://cloud.tencent.com/act/cps/redirect?redirect=3274&amp;cps_key=6a15b90f1178f38fb09b07f16943cf3e&amp;from=console" target="_blank" onclick="gtag(&#39;event&#39;, &#39;click&#39;, {&#39;event_category&#39;: &#39;ad&#39;, &#39;event_label&#39;: &#39;T2-腾讯云&#39;})">【推荐】腾讯云云产品年终特惠，轻量应用服务器6.58元/月起</a><br></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="under-post-card">
+            <div id="div-gpt-ad-1592365906576-0" style="width: 300px; height: 250px;" data-google-query-id="CNCx47PY6fwCFQs3vQodhwkACw"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt none; display: inline-block; width: 300px; height: 250px;"><iframe frameborder="0" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/container.html" id="google_ads_iframe_/1090369/C1_0" title="3rd party ad content" name="" scrolling="no" marginwidth="0" marginheight="0" width="300" height="250" data-is-safeframe="true" sandbox="allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-top-navigation-by-user-activation" role="region" aria-label="Advertisement" tabindex="0" data-google-container-id="1" style="border: 0px; vertical-align: bottom;" data-load-complete="true"></iframe></div></div>
+    </div>
+    <div id="under_post_card1"><div class="under-post-card">
+<b>编辑推荐：</b>
+<br>
+
+· <a href="https://www.cnblogs.com/jiujuan/p/17066590.html" target="_blank">微服务架构学习与思考：从单体架构到微服务架构的演进历程</a>
+    <br>
+· <a href="https://www.cnblogs.com/wzh2010/p/15888525.html" target="_blank">MQ 系列11：如何保证消息可靠性传输</a>
+    <br>
+· <a href="https://www.cnblogs.com/makemylife/p/17063284.html" target="_blank">聊聊我与流式计算的故事</a>
+    <br>
+· <a href="https://www.cnblogs.com/tcjiaan/p/17065118.html" target="_blank">［ASP.NET Core］用配置文件来设置授权角色</a>
+    <br>
+· <a href="https://www.cnblogs.com/liuyangfirst/p/17064173.html" target="_blank">探究：初学者编程语言的选择</a>
+    <br>
+</div></div>
+    <div id="under_post_card2"><div class="itnews under-post-card">
+    <b>阅读排行：</b>
+    <br>
+ ·          <a href="https://www.cnblogs.com/nezhaSoft/p/17068767.html" target="_blank">自从学习了MongoDB高可用，慢慢的喜欢上了它，之前确实冷落了</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/smartloli/p/17069184.html" target="_blank">ChatGPT开发实战</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/nullnuo/p/17068843.html" target="_blank">windows11预览版装WSA心得</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/tangyanzhi1111/p/17068468.html" target="_blank">.Net 7 托管Main入口的四种写法（茴香豆？）</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/xueweihan/p/17069622.html" target="_blank">《HelloGitHub》第 82 期</a>
+        <br>
+</div></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+
+
+</div>
+</div>
+<div id="leftmenu">
+
+
+<h3>导航</h3>
+<ul>
+    <li>
+        <a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+
+    </li>
+    <li>
+        
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/tzj-kernel/">
+首页</a>
+
+    </li>
+    <li>
+        
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+
+    </li>
+    <li>
+        
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E7%BA%A2%E6%97%97kernel">
+联系</a>
+    </li>
+    <li>
+        
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/tzj-kernel/rss/">
+订阅</a>
+        
+<a id="blog_nav_rss_image" href="https://www.cnblogs.com/tzj-kernel/rss/">
+    <img src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/xml.gif" alt="订阅">
+</a>
+    </li>
+    <li>
+        
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+
+    </li>
+</ul>
+
+
+<div id="blog-calendar" style="">
+
+<table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar" border="0">
+    <tbody>
+        <tr>
+            <td colspan="7">
+                <table class="CalTitle" cellspacing="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2022/12/28&#39;); return false;">&lt;</a>
+                            </td>
+                            <td align="center">2023年1月</td>
+                            <td align="right" class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2023/02/28&#39;); return false;">&gt;</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    <tr>
+        <th class="CalDayHeader" align="center" abbr="日" scope="col">日</th>
+        <th class="CalDayHeader" align="center" abbr="一" scope="col">一</th>
+        <th class="CalDayHeader" align="center" abbr="二" scope="col">二</th>
+        <th class="CalDayHeader" align="center" abbr="三" scope="col">三</th>
+        <th class="CalDayHeader" align="center" abbr="四" scope="col">四</th>
+        <th class="CalDayHeader" align="center" abbr="五" scope="col">五</th>
+        <th class="CalDayHeader" align="center" abbr="六" scope="col">六</th>
+    </tr>
+            <tr>
+                        <td class="CalWeekendDay" align="center">
+                            1
+                        </td>
+                        <td class="" align="center">
+                            2
+                        </td>
+                        <td class="" align="center">
+                            3
+                        </td>
+                        <td class="" align="center">
+                            <a href="https://www.cnblogs.com/tzj-kernel/archive/2023/01/04.html"><u>4</u></a>
+                        </td>
+                        <td class="" align="center">
+                            5
+                        </td>
+                        <td class="" align="center">
+                            6
+                        </td>
+                    <td class="CalWeekendDay" align="center">
+                        7
+                    </td>
+            </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            8
+                        </td>
+                            <td class="" align="center">
+                                9
+                            </td>
+                            <td class="" align="center">
+                                10
+                            </td>
+                            <td class="" align="center">
+                                11
+                            </td>
+                            <td class="" align="center">
+                                12
+                            </td>
+                            <td class="" align="center">
+                                13
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            14
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            15
+                        </td>
+                            <td class="" align="center">
+                                16
+                            </td>
+                            <td class="" align="center">
+                                17
+                            </td>
+                            <td class="" align="center">
+                                18
+                            </td>
+                            <td class="" align="center">
+                                19
+                            </td>
+                            <td class="" align="center">
+                                20
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            21
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            22
+                        </td>
+                            <td class="" align="center">
+                                23
+                            </td>
+                            <td class="" align="center">
+                                24
+                            </td>
+                            <td class="" align="center">
+                                25
+                            </td>
+                            <td class="" align="center">
+                                26
+                            </td>
+                            <td class="" align="center">
+                                27
+                            </td>
+                        <td class="CalTodayDay" align="center">
+                            28
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            29
+                        </td>
+                            <td class="" align="center">
+                                30
+                            </td>
+                            <td class="" align="center">
+                                31
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                1
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                2
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                3
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            4
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalOtherMonthDay" align="center">
+                            5
+                        </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                6
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                7
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                8
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                9
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                10
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            11
+                        </td>
+                </tr>
+    </tbody>
+</table></div><script>loadBlogDefaultCalendar();</script>
+<div id="sidebar_news" class="newsItem"><meta name="vs_showGrid" content="False">
+<h3>公告</h3>
+
+<div id="blog-news">
+    
+    <div id="profile_block">
+        昵称：
+        <a href="https://home.cnblogs.com/u/tzj-kernel/">
+            红旗kernel
+        </a>
+        <br>
+        园龄：
+        <a href="https://home.cnblogs.com/u/tzj-kernel/" title="入园时间：2021-03-01">
+            1年10个月
+        </a>
+        <br>
+        粉丝：
+        <a class="follower-count" href="https://home.cnblogs.com/u/tzj-kernel/followers/">
+            0
+        </a>
+        <br>
+        关注：
+        <a class="folowing-count" href="https://home.cnblogs.com/u/tzj-kernel/followees/">
+            15
+        </a>
+        <div id="p_b_follow" class="follow-tip">
+<a href="javascript:void(0)" onclick="follow(&#39;c175fbf3-4d53-40fd-67bc-08d8d71b3f30&#39;)">+加关注</a></div>
+        <script>getFollowStatus('c175fbf3-4d53-40fd-67bc-08d8d71b3f30');</script>
+    </div>
+</div>
+
+</div>
+<div id="sidebar_c3"></div>
+<div id="blog-sidecolumn"><!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block">
+<h3 class="catListTitle">
+常用链接
+</h3>
+<ul>
+    <li><a href="https://www.cnblogs.com/tzj-kernel/p/" title="我的博客的随笔列表">我的随笔</a></li>
+<li><a href="https://www.cnblogs.com/tzj-kernel/MyComments.html" title="我的发表过的评论列表">我的评论</a></li>
+<li><a href="https://www.cnblogs.com/tzj-kernel/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li>
+<li><a href="https://www.cnblogs.com/tzj-kernel/comments" title="我的博客的评论列表">最新评论</a></li>
+<li><a href="https://www.cnblogs.com/tzj-kernel/tag/" title="我的博客的标签列表">我的标签</a></li>
+
+</ul>
+</div>
+
+<!-- 最新随笔 -->
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block"></div>
+
+<!-- 积分与排名 -->
+
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+
+    <h3>
+        
+    <a class="sidebar-card-title-a" href="https://www.cnblogs.com/tzj-kernel/categories">随笔分类</a>
+
+
+
+    </h3>
+    <ul>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/1985604.html" class="category-item-link" rel="" target="">/C/C++/shell(6)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/2167941.html" class="category-item-link" rel="" target="">API（自我封装）(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/2017242.html" class="category-item-link" rel="" target="">docker(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/1989883.html" class="category-item-link" rel="" target="">GCC/GDB/KDB(5)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/1985605.html" class="category-item-link" rel="" target="">kernel基础知识(2)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/2093836.html" class="category-item-link" rel="" target="">perf(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/2017236.html" class="category-item-link" rel="" target="">USB(3)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/1989882.html" class="category-item-link" rel="" target="">常用工具(7)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/2238057.html" class="category-item-link" rel="" target="">进程管理(2)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/2048678.html" class="category-item-link" rel="" target="">内存管理(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/2090168.html" class="category-item-link" rel="" target="">问题单(2)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/category/2103215.html" class="category-item-link" rel="" target="">性能优化(1)</a>
+
+            </li>
+        
+    </ul>
+    <h3>
+        
+随笔档案
+
+
+    </h3>
+    <ul>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2023/01.html" class="category-item-link" rel="" target="">2023年1月(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2022/12.html" class="category-item-link" rel="" target="">2022年12月(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2022/11.html" class="category-item-link" rel="" target="">2022年11月(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2022/09.html" class="category-item-link" rel="" target="">2022年9月(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2022/08.html" class="category-item-link" rel="" target="">2022年8月(2)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2022/07.html" class="category-item-link" rel="" target="">2022年7月(2)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2022/05.html" class="category-item-link" rel="" target="">2022年5月(4)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2022/04.html" class="category-item-link" rel="" target="">2022年4月(2)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2022/02.html" class="category-item-link" rel="" target="">2022年2月(2)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2022/01.html" class="category-item-link" rel="" target="">2022年1月(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2021/12.html" class="category-item-link" rel="" target="">2021年12月(1)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2021/09.html" class="category-item-link" rel="" target="">2021年9月(2)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2021/08.html" class="category-item-link" rel="" target="">2021年8月(4)</a>
+
+            </li>
+            <li data-category-list-item-visible="true" style="display: block">
+                
+<a href="https://www.cnblogs.com/tzj-kernel/archive/2021/06.html" class="category-item-link" rel="" target="">2021年6月(4)</a>
+
+            </li>
+        
+    </ul>
+</div>
+
+<!-- 最新评论 -->
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block">
+<div id="topview_posts_wrap">
+    <h3 class="catListTitle">
+        <a href="https://www.cnblogs.com/tzj-kernel/most-viewed" class="sidebar-card-title-a">
+    阅读排行榜
+</a>
+
+    </h3>
+    <div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/tzj-kernel/p/16196166.html">
+                            1. 获取 cpu 时钟周期数（cpu cycle）(1391)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tzj-kernel/p/15307231.html">
+                            2. 热插拔机制：hotplug(1275)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tzj-kernel/p/16506032.html">
+                            3. gcc 中weak弱函数(739)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tzj-kernel/p/15770009.html">
+                            4. 系统root用户登录失败(661)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/tzj-kernel/p/15256390.html">
+                            5. USB抓包usbmon(549)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block"><div id="topfeedback_posts_wrap">
+    <h3 class="catListTitle">
+        <a href="https://www.cnblogs.com/tzj-kernel/most-commented" class="sidebar-card-title-a">评论排行榜</a>
+
+    </h3>
+    <div id="TopFeedbackPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/tzj-kernel/p/15256390.html">
+                            1. USB抓包usbmon(2)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block"></div><div id="sidebar_recentcomments" class="sidebar-block"><div id="recent_comments_wrap" class="RecentComment">
+    <h3 class="catListTitle"><a href="https://www.cnblogs.com/tzj-kernel/comments" class="sidebar-card-title-a">最新评论</a></h3>    
+    <div class="RecentCommentBlock">
+        <ul>
+                <li class="recent_comment_title"><a href="https://www.cnblogs.com/tzj-kernel/p/15256390.html">1. Re:USB抓包usbmon</a></li>
+                <li class="recent_comment_body">@范文俊 看的很细致的，的确，此处写错了，非常感谢哈！...</li>
+                <li class="recent_comment_author">--红旗kernel</li>
+                <li class="recent_comment_title"><a href="https://www.cnblogs.com/tzj-kernel/p/15256390.html">2. Re:USB抓包usbmon</a></li>
+                <li class="recent_comment_body"><p>文章非常棒，有个小疏漏：表格中，等时传输时Zi,Zo.不是Ii，Io。</p>
+</li>
+                <li class="recent_comment_author">--范文俊</li>
+        </ul>
+    </div>
+</div></div>
+
+
+</div>
+                    <script>loadBlogSideColumn();</script>
+
+</div>
+</div>
+<div class="clear"></div>
+<div id="footer">
+<p id="footer">
+	Powered by: 
+	<br>
+	
+	<a href="https://www.cnblogs.com/" id="footer_site_link">博客园</a>
+	<br>
+	Copyright © 2023 红旗kernel
+<br><span id="poweredby">Powered by .NET 7.0 on Kubernetes</span>
+
+</p>
+
+
+</div>
+</div>
+
+
+
+
+
+<input type="hidden" id="antiforgery_token" value="CfDJ8GXQNXLgcs5PrnWvMs4xAGMww8gFI7crdzycdG3DoHnDhZ0FYeKq8PuiCXKMpko-nqu0-n0hxez40gpcrD7MyMAUg7NLTISOP6yCJVqN2K6THPUAnBXSM3jdSKEfsoy9VrOzJJeVeyfI0dPxu9usIuQ">
+<script async="" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/js"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    var kv = getGACustom();
+    if (kv) {
+        gtag('set', kv);
+    }
+    gtag('config', 'UA-476124-1');
+</script>
+<script defer="" src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/hm.js.下载"></script><iframe src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/container(1).html" style="visibility: hidden; display: none;"></iframe>
+
+<div class="uprightsideBar" id="uprightsideBar"><div id="sideBarTab"><h2>目录导航</h2></div><div id="sideBarContents" style="display: none;"><dl><dd name="0">预备知识：</dd><dd name="1">1、gdb 命令行可带参数</dd><dd name="2">2、gdb 调试可使用命令及参数</dd><dd class="indent3" name="3">2.1 断点</dd><dd class="indent3" name="4">2.2 运行/调试/退出程序</dd><dd class="indent3" name="5">2.3 函数/堆栈/帧</dd><dd class="indent3" name="6">2.4 打印/查看命令</dd><dd class="indent3" name="7">2.5 coredump文件</dd><dd class="indent3" name="8">2.6 进程/线程</dd><dd class="indent3" name="9">2.7 观察点/异常捕获</dd><dd class="indent3" name="10">2.8 日志相关</dd><dd class="indent3" name="11">2.9 汇编/寄存器</dd><dd class="indent3" name="12">2.10 信号</dd><dd class="indent3" name="13">2.11 脚本/GDB配置文件</dd><dd class="indent3" name="14">2.12 lib库/源文件</dd><dd class="indent3" name="15">2.13&nbsp;其他</dd><dd name="16">&nbsp;</dd><dd name="17">3、附件：</dd><dd name="18">4、参考：</dd></dl></div></div><iframe src="./gdb 调试常用命令 - 红旗kernel - 博客园_files/aframe.html" width="0" height="0" style="display: none;"></iframe></body></html>

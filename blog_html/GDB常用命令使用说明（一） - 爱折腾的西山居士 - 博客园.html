@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<!-- saved from url=(0053)https://www.cnblogs.com/xsln/p/gdb_instructions1.html -->
+<html lang="zh-cn" style="--olcb-folder-code-block-max-height:80vh;"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="origin-when-cross-origin">
+    <meta name="description" content="本文由霸气的菠萝原创，转载请注明出处：http://www.cnblogs.com/xsln/p/gdb_instructions1.html全部关于gdb的文章索引请点这里GDB（GNU Debug">
+    <meta property="og:description" content="本文由霸气的菠萝原创，转载请注明出处：http://www.cnblogs.com/xsln/p/gdb_instructions1.html全部关于gdb的文章索引请点这里GDB（GNU Debug">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园</title>
+    <link id="favicon" rel="shortcut icon" href="https://common.cnblogs.com/favicon.svg" type="image/svg+xml">
+    
+    <style>#home :not(.cnblogs_code):not(.cnblogs_Highlighter)>pre:not([highlighted]):not([class*="brush:"]) code:not(.hljs), :not(.cnblogs_code):not(.cnblogs_Highlighter)>pre:not([highlighted]):not([class*="brush:"]) code:not(.hljs) {background: rgb(245, 245, 245);
+        padding: 12px;
+        border: 1px solid rgb(204, 204, 204);
+        border-radius: 3px;
+        border-color: transparent;
+        color: rgb(68, 68, 68);
+        font-family: "Courier New", sans-serif;
+        font-size: 12px</style><link rel="stylesheet" href="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/blog-common.min.css">
+    
+
+    <link id="MainCss" rel="stylesheet" href="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/bundle-coffee.min.css">
+        <link id="highlighter-theme-cnblogs" type="text/css" rel="stylesheet" href="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/cnblogs.css">
+    
+    
+    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/bundle-coffee-mobile.min.css">
+    
+    <link type="application/rss+xml" rel="alternate" href="https://www.cnblogs.com/xsln/rss">
+    <link type="application/rsd+xml" rel="EditURI" href="https://www.cnblogs.com/xsln/rsd.xml">
+    <link type="application/wlwmanifest+xml" rel="wlwmanifest" href="https://www.cnblogs.com/xsln/wlwmanifest.xml">
+    <script type="text/javascript" async="" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/analytics.js.下载"></script><script>
+        var currentBlogId = 174831;
+        var currentBlogApp = 'xsln';
+        var isLogined = false;
+        var isBlogOwner = false;
+        var skinName = 'coffee';
+        var visitorUserId = '';
+        var hasCustomScript = false;
+        try {
+            if (hasCustomScript && document.referrer && document.referrer.indexOf('baidu.com') >= 0) {
+                Object.defineProperty(document, 'referrer', { value: '' });
+                Object.defineProperty(Document.prototype, 'referrer', { get: function(){ return ''; } });
+            }
+        } catch(error) { }
+        window.cb_enable_mathjax = false;
+        window.mathEngine = 0;
+        window.codeHighlightEngine = 1;
+        window.enableCodeLineNumber = false;
+        window.codeHighlightTheme = 'cnblogs';
+        window.darkModeCodeHighlightTheme = 'vs2015';
+        window.isDarkCodeHighlightTheme = false;
+        window.isDarkModeCodeHighlightThemeDark = true;
+        window.isDisableCodeHighlighter = false;
+        window.enableCodeThemeTypeFollowSystem = false;
+    </script>
+        <script>
+            var currentPostDateAdded = '2016-01-22 18:06';
+        </script>
+    <script src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/jquery-2.2.0.min.js.下载"></script>
+    <script src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/blog-common.min.js.下载"></script><style>.medium-zoom-overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity 300ms;
+  will-change: opacity;
+}
+
+.medium-zoom--opened .medium-zoom-overlay {
+  cursor: pointer;
+  cursor: zoom-out;
+  opacity: 1;
+}
+
+.medium-zoom-image {
+  cursor: pointer;
+  cursor: zoom-in;
+  /*
+    The `transition` is marked as "!important" for the animation to happen
+    even though it's overriden by another inline `transition` style attribute.
+
+    This is problematic with frameworks that generate inline styles on their
+    images (e.g. Gatsby).
+
+    See https://github.com/francoischalifour/medium-zoom/issues/110
+   */
+  transition: transform 300ms cubic-bezier(0.2, 0, 0.2, 1) !important;
+}
+
+.medium-zoom-image--hidden {
+  visibility: hidden;
+}
+
+.medium-zoom-image--opened {
+  position: relative;
+  cursor: pointer;
+  cursor: zoom-out;
+  will-change: transform;
+}
+</style><script id="hljs-script" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/highlight.min.js.下载" type="text/javascript" defer=""></script>
+    
+
+    
+<meta http-equiv="origin-trial" content="Az6AfRvI8mo7yiW5fLfj04W21t0ig6aMsGYpIqMTaX60H+b0DkO1uDr+7BrzMcimWzv/X7SXR8jI+uvbV0IJlwYAAACFeyJvcmlnaW4iOiJodHRwczovL2RvdWJsZWNsaWNrLm5ldDo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A+USTya+tNvDPaxUgJooz+LaVk5hPoAxpLvSxjogX4Mk8awCTQ9iop6zJ9d5ldgU7WmHqBlnQB41LHHRFxoaBwoAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXN5bmRpY2F0aW9uLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><meta http-equiv="origin-trial" content="A7FovoGr67TUBYbnY+Z0IKoJbbmRmB8fCyirUGHavNDtD91CiGyHHSA2hDG9r9T3NjUKFi6egL3RbgTwhhcVDwUAAACLeyJvcmlnaW4iOiJodHRwczovL2dvb2dsZXRhZ3NlcnZpY2VzLmNvbTo0NDMiLCJmZWF0dXJlIjoiUHJpdmFjeVNhbmRib3hBZHNBUElzIiwiZXhwaXJ5IjoxNjgwNjUyNzk5LCJpc1N1YmRvbWFpbiI6dHJ1ZSwiaXNUaGlyZFBhcnR5Ijp0cnVlfQ=="><script src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/pubads_impl_2023011901.js.下载" async=""></script><link rel="preload" href="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/f.txt" as="script"><script type="text/javascript" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/f.txt"></script></head>
+<body class="skin-coffee has-navbar">
+<a name="top"></a>
+<div id="top_nav" class="navbar forpc">
+    <nav id="nav_main" class="navbar-main">
+        <ul id="nav_left" class="navbar-list navbar-left">
+            <li class="navbar-branding">
+                <a href="https://www.cnblogs.com/" title="开发者的网上家园" role="banner">
+                    <img src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/logo.svg" alt="博客园Logo">
+                </a>
+            </li>
+            <li>
+                <a href="https://www.cnblogs.com/" onclick="countClicks(&#39;skin-navbar-sitehome&#39;)">首页</a>
+            </li>
+            <li>
+                <a href="https://news.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-news&#39;)">新闻</a>
+            </li>
+            <li>
+                <a href="https://q.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-q&#39;)">博问</a>
+            </li>
+            <li>
+                <a id="nav_brandzone" href="https://brands.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-brands&#39;)">专区</a>
+            </li>
+            <li>
+                <a href="https://ing.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-ing&#39;)">闪存</a>
+            </li>
+            <li>
+                <a href="https://edu.cnblogs.com/" onclick="countClicks(&#39;nav&#39;, &#39;skin-navbar-edu&#39;)">班级</a>
+            </li>
+        </ul>
+        <ul id="nav_right" class="navbar-list navbar-right">
+            <li>
+                <form id="zzk_search" class="navbar-search" action="https://zzk.cnblogs.com/s" method="get" role="search">
+                    <input name="w" id="zzk_search_input" placeholder="代码改变世界" type="search" tabindex="3">
+                    <button type="submit" id="zzk_search_button">
+                        <img src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/search.svg" alt="搜索">
+                    </button>
+                </form>
+            </li>
+            <li id="navbar_login_status" class="navbar-list">
+                <a class="navbar-user-info navbar-blog" href="https://i.cnblogs.com/EditPosts.aspx?opt=1" alt="写随笔" title="写随笔" style="display: none;">
+                    <img id="new_post_icon" class="navbar-icon" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/newpost.svg" alt="写随笔">
+                </a>
+                <a id="navblog-myblog-icon" class="navbar-user-info navbar-blog" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx" alt="我的博客" title="我的博客" style="display: none;">
+                    <img id="myblog_icon" class="navbar-icon" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/myblog.svg" alt="我的博客">
+                </a>
+                <a class="navbar-user-info navbar-message navbar-icon-wrapper" href="https://msg.cnblogs.com/" alt="短消息" title="短消息" style="display: none;">
+                    <img id="msg_icon" class="navbar-icon" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/message.svg" alt="短消息">
+                    <span id="msg_count" style="display: none"></span>
+                </a>
+                <a id="navbar_lite_mode_indicator" data-current-page="blog" style="display: none" href="javascript:void(0)" alt="简洁模式" title="简洁模式启用，您在访问他人博客时会使用简洁款皮肤展示">
+                    <img class="navbar-icon" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/lite-mode-on.svg" alt="简洁模式">
+                </a>
+                <div id="user_info" class="navbar-user-info dropdown" style="display: none;">
+                    <a class="dropdown-button" href="https://home.cnblogs.com/">
+                        <img id="user_icon" class="navbar-avatar" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/avatar-default.svg" alt="用户头像">
+                    </a>
+                    <div class="dropdown-menu">
+                        <a id="navblog-myblog-text" href="https://passport.cnblogs.com/GetBlogApplyStatus.aspx">我的博客</a>
+                        <a href="https://home.cnblogs.com/">我的园子</a>
+                        <a href="https://account.cnblogs.com/settings/account">账号设置</a>
+                        <a href="javascript:void(0)" id="navbar_lite_mode_toggle" title="简洁模式会使用简洁款皮肤显示所有博客">
+    简洁模式 <img id="navbar_lite_mode_on" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/lite-mode-check.svg" class="hide"><span id="navbar_lite_mode_spinner" class="hide">...</span>
+</a>
+                        <a href="javascript:void(0)" onclick="account.logout();">退出登录</a>
+                    </div>
+                </div>
+                <a class="navbar-anonymous" href="https://account.cnblogs.com/signup" style="display: inline;">注册</a>
+                <a class="navbar-anonymous" href="javascript:void(0);" onclick="account.login()" style="display: inline;">登录</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+
+
+
+<!--done-->
+<div id="home">
+<div id="header">
+	<div id="blogTitle">
+	<a href="https://www.cnblogs.com/xsln/"><img id="blogLogo" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/logo.gif" alt="返回主页"></a>			
+		
+<!--done-->
+<h1><a id="Header1_HeaderTitle" class="headermaintitle HeaderMainTitle" href="https://www.cnblogs.com/xsln/">爱折腾的西山居士</a>
+</h1>
+<h2>------------------------------西山流年</h2>
+
+
+
+
+		
+	</div><!--end: blogTitle 博客的标题和副标题 -->
+</div><!--end: header 头部 -->
+
+<div id="main">
+	<div id="mainContent">
+	<div class="forFlow">
+		<div id="navigator">
+			
+<ul id="navList">
+	<li><a id="blog_nav_sitehome" class="menu" href="https://www.cnblogs.com/">
+博客园</a>
+</li>
+	<li>
+<a id="blog_nav_myhome" class="menu" href="https://www.cnblogs.com/xsln/">
+首页</a>
+</li>
+	<li>
+
+<a id="blog_nav_newpost" class="menu" href="https://i.cnblogs.com/EditPosts.aspx?opt=1">
+新随笔</a>
+</li>
+	<li>
+<a id="blog_nav_contact" class="menu" href="https://msg.cnblogs.com/send/%E7%88%B1%E6%8A%98%E8%85%BE%E7%9A%84%E8%A5%BF%E5%B1%B1%E5%B1%85%E5%A3%AB">
+联系</a></li>
+	<li>
+<a id="blog_nav_admin" class="menu" href="https://i.cnblogs.com/">
+管理</a>
+</li>
+	<li>
+<a id="blog_nav_rss" class="menu" href="javascript:void(0)" data-rss="https://www.cnblogs.com/xsln/rss/">
+订阅</a>
+	
+<a id="blog_nav_rss_image" href="https://www.cnblogs.com/xsln/rss/">
+    <img src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/xml.gif" alt="订阅">
+</a></li>
+</ul>
+
+
+
+			<div class="blogStats">
+				
+				<!--done-->
+随笔- 9&nbsp;
+文章- 0&nbsp;
+评论- 13&nbsp;
+阅读- 
+<span title="总阅读数: 94256">
+94256</span>&nbsp;
+
+
+
+				
+			</div><!--end: blogStats -->
+		</div><!--end: navigator 博客导航栏 -->
+		<div id="post_detail">
+<!--done-->
+<div id="topics">
+	<div class="post">
+		<h1 class="postTitle">
+			
+<a id="cb_post_title_url" class="postTitle2 vertical-middle" href="https://www.cnblogs.com/xsln/p/gdb_instructions1.html">
+    <span role="heading" aria-level="2">GDB常用命令使用说明（一）</span>
+    
+</a>
+
+		</h1>
+		<div class="clear"></div>
+		<div class="postBody">
+			<div id="cnblogs_post_body" class="blogpost-body blogpost-body-html">
+<p><strong>本文由霸气的菠萝原创，转载请注明出处：http://www.cnblogs.com/xsln/p/gdb_instructions1.html</strong></p>
+<p><a title="GDB常用命令" href="http://www.cnblogs.com/xsln/p/gdb_instructions.html" target="_blank" rel="noopener"><strong>全部关于gdb的文章索引请点这里</strong></a></p>
+<p>GDB（GNU Debugger）是在Unix以及类Unix系统下的调试工具。功能极其强大，几乎涵盖了你所需要的全部功能。&nbsp;<br>GDB主要帮忙你完成下面四个方面的功能：&nbsp;<br>1.启动你的程序，可以按照你的定制要求随心所欲的运行程序。&nbsp;<br>2.可让被调试的程序在你所指定的调置的断点处停住。&nbsp;<br>3.当程序被停住时，可以检查此时你的程序中所发生的事，以及内存状态等。&nbsp;<br>4.动态的改变你程序的执行环境。</p>
+<p>&nbsp;</p>
+<p>gdb使用总旨：help指令很强大！多用help！help里面总会有你需要的信息。如果你不知道如何使用help，请在gdb里面输入：help all</p>
+<p>&nbsp;</p>
+<p>&nbsp;一、gdb使用前置条件：编译时加入debug信息。</p>
+<p>&nbsp; &nbsp; gcc/g++是在编译时加入-g，其他语言请自行百度。值得注意的是，-g分4个等级：</p>
+<ol>
+<li>-g0等于不加-g。即不包含任何信息</li>
+<li>-g1只包含最小信息，一般来说只有你不需要debug，只需要backtrace信息，并且真的很在意程序大小，或者有其他保密/特殊需求时才会使用-g1。</li>
+<li>–g2为gdb默认等级，包含绝大多数你需要的信息。</li>
+<li>–g3包含一些额外信息，例如包含宏定义信息。当你需要调试宏定义时，请使用-g3</li>
+
+
+</ol>
+<p>&nbsp;</p>
+<p>二、gdb最常见的几个用法：</p>
+<p>&nbsp; &nbsp; &nbsp;1.&nbsp;调试程序。有几种方法可以在gdb下运行你的程序：</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 1)&nbsp;&nbsp;&nbsp; gdb ${你的程序} 进入gdb后，输入run(简写r) ${arg1} ${arg2} … ${argN}</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;2)&nbsp;&nbsp;&nbsp; gdb --args ${你的程序} ${arg1} ${arg2} … ${argN} 进入gdb后，运行run。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;3)&nbsp;&nbsp;&nbsp; gdb进入gdb后，输入file ${你的程序}。然后使用set args &nbsp;${arg1} ${arg2} … ${argN} 设定好你的程序参数，再运行run。</p>
+<p>&nbsp; &nbsp; &nbsp;2. 调试正在运行的程序：</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; gdb ${你的程序} ${程序pid}</p>
+<p>&nbsp; &nbsp; &nbsp;3.&nbsp;查core：</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;gdb ${你的程序} ${core文件}</p>
+<p>&nbsp;</p>
+<p>三、gdb常用命令：</p>
+<p>&nbsp; &nbsp; &nbsp;1.&nbsp;backtrace：显示栈信息。简写为bt。</p>
+<p>&nbsp; &nbsp; &nbsp;2.&nbsp;frame x 切换到第x帧。其中x会在bt命令中显示，从0开始。0表示栈顶。简写为f。</p>
+<p>&nbsp; &nbsp; &nbsp;3.&nbsp;up/down x 往栈顶/栈底移动x帧。当不输入x时，默认为1。</p>
+<p>&nbsp; &nbsp; &nbsp;4.&nbsp;print x打印x的信息，x可以是变量，也可以是对象或者数组。简写为p。</p>
+<p>&nbsp; &nbsp; &nbsp;5.&nbsp;print */&amp;x 打印x的内容/地址。</p>
+<p>&nbsp; &nbsp; &nbsp;6.&nbsp;call 调用函数。注意此命令需要一个正在运行的程序。</p>
+<p>&nbsp; &nbsp; &nbsp;7.&nbsp;set substitute-path from_path&nbsp; to_path，替换源码文件路径。当编译机与运行程序的机器代码路径不同时，需要使用该指令替换代码路径，否则你无法在gdb中看到源码。</p>
+<p>&nbsp; &nbsp; &nbsp;8.&nbsp;break x.cpp:n 在x.cpp的第n行设置断点，然后gdb会给出断点编号m。命令可简写为b。后面会对break命令进行更详细的解释。</p>
+<p>&nbsp; &nbsp; &nbsp;9.&nbsp;command m 设置程序执行到断点m时要看的内容，例如：</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;command n</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp; &gt;printf "x is %d\n",x</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt;c</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &gt;end</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;如果command后面没有参数n，则命令被赋给最后一个breakpoint，这其实是说break和command连在一起用，在脚本里用就非常方便了。gdb脚本会在后面详细介绍</p>
+<p>&nbsp; &nbsp; &nbsp;10.&nbsp;x /nfu ${addr} 打印addr的内容。addr可以是任何合法的地址表达式，例如0x562fb3d，一个当前有效的指针变量p，或者一个当前有效的变量var的地址&amp;var。nfu是格式，n表示查看的长度，F表示格式（例如16进制或10进制），U表示单位（例如单字节b，双字h，四字w等）。举个栗子：</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;(gdb) x /3xw&nbsp;0x562fb3d //这个指令的意思为：以16进制格式显示地址0x562fb3d处3个单位，每个单位四字节的内容。你将得到下列数值：</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;0x562fb3d:&nbsp;&nbsp;&nbsp; 0x00282ff4&nbsp;&nbsp;&nbsp; 0x080484e0&nbsp;&nbsp;&nbsp; 0x00000000</p>
+<p>&nbsp; &nbsp; &nbsp;11.&nbsp;continue 继续运行程序。进入调试模式后，若你已经获取了你需要的信息或者需要程序继续运行时使用。可简写为c</p>
+<p>&nbsp; &nbsp; &nbsp;12.&nbsp;until 执行到当前循环完成。可简写为u</p>
+<p>&nbsp; &nbsp; &nbsp;13.&nbsp;step 单步调试，步入当前函数。可简写为s</p>
+<p>&nbsp; &nbsp; &nbsp;14.&nbsp;next 单步调试，步过当前函数。可简写为n</p>
+<p>&nbsp; &nbsp; &nbsp;15.&nbsp;finish 执行到当前函数返回</p>
+<p>&nbsp; &nbsp; &nbsp;16.&nbsp;set var x=10 改变当前变量x的值。也可以这样用：set {int}0x83040 = 10把内存地址0x83040的值强制转换为int并赋值为10</p>
+<p>&nbsp; &nbsp; &nbsp;17.&nbsp;info locals 打印当前栈帧的本地变量</p>
+<p>&nbsp; &nbsp; &nbsp;18.&nbsp;jump使当前执行的程序跳转到某一行，或者跳转到某个地址。由于只会使程序跳转而不会改变栈值，因此若跳出函数到另外的地方 会导致return出错。另外，熟悉汇编的人都知道，程序运行时，有一个寄存器用于保存当前代码所在的内存地址。所以，jump命令也就是改变了这个寄存器中的值。于是，你可以使用“set $pc”来更改跳转执行的地址。如： set $pc = 0x485</p>
+<p>&nbsp; &nbsp; &nbsp;19.&nbsp;return: 强制函数返回。可以指定返回值</p>
+<p>&nbsp;</p>
+<p>&nbsp;四、程序中断机制：监视点(watchpoint)、断点(breakpoint)和捕捉点(catchpoint)：</p>
+<p>&nbsp;&nbsp; &nbsp; &nbsp;1.&nbsp;监视点。监视点是监视内存中某个地址，当该地址的数据被改变（或者被读取）时，程序交出控制权进入调试器。注意监视点分为软件模式和硬件模式：GDB 使用软件监视点的方式是在单步执行你的程序的同时测试变量的值，所以执行程序的速度会变慢。同时，软件监视点仅在当前线程有效。幸运的是，32 位的 Intel x86 处理器提供了 4 个特殊的调试寄存器用来方便调试程序，GDB 可以使用这些寄存器建立硬件监视点。GDB 总是会优先使用硬件监视点，因为这样不会减慢程序的执行速度。然而，可用的（enable的）硬件监视点的个数是有限的。如果你设置了过多的硬件监视点，当程序从中断的状态变为执行的状态（例如continue，until或者finish）时，GDB 可能无法把它们全部激活。另外，活动的硬件监视点的数量只有在试图继续执行程序时才能知道，也就是说，即使你设置了过多的硬件监视点，gdb在你运行程序之前也不会警告你。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 设置监视点的命令有3个，watch（写监视），rwatch（读监视）以及awatch（读写监视）。他们的使用方法一样，皆为以下几种：</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 1) (r/a)watch x。x是一个变量名。当x的值改变/被读取时，程序交出控制权进入调试器。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 2)&nbsp;(r/a)watch 0xN。N为一个有效地址。当该地址的内容变化/被读取时，程序交出控制权进入调试器。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 3)&nbsp;(r/a)watch *(int *)0xN。N为一个有效地址。当该地址的中的int指针指向的内容变化/被读取时，程序交出控制权进入调试器。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 4)&nbsp;(r/a)watch -l *(int *)0xN。N为一个有效地址。当该地址的中的int指针指向的内容变化/被读取，或者该地址的内容变化/被读取时，程序交出控制权进入调试器。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 注意3)和4)的区别在于，当加入-l选项后，会同时监视表达式本身以及表达式指向的内容。</p>
+<p>&nbsp; &nbsp; &nbsp;2.&nbsp;断点是指当执行到程序某一步时，程序交出控制权进入调试器。值得注意的是，break会有一些变体：tbreak，hbreak，thbreak与rbreak。tbreak与break功能相同，只是所设置的断点在触发一次后自动删除。hbreak是一个硬件断点。thbreak则既是一个临时的硬件断点。注意硬件断点需要硬件支持，某些硬件可能不支持这种类型的断点。rbreak稍微特殊一些，它会在匹配正则表达式的全部位置加上断点，后面会有详细讲解。除去rbreak，其他break家族的使用方法如下：</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 1) (t/h)break x.cpp:y 。在代码x.cpp的第y行加入断点。x.cpp若不指定，则会以当前执行的文件作为断点文件。若程序未执行，则以包含main函数的源代码文件作为断点文件。若x.cpp和y都不指定，则以当前debugger的点作为断点处。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 2) (t/h)break&nbsp;0xN。在地址N处加入断点。N必须为一个有效的代码段（code segment）地址。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 3) (t/h)break&nbsp;&nbsp;x.cpp:func。在x.cpp的func函数入口处加入断点。x.cpp可以不提供直接使用break func。注意由于重载(overload)的存在，因此gdb可能会询问你希望在哪个函数加上断点。你也可以通过指定参数类型来避免该问题，例如break func(int ,char *)</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 4) (t/h)break &nbsp;+/-N。在当前运行处的第N行后/前加入断点。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 5) rbreak REGEXP。 在所有符合正则表达式REGEXP的函数入口加入断点。例如rbeak EX_* 表示在所有符合以EX_开头的函数入口处加入断点。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 注意break后面还有2个可选参数，线程id和条件。线程id指在info threads中的线程序号，而非系统提供的tid。例如break x.cpp:y 2 if (a==24)，表示在2号线程的x.cpp的第y行加入断点，并且只有当a的值为24时，程序才会交出控制权进入调试器。</p>
+<p>&nbsp; &nbsp; &nbsp; &nbsp; 另外，breakpoints可以通过save命令保存，以方便使用者下次再次进入程序调试时不需要重设断点。</p>
+<p>&nbsp; &nbsp; &nbsp;3.&nbsp;捕捉点是当某些事件发生时，程序交出控制权进入调试器。例如catch一个exception，assert，signal，fork甚至syscall。tcatch与catch功能一样，只是所设置的捕捉点在触发一次后自动删除。以后会详细介绍catchpoint。</p>
+<p>&nbsp;</p>
+<p>五、跟踪点(tracepoint)：</p>
+<p>&nbsp; &nbsp; &nbsp;跟踪点与上面三个断点不同之处在于，它只是跟踪记录信息而不会中断程序的运行。当你的程序是realtime程序，或者与其他的程序有交互时，你可能会希望使用跟踪点达到监视程序而又不破坏程序自身行为的目的。与断点相同的是，跟踪点会保存下在跟踪点时的一些内存信息供使用者查阅，例如数组或者对象。</p>
+<p>&nbsp;&nbsp; &nbsp; 另外，tracepoints可以通过save命令保存，以方便使用者下次再次进入程序调试时不需要重设这些跟踪点。</p>
+<p>六、检查点(checkpoint)：</p>
+<p>&nbsp; &nbsp; &nbsp;gdb可以保存某一个时间点的程序状态或者说是程序映像，并且稍后又可以返回到这个状态。这个称之为checkpoint。</p>
+<p>&nbsp; &nbsp; &nbsp;每个检查点是进程的一个拷贝。这样当一个bug很难重现，而又担心调试过头了又要从头开始重现时，可以在估计要重现这个bug之前，做一个checkpoint，这样即使debug过头了，也可以从这个checkpoint开始，而不用重启整个程序并且期待它重现这个bug（也许需要很久！！）。</p>
+<p>&nbsp; &nbsp; &nbsp;但是每个checkpoint有一个唯一的进程id，这个pid与原始程序的pid不同，因此如果程序需要使用pid的信息时，需要慎重考虑。</p>
+</div>
+<div class="clear"></div>
+<div id="blog_post_info_block" role="contentinfo">
+
+
+    <div id="blog_post_info">
+<div id="green_channel">
+        <a href="javascript:void(0);" id="green_channel_digg" onclick="DiggIt(5152012,cb_blogId,1);green_channel_success(this,&#39;谢谢推荐！&#39;);">好文要顶</a>
+        <a id="green_channel_follow" onclick="follow(&#39;6e9b65f2-1483-e311-8d02-90b11c0b17d6&#39;);" href="javascript:void(0);">关注我</a>
+    <a id="green_channel_favorite" onclick="AddToWz(cb_entryId);return false;" href="javascript:void(0);">收藏该文</a>
+    <a id="green_channel_weibo" href="javascript:void(0);" title="分享至新浪微博" onclick="ShareToTsina()"><img src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/icon_weibo_24.png" alt=""></a>
+    <a id="green_channel_wechat" href="javascript:void(0);" title="分享至微信" onclick="shareOnWechat()"><img src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/wechat.png" alt=""></a>
+</div>
+<div id="author_profile">
+    <div id="author_profile_info" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/xsln/" target="_blank"><img src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/sample_face.gif" class="author_avatar" alt=""></a>
+        <div id="author_profile_detail" class="author_profile_info">
+            <a href="https://home.cnblogs.com/u/xsln/">爱折腾的西山居士</a><br>
+            <a href="https://home.cnblogs.com/u/xsln/followers/">粉丝 - <span class="follower-count">8</span></a>
+            <a href="https://home.cnblogs.com/u/xsln/followees/">关注 - <span class="following-count">0</span></a><br>
+        </div>
+    </div>
+    <div class="clear"></div>
+    <div id="author_profile_honor"></div>
+    <div id="author_profile_follow" class="follow-tip">
+                <a href="javascript:void(0);" onclick="follow(&#39;6e9b65f2-1483-e311-8d02-90b11c0b17d6&#39;);return false;">+加关注</a>
+    </div>
+</div>
+<div id="div_digg">
+    <div class="diggit" onclick="votePost(5152012,&#39;Digg&#39;)">
+        <span class="diggnum" id="digg_count">2</span>
+    </div>
+    <div class="buryit" onclick="votePost(5152012,&#39;Bury&#39;)">
+        <span class="burynum" id="bury_count">0</span>
+    </div>
+    <div class="clear"></div>
+    <div class="diggword" id="digg_tips">
+    </div>
+</div>
+
+<script type="text/javascript">
+    currentDiggType = 0;
+</script></div>
+    <div class="clear"></div>
+    <div id="post_next_prev">
+
+    <a href="https://www.cnblogs.com/xsln/p/5151951.html" class="p_n_p_prefix">« </a> 上一篇：    <a href="https://www.cnblogs.com/xsln/p/5151951.html" data-featured-image="" title="发布于 2016-01-22 17:41">Unity优化----drawcall系列</a>
+    <br>
+    <a href="https://www.cnblogs.com/xsln/p/ptrace.html" class="p_n_p_prefix">» </a> 下一篇：    <a href="https://www.cnblogs.com/xsln/p/ptrace.html" data-featured-image="" title="发布于 2016-02-02 11:42">GDB调试原理——ptrace系统调用</a>
+
+</div>
+</div>
+		</div>
+		<div class="postDesc">posted @ 
+<span id="post-date">2016-01-22 18:06</span>&nbsp;
+<a href="https://www.cnblogs.com/xsln/">爱折腾的西山居士</a>&nbsp;
+阅读(<span id="post_view_count">35156</span>)&nbsp;
+评论(<span id="post_comment_count">1</span>)&nbsp;
+<a href="https://i.cnblogs.com/EditPosts.aspx?postid=5152012" rel="nofollow">编辑</a>&nbsp;
+<a href="javascript:void(0)" onclick="AddToWz(5152012);return false;">收藏</a>&nbsp;
+<a href="javascript:void(0)" onclick="reportManager.report({ currentUserId: &#39;&#39;, targetType: &#39;blogPost&#39;, targetId: &#39;5152012&#39;, targetLink: &#39;https://www.cnblogs.com/xsln/p/gdb_instructions1.html&#39;, title: &#39;GDB常用命令使用说明（一）&#39; })">举报</a></div>
+	</div>
+	
+	
+</div><!--end: topics 文章、评论容器-->
+
+<script>
+    var cb_entryId = 5152012, cb_entryCreatedDate = '2016-01-22 18:06', cb_postType = 1, cb_postTitle = 'GDB常用命令使用说明（一）';
+    var allowComments = true, cb_blogId = 174831, cb_blogApp = 'xsln', cb_blogUserGuid = '6e9b65f2-1483-e311-8d02-90b11c0b17d6';
+    mermaidRender.render()
+    markdown_highlight()
+    zoomManager.apply("#cnblogs_post_body img:not(.code_img_closed):not(.code_img_opened)");
+    updatePostStats(
+            [cb_entryId],
+            function(id, count) { $("#post_view_count").text(count) },
+            function(id, count) { $("#post_comment_count").text(count) })
+</script>
+<a id="!comments"></a>
+<div id="blog-comments-placeholder"></div>
+<div id="comment_form" class="commentform">
+    <a name="commentform"></a>
+    <div id="divCommentShow"></div>
+    <div id="comment_nav"><span id="span_refresh_tips"></span><a href="javascript:void(0);" onclick="return RefreshCommentList();" id="lnk_RefreshComments" runat="server" clientidmode="Static">刷新评论</a><a href="https://www.cnblogs.com/xsln/p/gdb_instructions1.html#" onclick="return RefreshPage();">刷新页面</a><a href="https://www.cnblogs.com/xsln/p/gdb_instructions1.html#top">返回顶部</a></div>
+    <div id="comment_form_container" style="visibility: visible;"><div class="login_tips">
+    登录后才能查看或发表评论，立即 <a rel="nofollow" href="javascript:void(0);" class="underline" onclick="return account.login(&#39;!comments&#39;);">登录</a> 或者
+    <a href="https://www.cnblogs.com/">逛逛</a> 博客园首页
+</div>
+</div>
+    <div class="ad_text_commentbox" id="ad_text_under_commentbox"></div>
+        <div id="cnblogs_ch"><a href="https://click.aliyun.com/m/1000365553/" target="_blank" onclick="gtag(&#39;event&#39;, &#39;click&#39;, {&#39;event_category&#39;: &#39;ad&#39;, &#39;event_label&#39;: &#39;T2-阿里云-新人特惠&#39;})">【推荐】阿里云新人特惠，爆款云服务器2核4G低至0.46元/天</a><br><a href="https://cloud.tencent.com/act/cps/redirect?redirect=3274&amp;cps_key=6a15b90f1178f38fb09b07f16943cf3e&amp;from=console" target="_blank" onclick="gtag(&#39;event&#39;, &#39;click&#39;, {&#39;event_category&#39;: &#39;ad&#39;, &#39;event_label&#39;: &#39;T2-腾讯云&#39;})">【推荐】腾讯云云产品年终特惠，轻量应用服务器6.58元/月起</a><br></div>
+    <div id="opt_under_post"></div>
+    <div id="cnblogs_c1" class="under-post-card">
+            <div id="div-gpt-ad-1592365906576-0" style="width: 300px; height: 250px;" data-google-query-id="CKahnMbn6fwCFQmqvQodQuQBFw"><div id="google_ads_iframe_/1090369/C1_0__container__" style="border: 0pt none;"><iframe id="google_ads_iframe_/1090369/C1_0" name="google_ads_iframe_/1090369/C1_0" title="3rd party ad content" width="300" height="250" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" role="region" aria-label="Advertisement" tabindex="0" style="border: 0px; vertical-align: bottom;" data-load-complete="true" data-google-container-id="1" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/saved_resource.html"></iframe></div></div>
+    </div>
+    <div id="under_post_card1"><div class="under-post-card">
+<b>编辑推荐：</b>
+<br>
+
+· <a href="https://www.cnblogs.com/jiujuan/p/17066590.html" target="_blank">微服务架构学习与思考：从单体架构到微服务架构的演进历程</a>
+    <br>
+· <a href="https://www.cnblogs.com/wzh2010/p/15888525.html" target="_blank">MQ 系列11：如何保证消息可靠性传输</a>
+    <br>
+· <a href="https://www.cnblogs.com/makemylife/p/17063284.html" target="_blank">聊聊我与流式计算的故事</a>
+    <br>
+· <a href="https://www.cnblogs.com/tcjiaan/p/17065118.html" target="_blank">［ASP.NET Core］用配置文件来设置授权角色</a>
+    <br>
+· <a href="https://www.cnblogs.com/liuyangfirst/p/17064173.html" target="_blank">探究：初学者编程语言的选择</a>
+    <br>
+</div></div>
+    <div id="under_post_card2"><div class="itnews under-post-card">
+    <b>阅读排行：</b>
+    <br>
+ ·          <a href="https://www.cnblogs.com/nezhaSoft/p/17068767.html" target="_blank">自从学习了MongoDB高可用，慢慢的喜欢上了它，之前确实冷落了</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/smartloli/p/17069184.html" target="_blank">ChatGPT开发实战</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/nullnuo/p/17068843.html" target="_blank">windows11预览版装WSA心得</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/tangyanzhi1111/p/17068468.html" target="_blank">.Net 7 托管Main入口的四种写法（茴香豆？）</a>
+        <br>
+ ·          <a href="https://www.cnblogs.com/xueweihan/p/17069622.html" target="_blank">《HelloGitHub》第 82 期</a>
+        <br>
+</div></div>
+    <div id="HistoryToday" class="under-post-card"></div>
+    <script type="text/javascript">
+        var commentManager = new blogCommentManager();
+        commentManager.renderComments(0);
+        fixPostBody();
+        window.footnoteTipManager.generateFootnoteTips();
+
+            window.tocManager.displayDisableTocTips = false;
+            window.tocManager.generateToc();
+            
+                setTimeout(function() { countViews(cb_blogId, cb_entryId); }, 50);
+            
+            deliverT2();
+            deliverC1C2();
+            loadNewsAndKb();
+            
+                LoadPostCategoriesTags(cb_blogId, cb_entryId);
+            
+            LoadPostInfoBlock(cb_blogId, cb_entryId, cb_blogApp, cb_blogUserGuid);
+            GetPrevNextPost(cb_entryId, cb_blogId, cb_entryCreatedDate, cb_postType);
+            loadOptUnderPost();
+            GetHistoryToday(cb_blogId, cb_blogApp, cb_entryCreatedDate);
+                </script>
+</div>
+
+</div>
+
+
+	</div><!--end: forFlow -->
+	</div><!--end: mainContent 主体内容容器-->
+
+	<div id="sideBar">
+		<div id="sideBarMain">
+			<div id="sidebar_news" class="newsItem"><!--done-->
+<div class="newsItem">
+<h3 class="catListTitle">公告</h3>
+	
+<div id="blog-news">
+    
+    <div id="profile_block">
+        昵称：
+        <a href="https://home.cnblogs.com/u/xsln/">
+            爱折腾的西山居士
+        </a>
+        <br>
+        园龄：
+        <a href="https://home.cnblogs.com/u/xsln/" title="入园时间：2014-01-22">
+            9年
+        </a>
+        <br>
+        粉丝：
+        <a class="follower-count" href="https://home.cnblogs.com/u/xsln/followers/">
+            8
+        </a>
+        <br>
+        关注：
+        <a class="folowing-count" href="https://home.cnblogs.com/u/xsln/followees/">
+            0
+        </a>
+        <div id="p_b_follow" class="follow-tip">
+<a href="javascript:void(0)" onclick="follow(&#39;6e9b65f2-1483-e311-8d02-90b11c0b17d6&#39;)">+加关注</a></div>
+        <script>getFollowStatus('6e9b65f2-1483-e311-8d02-90b11c0b17d6');</script>
+    </div>
+</div>
+</div>
+
+</div>
+<div id="sidebar_c3"></div>
+			<div id="calendar"><div id="blog-calendar" style="">
+
+<table id="blogCalendar" class="Cal" cellspacing="0" cellpadding="0" title="Calendar" border="0">
+    <tbody>
+        <tr>
+            <td colspan="7">
+                <table class="CalTitle" cellspacing="0" border="0">
+                    <tbody>
+                        <tr>
+                            <td class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2022/12/28&#39;); return false;">&lt;</a>
+                            </td>
+                            <td align="center">2023年1月</td>
+                            <td align="right" class="CalNextPrev">
+                                <a href="javascript:void(0);" onclick="loadBlogCalendar(&#39;2023/02/28&#39;); return false;">&gt;</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    <tr>
+        <th class="CalDayHeader" align="center" abbr="日" scope="col">日</th>
+        <th class="CalDayHeader" align="center" abbr="一" scope="col">一</th>
+        <th class="CalDayHeader" align="center" abbr="二" scope="col">二</th>
+        <th class="CalDayHeader" align="center" abbr="三" scope="col">三</th>
+        <th class="CalDayHeader" align="center" abbr="四" scope="col">四</th>
+        <th class="CalDayHeader" align="center" abbr="五" scope="col">五</th>
+        <th class="CalDayHeader" align="center" abbr="六" scope="col">六</th>
+    </tr>
+            <tr>
+                        <td class="CalWeekendDay" align="center">
+                            1
+                        </td>
+                        <td class="" align="center">
+                            2
+                        </td>
+                        <td class="" align="center">
+                            3
+                        </td>
+                        <td class="" align="center">
+                            4
+                        </td>
+                        <td class="" align="center">
+                            5
+                        </td>
+                        <td class="" align="center">
+                            6
+                        </td>
+                    <td class="CalWeekendDay" align="center">
+                        7
+                    </td>
+            </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            8
+                        </td>
+                            <td class="" align="center">
+                                9
+                            </td>
+                            <td class="" align="center">
+                                10
+                            </td>
+                            <td class="" align="center">
+                                11
+                            </td>
+                            <td class="" align="center">
+                                12
+                            </td>
+                            <td class="" align="center">
+                                13
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            14
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            15
+                        </td>
+                            <td class="" align="center">
+                                16
+                            </td>
+                            <td class="" align="center">
+                                17
+                            </td>
+                            <td class="" align="center">
+                                18
+                            </td>
+                            <td class="" align="center">
+                                19
+                            </td>
+                            <td class="" align="center">
+                                20
+                            </td>
+                        <td class="CalWeekendDay" align="center">
+                            21
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            22
+                        </td>
+                            <td class="" align="center">
+                                23
+                            </td>
+                            <td class="" align="center">
+                                24
+                            </td>
+                            <td class="" align="center">
+                                25
+                            </td>
+                            <td class="" align="center">
+                                26
+                            </td>
+                            <td class="" align="center">
+                                27
+                            </td>
+                        <td class="CalTodayDay" align="center">
+                            28
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalWeekendDay" align="center">
+                            29
+                        </td>
+                            <td class="" align="center">
+                                30
+                            </td>
+                            <td class="" align="center">
+                                31
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                1
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                2
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                3
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            4
+                        </td>
+                </tr>
+                <tr>
+                        <td class="CalOtherMonthDay" align="center">
+                            5
+                        </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                6
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                7
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                8
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                9
+                            </td>
+                            <td class="CalOtherMonthDay" align="center">
+                                10
+                            </td>
+                        <td class="CalOtherMonthDay" align="center">
+                            11
+                        </td>
+                </tr>
+    </tbody>
+</table></div><script>loadBlogDefaultCalendar();</script></div>
+			
+			<div id="leftcontentcontainer">
+				<div id="blog-sidecolumn"><!-- 搜索 -->
+<div id="sidebar_search" class="sidebar-block">
+    <div id="sidebar_search" class="mySearch">
+        <h3 class="catListTitle">搜索</h3>
+        <div id="sidebar_search_box">
+            <div id="widget_my_zzk" class="div_my_zzk">
+                <input type="text" id="q" onkeydown="return zzk_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="zzk_go()" type="button" value="找找看" id="btnZzk" class="btn_my_zzk">
+            </div>
+            <div id="widget_my_google" class="div_my_zzk">
+                <input type="text" name="google_q" id="google_q" onkeydown="return google_go_enter(event);" class="input_my_zzk">&nbsp;<input onclick="google_go()" type="button" value="谷歌搜索" class="btn_my_zzk">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 常用链接 -->
+<div id="sidebar_shortcut" class="sidebar-block"><div class="catListLink">
+<h3 class="catListTitle">
+常用链接
+</h3>
+<ul>
+    <li><a href="https://www.cnblogs.com/xsln/p/" title="我的博客的随笔列表">我的随笔</a></li>
+<li><a href="https://www.cnblogs.com/xsln/MyComments.html" title="我的发表过的评论列表">我的评论</a></li>
+<li><a href="https://www.cnblogs.com/xsln/OtherPosts.html" title="我评论过的随笔列表">我的参与</a></li>
+<li><a href="https://www.cnblogs.com/xsln/comments" title="我的博客的评论列表">最新评论</a></li>
+<li><a href="https://www.cnblogs.com/xsln/tag/" title="我的博客的标签列表">我的标签</a></li>
+
+    <li><a id="itemListLink" onclick="this.blur();WarpClass(&#39;itemListLink&#39;, &#39;itemListLin_con&#39;);return false;" href="https://www.cnblogs.com/xsln/p/gdb_instructions1.html#">更多链接</a></li>
+</ul>
+</div>
+
+</div>
+
+<!-- 最新随笔 -->
+
+
+<!-- 我的标签 -->
+<div id="sidebar_toptags" class="sidebar-block"><div class="catListTag">
+    <h3 class="catListTitle"><a href="https://www.cnblogs.com/xsln/tag/" class="sidebar-card-title-a">我的标签</a></h3>
+<ul>
+        <li>
+            <a href="https://www.cnblogs.com/xsln/tag/%E6%8A%80%E6%9C%AF%E5%88%86%E4%BA%AB/">技术分享<span class="tag-count">(2)</span></a>
+        </li>
+        <li>
+            <a href="https://www.cnblogs.com/xsln/tag/Unity/">Unity<span class="tag-count">(2)</span></a>
+        </li>
+    
+
+</ul>
+</div>
+
+</div>
+
+<!-- 积分与排名 -->
+
+
+<!-- 随笔分类、随笔档案、文章分类、新闻分类、相册、链接 -->
+<div id="sidebar_categories">
+
+    <div class="catListPostCategory">
+        <h3 class="catListTitle">
+            
+    <a class="sidebar-card-title-a" href="https://www.cnblogs.com/xsln/categories">随笔分类</a>
+
+
+
+        </h3>
+
+        <ul>
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/xsln/category/574745.html" class="category-item-link" rel="" target="">测试思考(1)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/xsln/category/602116.html" class="category-item-link" rel="" target="">优化和库(3)</a>
+ 
+                </li>                
+            
+        </ul>
+    </div>    
+    <div class="catListPostArchive">
+        <h3 class="catListTitle">
+            
+随笔档案
+
+
+        </h3>
+
+        <ul>
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/xsln/archive/2016/02.html" class="category-item-link" rel="" target="">2016年2月(1)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/xsln/archive/2016/01.html" class="category-item-link" rel="" target="">2016年1月(6)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/xsln/archive/2014/08.html" class="category-item-link" rel="" target="">2014年8月(1)</a>
+ 
+                </li>                
+                <li data-category-list-item-visible="true" style="display: block">
+                    
+<a href="https://www.cnblogs.com/xsln/archive/2014/02.html" class="category-item-link" rel="" target="">2014年2月(1)</a>
+ 
+                </li>                
+            
+        </ul>
+    </div>    
+</div>
+
+<!-- 最新评论 -->
+<!-- 阅读排行榜 -->
+<div id="sidebar_topviewedposts" class="sidebar-block"><div class="catListView">
+    <h3 class="catListTitle">
+        <a href="https://www.cnblogs.com/xsln/most-viewed" class="sidebar-card-title-a">
+    阅读排行榜
+</a>
+
+    </h3>
+    <div id="TopViewPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/gdb_instructions1.html">
+                            1. GDB常用命令使用说明（一）(35155)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/ptrace.html">
+                            2. GDB调试原理——ptrace系统调用(20132)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/BeginProfiler.html">
+                            3. Unity3D中使用Profiler精确定位性能热点的优化技巧(14553)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/Introduction_TcMalloc.html">
+                            4. TcMalloc的介绍以及Windows下安装使用(7850)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/5151951.html">
+                            5. Unity优化----drawcall系列(7504)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 评论排行榜 -->
+<div id="sidebar_topcommentedposts" class="sidebar-block"><div class="catListFeedback">
+    <h3 class="catListTitle">
+        <a href="https://www.cnblogs.com/xsln/most-commented" class="sidebar-card-title-a">评论排行榜</a>
+
+    </h3>
+    <div id="TopFeedbackPostsBlock">
+        <ul style="word-break:break-all">
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/Introduction_TcMalloc.html">
+                            1. TcMalloc的介绍以及Windows下安装使用(8)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/BeginProfiler.html">
+                            2. Unity3D中使用Profiler精确定位性能热点的优化技巧(2)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/gdb_instructions1.html">
+                            3. GDB常用命令使用说明（一）(1)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/5151951.html">
+                            4. Unity优化----drawcall系列(1)
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.cnblogs.com/xsln/p/gdb_instructions.html">
+                            5. GDB常用命令系列(1)
+                        </a>
+                    </li>
+        </ul>
+    </div>
+</div></div>
+
+<!-- 推荐排行榜 -->
+<div id="sidebar_topdiggedposts" class="sidebar-block"><div id="topdigg_posts_wrap">
+    <div class="catListView">
+        <h3 class="catListTitle">
+            <a href="https://www.cnblogs.com/xsln/most-liked" class="sidebar-card-title-a">推荐排行榜</a>
+
+        </h3>
+        <div id="TopDiggPostsBlock">
+            <ul style="word-break: break-all">
+                        <li>
+                            <a href="https://www.cnblogs.com/xsln/p/BeginProfiler.html">
+                                1. Unity3D中使用Profiler精确定位性能热点的优化技巧(6)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/xsln/p/gdb_instructions1.html">
+                                2. GDB常用命令使用说明（一）(2)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/xsln/p/ptrace.html">
+                                3. GDB调试原理——ptrace系统调用(1)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/xsln/p/5151951.html">
+                                4. Unity优化----drawcall系列(1)
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.cnblogs.com/xsln/p/Animator_Override_Controller.html">
+                                5. Animator Override Controller学习及性能测试(1)
+                            </a>
+                        </li>
+            </ul>
+        </div>
+    </div>
+</div></div><div id="sidebar_recentcomments" class="sidebar-block"><div class="catListComment">
+<h3 class="catListTitle"><a href="https://www.cnblogs.com/xsln/comments" class="sidebar-card-title-a">最新评论</a></h3>
+    <div class="RecentCommentBlock">
+        <ul>
+                <li class="recent_comment_title"><a href="https://www.cnblogs.com/xsln/p/gdb_instructions.html">1. Re:GDB常用命令系列</a></li>
+                <li class="recent_comment_body"><p>不错。<br>
+GDB常用命令说明（二） 网页找不到了。</p>
+</li>
+                <li class="recent_comment_author">--GL0312</li>
+                <li class="recent_comment_title"><a href="https://www.cnblogs.com/xsln/p/5151951.html">2. Re:Unity优化----drawcall系列</a></li>
+                <li class="recent_comment_body">一些Unity的render不能被batch。比如shadow casters，摄像机的深度图和GUI都会batch.<br><br>最后这句少了个“不”字？</li>
+                <li class="recent_comment_author">--凌冬不凋</li>
+                <li class="recent_comment_title"><a href="https://www.cnblogs.com/xsln/p/gdb_instructions1.html">3. Re:GDB常用命令使用说明（一）</a></li>
+                <li class="recent_comment_body">写的很清晰！突然间发现了很多有用的指令。</li>
+                <li class="recent_comment_author">--ww3113306</li>
+                <li class="recent_comment_title"><a href="https://www.cnblogs.com/xsln/p/BeginProfiler.html">4. Re:Unity3D中使用Profiler精确定位性能热点的优化技巧</a></li>
+                <li class="recent_comment_body">如果Begin和End配对分析的是单帧结果，对异步加载怎么检测呢</li>
+                <li class="recent_comment_author">--sun_dust_shadow</li>
+                <li class="recent_comment_title"><a href="https://www.cnblogs.com/xsln/p/BeginProfiler.html">5. Re:Unity3D中使用Profiler精确定位性能热点的优化技巧</a></li>
+                <li class="recent_comment_body">我新建了一个工程，贴了你的代码，生成apk文件，安装在安卓手机上，之后跑软件。profiler连接上，也有滚动的出来了，但是我的behaviorUpdate一直是0；不知道哪里出了问题</li>
+                <li class="recent_comment_author">--迷失的山鬼</li>
+        </ul>
+    </div>
+</div>
+
+</div>
+
+
+</div>
+                    <script>loadBlogSideColumn();</script>
+			</div>
+			
+		</div><!--end: sideBarMain -->
+	</div><!--end: sideBar 侧边栏容器 -->
+	<div class="clear"></div>
+	</div><!--end: main -->
+	<div class="clear"></div>
+	<div id="footer">
+		<!--done-->
+Copyright © 2023 爱折腾的西山居士
+<br><span id="poweredby">Powered by .NET 7.0 on Kubernetes</span>
+
+
+
+	</div><!--end: footer -->
+</div><!--end: home 自定义的最大容器 -->
+
+
+
+
+
+<input type="hidden" id="antiforgery_token" value="CfDJ8GXQNXLgcs5PrnWvMs4xAGPFk3NC6r9eIIGvreM076VKbpgn25-lxdZB-ATc9eOgRBt4VPHVXtE2oPDec4FPdhRLGd0Qh2B352ev-2qpA6jHc3lkXtt6frgJu4smgiZb5Xttx8YF9-gNIvh4dz0eIfM">
+<script async="" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/js"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    var kv = getGACustom();
+    if (kv) {
+        gtag('set', kv);
+    }
+    gtag('config', 'UA-476124-1');
+</script>
+<script defer="" src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/hm.js.下载"></script><iframe src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/container.html" style="visibility: hidden; display: none;"></iframe>
+
+<iframe src="./GDB常用命令使用说明（一） - 爱折腾的西山居士 - 博客园_files/aframe.html" width="0" height="0" style="display: none;"></iframe></body></html>
