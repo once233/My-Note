@@ -2,18 +2,25 @@
 使用gdb调试c++程序 - 高胖 - 博客园
 https://www.cnblogs.com/gaopang/p/11588683.html
 
+----------------------------------------------------------------------
+生成core文件的条件
+1、ulimit -c unlimited 解除数据段长度限制（当前终端生效）
+2、有装core文件的文件夹，系统默认的会因为权限问题无法生成
+   查看当前core文件的生成路径：cat /proc/sys/kernel/core_pattern
+   改变生成路径：
+   ① /etc/sysctl.conf  最后一行增加 kernel.core_pattern= ${path} 以指定corefile生成路径，reboot后生效
+   ② sudo bash -c "echo ${path} > /proc/sys/kernel/core_pattern " 直接设置core文件的生成路径，临时的
+
+打开core文件：gdb ${filepath} ${corefile}
 
 ----------------------------------------------------------------------
 把gdb的打印输出到文件 3种
 1： gdb xxx | tee -a "file"
 2： run arg1 arg2 ... >output.log
-3:  
-(gdb) set logging file <file name>
-(gdb) set logging on
-(gdb) info functions
-(gdb) set logging off
-
-
+3:(gdb) set logging file <file name>
+  (gdb) set logging on
+  (gdb) info functions
+  (gdb) set logging off
 
 ----------------------------------------------------------------------
 gdb指令
