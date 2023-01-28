@@ -1,0 +1,2 @@
+把gdb的打印输出到文件
+gdb xxx | tee -a "file"
