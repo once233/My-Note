@@ -8,6 +8,8 @@ https://sourceware.org/gdb/documentation/
 gdb基本命令(非常详细)
 https://blog.csdn.net/yinjiabin/article/details/7732931
 ----------------------------------------------------------------------
+
+
 生成core文件的条件
 1、编译时要有-g参数
 2、ulimit -c unlimited 解除数据段长度限制（当前终端生效）
@@ -32,6 +34,17 @@ https://blog.csdn.net/yinjiabin/article/details/7732931
    -q	gdb        启动时，关掉提示或者打印信息 【gdb  -q a.out】
    -r(--readnow)     立即读入每一个符号文件的符号表,而不是默认的那种在需要时才渐次读入的方式。这将是初始阶段慢一点, 而以后执行将更快
 ----------------------------------------------------------------------
+
+
+无法追踪运行中的线程时
+sudo gedit /etc/sysctl.d/10-ptrace.conf
+修改kernel.yama.ptrace_scope = 0
+【about ptrace】https://wiki.ubuntu.com/SecurityTeam/Roadmap/KernelHardening#ptrace
+A PTRACE scope of "0" is the more permissive mode.  
+A scope of "1" limits PTRACE only to direct child processes
+----------------------------------------------------------------------
+
+
 把gdb的打印输出到文件 3种
 1： gdb xxx | tee -a "file"
 2： run arg1 arg2 ... >output.log
@@ -39,27 +52,28 @@ https://blog.csdn.net/yinjiabin/article/details/7732931
   (gdb) set logging on
   (gdb) info functions
   (gdb) set logging off
-
 ----------------------------------------------------------------------
+
+
 gdb指令
 (gdb) break xxx
 (gdb) b xxx	在源代码指定的某一行设置断点，其中 xxx 用于指定具体打断点的位置
-----------------------------------------------------------------------
+
 (gdb) run
 (gdb) r	执行被调试的程序，其会自动在第一个断点处暂停执行。<r arg1 arg2 ...>
-----------------------------------------------------------------------
+
 (gdb) continue
 (gdb) c	当程序在某一断点处停止运行后，使用该指令可以继续执行，直至遇到下一个断点或者程序结束。
-----------------------------------------------------------------------
+
 (gdb) next
 (gdb) n	令程序一行代码一行代码的执行。
-----------------------------------------------------------------------
+
 (gdb) print xxx
 (gdb) p xxx	打印指定变量的值，其中 xxx 指的就是某一变量名。
-----------------------------------------------------------------------
+
 (gdb) list
 (gdb) l	显示源程序代码的内容，包括各行代码所在的行号。
-----------------------------------------------------------------------
+
 (gdb) quit
 (gdb) q	终止调试。
 ----------------------------------------------------------------------
