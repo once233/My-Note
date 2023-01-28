@@ -1,5 +1,13 @@
-把gdb的打印输出到文件
-gdb xxx | tee -a "file"
+把gdb的打印输出到文件 3种
+1： gdb xxx | tee -a "file"
+2： run arg1 arg2 ... >output.log
+3:  
+(gdb) set logging file <file name>
+(gdb) set logging on
+(gdb) info functions
+(gdb) set logging off
+
+
 
 ----------------------------------------------------------------------
 gdb指令
