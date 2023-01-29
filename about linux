@@ -1,0 +1,5 @@
+增加路径环境变量
+1、在/etc/profile增加export PATH="$PATH:/home/" 全局加
+2、在~/.bashrc增加export PATH="$PATH:/home" 为选择用户加
+3、export PATH=/home:$PATH 临时增加
+修改后使用source profile使修改生效
