@@ -1,1 +1,1 @@
-
+查看rosservice的参数 rosservice type /spawn | rossrv show
