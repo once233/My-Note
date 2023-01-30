@@ -1,1 +1,2 @@
-查看rosservice的参数 rosservice type /spawn | rossrv show
+rosservice type /spawn | rossrv show 查看rosservice的参数
+ps -ef | grep -i rosmaster 查看roscore是否运行
