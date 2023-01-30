@@ -12,6 +12,7 @@ grep -E ‘Tech|Sales’ employee.txt -E:选项可以用来扩展选项为正则
 grep -e Tech -e Sales employee.txt -e:只能接一个关键字
 grep -E ‘Dev.*Tech’ employee.txt .*：与运算
 egrep ‘Manager|Developer’ employee.txt | grep -v Sales -v:反选，不包含后面关键字的
+grep -i 忽略大小写
 
 ps 查看进程
 ps -ef 和ps -aux 功能差不多，只是显示的内容略微不同
