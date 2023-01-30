@@ -3,3 +3,12 @@
 2、在~/.bashrc增加export PATH="$PATH:/home" 为选择用户加
 3、export PATH=/home:$PATH 临时增加
 修改后使用source profile使修改生效
+------------------------------------------------------
+
+常用命令
+grep 筛选文本内容：
+grep ‘Tech|Sales’ employee.txt 不加参数直接筛选
+grep -E ‘Tech|Sales’ employee.txt -E:选项可以用来扩展选项为正则表达式(== egrep ‘Tech|Sales’ employee.txt)
+grep -e Tech -e Sales employee.txt -e:只能接一个关键字
+grep -E ‘Dev.*Tech’ employee.txt .*：与运算
+egrep ‘Manager|Developer’ employee.txt | grep -v Sales -v:反选，不包含后面关键字的
