@@ -1,2 +1,7 @@
 rosservice type /spawn | rossrv show 查看rosservice的参数
 ps -ef | grep -i rosmaster 查看roscore是否运行
+
+
+
+rviz
+rviz  -d [文件名] ：rosrun rviz rviz -d `rospack find turtle_tf`/rviz/turtle_rviz.rviz
