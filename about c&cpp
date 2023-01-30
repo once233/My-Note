@@ -1,4 +1,6 @@
 main的参数：
 int argc: 于参数计数 输入的程序路径及名称也是一个参数所以参数最少为1
-char **argv or: char *argv[] ：一个指向字符串数组的指针，前者可用下标来找元素，后者只能用指针运算
+char **argv or: char *argv[] ：一个指向字符串数组的指针，差不多等价赋值方法不同
                                argv[0]指向输入的程序路径及名称 argv[n] 指向第n个参数字符串
+                               char **argv赋值： char **arg = (char**)malloc(3*sizeof(char*));
+                               都可以通过arg[n]来访问
