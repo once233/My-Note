@@ -16,3 +16,6 @@ grep -i 忽略大小写
 
 ps 查看进程
 ps -ef 和ps -aux 功能差不多，只是显示的内容略微不同
+
+反引号 ``
+rosrun rviz rviz -d `rospack find turtle_tf`/rviz/turtle_rviz.rviz 把指令输出当语句
