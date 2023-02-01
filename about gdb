@@ -18,7 +18,7 @@ https://blog.csdn.net/yinjiabin/article/details/7732931
    改变生成路径：
    ① /etc/sysctl.conf  最后一行增加 kernel.core_pattern= ${path} 以指定corefile生成路径，reboot后生效
    ② sudo bash -c "echo ${path} > /proc/sys/kernel/core_pattern " 直接设置core文件的生成路径，临时的
-
+   ③ filename_%e_%p_%t，可在路径后生成应用程序名，进程id，时间戳信息
 打开core文件：gdb ${filepath} ${corefile}
 
 详细指令方式打开： gdb -c ${corefile} -e ${filepath} --symbols ${filepath} --readnow
