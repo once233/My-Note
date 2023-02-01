@@ -35,5 +35,41 @@ tee -a ~/gdblog/`date "+%Y-%m-%d %H:%M:%s"`.txt 把输出的文件名设置为�
 ----------------------------------------------------------------------------
 
 
+find
+find [路径] [表达式选项] [行动]
+[表达式选项]
+-mount, -xdev	只检查和指定目录在同一个文件系统下的文件，避免列出其它文件系统中的文件
+-amin n	在过去 n 分钟内被读取过
+-anewer file	比文件 file 更晚被读取过的文件
+-atime n	在过去n天内被读取过的文件
+-cmin n	在过去 n 分钟内被修改过
+-cnewer file	比文件 file 更新的文件
+-ctime n	在过去n天内被修改过的文件
+-empty	空的文件-gid n or -group name
+-ipath p, -path p	路径名称符合 p 的文件，ipath 会忽略大小写
+-name name, -iname name	文件名称符合 name 的文件。iname 会忽略大小写
+-size n	文件大小 是 n 单位，b 代表 512 位元组的区块，c 表示字元数，k 表示 kilo bytes，w 是二个位元组。
+-type b/d/c/p/l/f	查是块设备、目录、字符设备、管道、符号链接、普通文件
+-perm	按执行权限来查找
+-user username	按文件属主来查找
+-group groupname	按组来查找
+-depth	指定查找目录深度
+-follow	如果遇到符号链接文件，就跟踪链接所指的文件
+-prune	忽略某个目录
+-maxdepth	指定查找目录最大深度
+-mindepth	指定查找目录最小深度
+-version	查看版本
+-help	获取帮助
+
+[行动]
+-delete	删除查找到的文件
+-exec command	对查找到的文件执行command命令
+-ok command	执行命令前需要进行确认
+-printf	格式化输出
+-------------------------------------------------------------
+
+
 一些宏的使用
 mkdir "$(date +%y)"
+
+
