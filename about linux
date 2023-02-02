@@ -78,4 +78,8 @@ find [路径] [表达式选项] [行动]
 一些宏的使用
 mkdir "$(date +%y)"
 
-
+[遇见的一些问题]
+解决apt的时候报错“server certificate verification failed”
+sudo touch /etc/apt/apt.conf.d/99verify-peer.conf
+&& sudo echo >>/etc/apt/apt.conf.d/99verify-peer.conf "Acquire { https::Verify-Peer false }"
+来解决
