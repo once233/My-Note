@@ -77,9 +77,33 @@ find [路径] [表达式选项] [行动]
 
 一些宏的使用
 mkdir "$(date +%y)"
+---------------------------------------------------------------
+
 
 [遇见的一些问题]
 解决apt的时候报错“server certificate verification failed”
 sudo touch /etc/apt/apt.conf.d/99verify-peer.conf
 && sudo echo >>/etc/apt/apt.conf.d/99verify-peer.conf "Acquire { https::Verify-Peer false }"
-来解决
+
+
+删除python导致无法启动图形界面，且无法联网
+解决：
+1. 输入账户密码（输入密码时注意小键盘是否开启）
+2. 安装桌面
+sudo apt-get install ubuntu-desktop
+如果无效，接着进行第三步。
+这里发现根本就没有下载资源安装成功。
+3. 先连接网络再装桌面
+（1）连接网络
+# 尝试联网
+sudo dhclient eth0
+# 如果显示cannot find device "eth0"
+# 执行以下命令查看网卡名称
+dmesg | grep eth
+# 发现eth0被重命名成了ens33
+# ens33：renamed from eth0
+# 重新联网
+sudo dhclient ens33
+# 测试是否成功
+ping www.baidu.com
+-------------------------------------------------------------------------
