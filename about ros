@@ -1,15 +1,16 @@
+[ros1]
 rosservice type /spawn | rossrv show 查看rosservice的参数
 ps -ef | grep -i rosmaster 查看roscore是否运行
-
+------------------------------------------------------------------------------------
 
 
 rviz
 rviz  -d [文件名] ：rosrun rviz rviz -d `rospack find turtle_tf`/rviz/turtle_rviz.rviz
-
+--------------------------------------------------------------------------------
 
 tf
 rosrun tf view_frames 可打印节点图
-
+-------------------------------------------------------------------------------------
 
 launch文件标签
 ■ <launch> 指roslaunch语句的开始和结束。
@@ -59,3 +60,9 @@ killall gzclient
 
 URDF
 惯性矩阵公式 https://mp.weixin.qq.com/s/3L8Lilesy2W_WY5qup0gmA
+-----------------------------------------------------------------------------------------
+
+
+[ros2]
+常用指令
+https://blog.csdn.net/aibingjin/article/details/123899829
