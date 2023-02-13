@@ -5,6 +5,12 @@
 修改后使用source profile使修改生效
 ------------------------------------------------------
 
+
+git加速网站
+git clone https://ghproxy.com/+git地址
+---------------------------------------------------------
+
+
 常用命令
 
 grep 筛选文本内容：
@@ -81,12 +87,12 @@ mkdir "$(date +%y)"
 
 
 [遇见的一些问题]
-解决apt的时候报错“server certificate verification failed”
+♥ 解决apt的时候报错“server certificate verification failed”
 sudo touch /etc/apt/apt.conf.d/99verify-peer.conf
 && sudo echo >>/etc/apt/apt.conf.d/99verify-peer.conf "Acquire { https::Verify-Peer false }"
 
 
-删除python导致无法启动图形界面，且无法联网
+♥ 删除python导致无法启动图形界面，且无法联网
 解决：
 1. 输入账户密码（输入密码时注意小键盘是否开启）
 2. 安装桌面
@@ -106,4 +112,43 @@ dmesg | grep eth
 sudo dhclient ens33
 # 测试是否成功
 ping www.baidu.com
+
+
+♥ 网络图标消失
+原因一 ：NetworkManager 未接管网络
+解决办法：nmcli networking on
+原因：
+在终端中输入以下命令，查看 NetworkManager 是否接管了网络：
+
+nmcli networking
+如果输出 disabled，则表示 NetworkManager 未接管网络，网络图标消失也是由此导致的。
+
+查看网卡，则会提示“未托管”：
+
+[root@localhost ~]# nmcli device status
+DEVICE TYPE STATE CONNECTION
+ens33 ethernet 未托管 –
+连接网卡（以 ens33 网卡为例），会提示失败：
+
+[root@localhost ~]# nmcli device connect ens33
+错误：添加/激活新连接失败：Connection ‘ens33’ is not available on device ens33 because device is strictly unmanaged
+
+原因二：NetworkManager 未运行
+解决办法：systemctl restart NetworkManager
+原因：
+在终端中输入以下命令，查看 NetworkManager 的运行状态：
+systemctl status NetworkManager
+如果显示Active: inactive (dead)，则表示 NetworkManager 未运行
+
+再次查看 NetworkManager 的运行状态会显示：Active: active (running)。
+建议将 NetworkManager 设为开机自启：
+systemctl enable NetworkManager
+查看是否开机启动：
+systemctl is-enabled NetworkManager
+
+原因三： 网络开关是关闭状态 显示 wired off
+以 centos 8 为例，点击右上角的小三角，点击 connect 开启网络就可以了。
+我发现每次开机都要去手动点一下，机器才能有网。得执行一下
+sed –i s/ONBOOT=no/ONBOOT=yes/ /etc/sysconfig/network-scripts/ifcfg-ens33
+将网卡设置为开机自启就会自动联网了。
 -------------------------------------------------------------------------
