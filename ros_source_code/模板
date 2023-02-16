@@ -1,0 +1,6 @@
+template<typename ParameterT>
+auto Node::declare_parameter(
+  const std::string & name,
+  const ParameterT & default_value,
+  const rcl_interfaces::msg::ParameterDescriptor & parameter_descriptor,
+  bool ignore_override)；
