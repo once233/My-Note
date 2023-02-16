@@ -23,7 +23,19 @@ LifecycleNode(用来管理节点)。这种节点有点像是状态机，会在�
 --------- 节点的onActivate回调函数会被调用。函数中应当做好开始执行前的最后准备，包括获得只在节点active期间会用到的资源，比如对硬件的访问。理想情况下，不应该在这里执行需要大量时间的准备工作（比如冗长的硬件初始化，我猜测可能是单目SLAM的初始化这种）。
 --------- 如果onActivate回调函数成功执行，就会被切换到Active状态。
 --------- 如果执行出错就会切换到ErrorProcessing
-
+♦ ♦ ♦ ♦ ♦ Deactivating
+--------- 节点的onDeactivate回调函数会被调用。函数中应当执行清除操作以便开始执行，并做onActivate中相反的操作。
+--------- 如果onDeactivate回调函数成功执行，就会被切换到Active状态。
+--------- 如果执行出错就会切换到ErrorProcessing
+♦ ♦ ♦ ♦ ♦ ShuttingDown
+--------- 节点的onShutdown回调函数会被调用。函数中应当执行销毁前的必要的清除。该状态应当可以从除了Finalized的所有状态进入，函数中应当将节点返回到初始状态。
+--------- 如果onShutdown回调函数成功执行，就会被切换到Finalized状态。
+--------- 如果执行出错就会切换到ErrorProcessing
+♦ ♦ ♦ ♦ ♦ ErrorProcessing
+--------- 该状态是清除所有错误的地方。可以从所有状态进入该状态。如果错误被成功处理，那么会返回到Unconfigured状态，如果没有执行所有的清理，那它必须失败然后切换到Finalized状态并等待销毁。
+--------- 到ErrorProcessing切换可以是回调函数（或是回调函数中的函数）中生成的错误返回值以及未捕获的异常。
+--------- 如果onError回调函数成功执行，就会被切换到Unconfigured状态。期望的是onError会清除先前状态的所有状态。比如说如果是从Active进入的，那么必须提供onDeactivate和onCleanup的来返回成功。
+--------- 如果执行出错就会切换到Finalized
 ♦ ♦ ♦ ♦ decative()->[Deactivating]->[Inactive]->cleanup()->[ClearningUp]->[Unconfigure]->[ShuttingDown]
 
 ♦ ♦ 状态：分为主要状态和次要状态
