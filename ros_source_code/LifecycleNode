@@ -8,6 +8,22 @@ LifecycleNode(用来管理节点)。这种节点有点像是状态机，会在�
 ♦ ♦ 状态机
 ♦ ♦ ♦ 工作流程：
 ♦ ♦ ♦ ♦ create()->configure()->[inactive?]->activate()->[Activating]->[Active]
+♦ ♦ ♦ ♦ ♦ Configuring:
+--------- conConfigure回调函数会被调用，来允许节点加载配置以及进行必要的设置。
+--------- 节点的配置通常都会涉及到一些在节点的生命周期中必须被执行一次的任务，比如说申请内存、配置不会改变的topic的发布/订阅等等。
+--------- 节点也会用此来设置一些它的整个生命周期中必须保留的资源（不论是active状态还是inactive状态），比如说topic的发布/订阅器，持续需要的内存空间以及初始的配置参数。
+--------- 如果conConfigure回调函数成功被调用，那么节点会切换到Inactive状态。
+--------- 如果回调函数出现失败代码（需要具体的代码），那么节点就会返回到Unconfigured状态。
+--------- 如果回调函数引发或return了别的值，则节点将转换为ErrorProcessing状态。
+♦ ♦ ♦ ♦ ♦ CleaningUp
+--------- 节点的onCleanup回调函数会被调用。函数中应当清除所有状态并返回到与初次创建时一样的状态。
+--------- 如果onCleanup回调函数成功执行，就会被切换到Unconfigured状态。
+--------- 如果执行出错就会切换到ErrorProcessing
+♦ ♦ ♦ ♦ ♦ Activating
+--------- 节点的onActivate回调函数会被调用。函数中应当做好开始执行前的最后准备，包括获得只在节点active期间会用到的资源，比如对硬件的访问。理想情况下，不应该在这里执行需要大量时间的准备工作（比如冗长的硬件初始化，我猜测可能是单目SLAM的初始化这种）。
+--------- 如果onActivate回调函数成功执行，就会被切换到Active状态。
+--------- 如果执行出错就会切换到ErrorProcessing
+
 ♦ ♦ ♦ ♦ decative()->[Deactivating]->[Inactive]->cleanup()->[ClearningUp]->[Unconfigure]->[ShuttingDown]
 
 ♦ ♦ 状态：分为主要状态和次要状态
@@ -18,7 +34,7 @@ LifecycleNode(用来管理节点)。这种节点有点像是状态机，会在�
 ♦ ♦ ♦ ♦ 已完成 - 节点已被销毁。 仅用于调试。
 
 ♦ ♦ ♦ 次要状态 - 瞬态。 处理过渡，执行标准化的回调函数。用户代码在此处实现：
-♦ ♦ ♦ ♦ 配置 - 执行 onConfigure() - 加载配置、冗长的设置步骤、获取节点生命周期内使用的资源，如常量发布者/侦听器、内存缓冲区分配等…
+♦ ♦ ♦ ♦ 配置 - 执行 onConfigure() - 加载配置、冗长的设置步骤、获取节点生命周期内使用的资源，如常量发布者/侦听器、内存缓冲区分配等…[Configuring]
 ♦ ♦ ♦ ♦ 清理 - 执行 onCleanup() - 放弃资源，擦除内存。 新的开始，清理状态。
 ♦ ♦ ♦ ♦ 激活 - 执行 onActivate() - 获取传感器等短期资源，激活所有资源。 设置时间短。 启动主节点任务。
 ♦ ♦ ♦ ♦ 停用 - 执行 onDeactivate() - 反向Activatingsteps（反激活）。 暂停执行，释放短期资源。
@@ -35,13 +51,18 @@ LifecycleNode(用来管理节点)。这种节点有点像是状态机，会在�
 ♦ ♦ ♦ ♦ ♦ ♦ /get_transition_graph - 显示完整状态机
 ♦ ♦ ♦ ♦ ♦ 主题：
 ♦ ♦ ♦ ♦ ♦ ♦ /<node_name>__transition_event - 发布正在进行的转换
-♦ ♦ ♦ ♦ 生命周期命令行接口：
+♦ ♦ ♦ ♦ ♦ 生命周期命令行接口：
+♦ ♦ ♦ ♦ ♦ ♦ ros2 lifecycle nodes - 列出所有 LC 节点
+♦ ♦ ♦ ♦ ♦ ♦ ros2 lifecycle get - 列出指定节点或所有 LC 节点的当前状态。
+♦ ♦ ♦ ♦ ♦ ♦ ros2 lifecycle list - 列出指定节点可能的下一个状态和相应的转换调用（名称和 ID）。
+♦ ♦ ♦ ♦ ♦ ♦ ros2 lifecycle set - 在 LC 节点上触发转换（按名称或 ID）
+♦ ♦ ♦ ♦ ♦ 启动文件中的 LC 管理：
+♦ ♦ ♦ ♦ ♦ ♦ launch_ros.actions.LifecycleNode(…) 定义一个 LC 节点
+♦ ♦ ♦ ♦ ♦ ♦ launch_ros.event_handlers.OnStateTransition(…) 当 LC 节点从一种状态转换到另一种状态时，执行此动作
+♦ ♦ ♦ ♦ ♦ ♦ launch.actions.EmitEvent(…) 选择想要触发的事件
+♦ ♦ ♦ ♦ ♦ ♦ launch_ros.events.lifecycle.ChangeState(…) 通过为 LC 节点选择转换创建更改状态事件
+♦ ♦ ♦ ♦ ♦ ♦ Lifecycle_msgs.msg 保存状态和转换名称的枚举
 
 
 
 
-
-♦ ♦ 状态
-♦ ♦ 标准接口
-♦ ♦ 命令行接口（CLI）
-♦ ♦ 启动文件
