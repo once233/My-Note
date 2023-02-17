@@ -11,4 +11,9 @@ attempt_respawn_reconnection为true
 获取node的context【语境（Context）：上下文是 init-shutdown 循环的非全局状态。它还封装了节点和其他实体之间的共享状态。在大多数应用程序中，一个进程中只有一个 ROS 上下文】
 往node当前的context中加入关闭节点前的回调
 
-3.
+3.从LifecycleNode类里的node_interface 里获取以下当前的参数：
+node_names
+autostart
+bond_timeout
+bond_respawn_max_duration
+attempt_respawn_reconnection
