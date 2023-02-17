@@ -11,3 +11,7 @@ parameter_descriptor： 自定义的参数描述
 ignore_override：是否忽略覆盖参数
 返回值：参数的常量引用
 
+template<typename ParameterT>
+bool Node::get_parameter(const std::string & name, 
+                         ParameterT & parameter) const
+找到传入名称的参数
