@@ -7,3 +7,8 @@ bond_timeout为4.0
 bond_respawn_max_duration为10.0
 attempt_respawn_reconnection为true
 
+2.注册关闭节点前需要执行的回调：
+获取node的context【语境（Context）：上下文是 init-shutdown 循环的非全局状态。它还封装了节点和其他实体之间的共享状态。在大多数应用程序中，一个进程中只有一个 ROS 上下文】
+往node当前的context中加入关闭节点前的回调
+
+3.
