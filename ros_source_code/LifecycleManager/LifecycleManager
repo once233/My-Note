@@ -1,1 +1,9 @@
+工作流程：
+
+1.声明参数（和默认值）：
+node_names为rclcpp::PARAMETER_STRING_ARRAY 参数字符数组
+autostart为rclcpp::ParameterValue(false)
+bond_timeout为4.0
+bond_respawn_max_duration为10.0
+attempt_respawn_reconnection为true
 
