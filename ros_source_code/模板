@@ -4,3 +4,10 @@ auto Node::declare_parameter(
   const ParameterT & default_value,
   const rcl_interfaces::msg::ParameterDescriptor & parameter_descriptor,
   bool ignore_override)；
+申明参数，并返回有效值
+name :参数
+type：参数的类型
+parameter_descriptor： 自定义的参数描述
+ignore_override：是否忽略覆盖参数
+返回值：参数的常量引用
+
