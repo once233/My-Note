@@ -23,6 +23,9 @@ attempt_respawn_reconnection
   ManageLifecycleNodes服务 和 std_srvs::srv::Trigger服务
   create_service<'server_name'>(const std::string & service_name, CallbackT && callback, const rmw_qos_profile_t & qos_profile, rclcpp::CallbackGroup::SharedPtr group);
  
-6.
+6.预设状态转变中的中间状态的状态标识（枚举）及其文字描述
+transition_state_map_ 和 transition_label_map_
+
+7.
 
 
