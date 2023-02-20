@@ -37,8 +37,9 @@ add_callback_group(rclcpp::CallbackGroup::SharedPtr group_ptr,rclcpp::node_inter
   最后判断节点的上下文是否有效，并判断是否已经有发布程序，根据notify参数判断是否立即发布通知
 
 9. 创建服务器线程
+std::make_unique<nav2_util::NodeThread>('executor'）;
 
-10. 
-
-
+10. 设置诊断服务参数，并添加诊断服务
+diagnostics_updater_.setHardwareID("Nav2");
+diagnostics_updater_.add("Nav2 Health", this, &LifecycleManager::CreateActiveDiagnostic);
 
