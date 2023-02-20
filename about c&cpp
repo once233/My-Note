@@ -1,3 +1,5 @@
+https://cplusplus.com/reference/atomic/ c++库文档网站
+
 [main的参数]
 int argc: 于参数计数 输入的程序路径及名称也是一个参数所以参数最少为1
 char **argv or: char *argv[] ：一个指向字符串数组的指针，差不多等价赋值方法不同
@@ -16,4 +18,7 @@ std::unique_lock比std::lock_guard更灵活，这种灵活性主要体现在以�
 将一个左值转换成右值,并避免内存拷贝。
 避免内存拷贝依赖于被std::move转换的对象的具体实现，std::move只是将对象以右值的形式告诉接受者，这个对象的赋值操作可以直接使用其内存地址，而不是创建新内存拷贝数据。
                              
-                             
+[std::atomic<bool> = std::atomic_bool]
+最基本的原子整数类型是std::atomic，（可以使用预定义的别名std::atomic_bool），这是一个比std::atomic_flag功能更全的布尔标志，并且可以使用非原子的bool来赋值和初始化。
+std::atomic_bool::exchange:用val替换包含的值，并返回之前的值(设置锁)。
+
