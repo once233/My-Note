@@ -1,1 +1,13 @@
+ControllerServer 内部的操作都封装成了一个个状态
 
+1. 声明并初始化参数
+controller_frequency
+progress_checker_plugin
+goal_checker_plugins
+controller_plugins
+min_x_velocity_threshold
+min_y_velocity_threshold
+min_theta_velocity_threshold
+speed_limit_topic
+failure_tolerance
+ 
