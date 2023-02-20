@@ -30,7 +30,9 @@ transition_state_map_ 和 transition_label_map_
 createLifecycleServiceClients：帮助程序函数用于与生命周期节点交互。
 如果设置了自动开始，去改变所有节点的状态为配置中，配置好后改变所有状态为激活状态，设置标志位为已激活，并创建一个监控节点是否正常运行的定时器
 
-8. 创建一个单线程执行器，并添加
+8. 创建一个单线程执行器，并添加把回调组和节点的指针添加到地图中
+add_callback_group(rclcpp::CallbackGroup::SharedPtr group_ptr,rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_ptr,bool notify):
+把回调函数组的指针和他对应的节点绑定在一个地图里，并判断是否已经存在该执行器
 
 9. 
 
