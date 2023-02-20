@@ -14,5 +14,5 @@ failure_tolerance
 各种状态执行的函数
 on_configure：
 1. 获取当前server节点的指针：
-2. 获取当前的checker_id，并判断当前的checker_id是不是等于默认的checker_id,如果是的话，声明默认
-3. 
+2. 获取当前的checker_id，并判断当前的checker_id是不是等于默认的checker_id,如果是的话，声明默认。
+3. getting goal checker plugins
