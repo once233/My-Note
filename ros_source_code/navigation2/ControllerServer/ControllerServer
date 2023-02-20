@@ -1,6 +1,6 @@
 ControllerServer 内部的操作都封装成了一个个状态
 
-1. 声明并初始化参数
+构造函数
 controller_frequency
 progress_checker_plugin
 goal_checker_plugins
@@ -11,3 +11,8 @@ min_theta_velocity_threshold
 speed_limit_topic
 failure_tolerance
  
+各种状态执行的函数
+on_configure：
+1. 获取当前server节点的指针：
+2. 获取当前的checker_id，并判断当前的checker_id是不是等于默认的checker_id,如果是的话，声明默认
+3. 
