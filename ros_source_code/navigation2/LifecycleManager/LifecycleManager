@@ -19,6 +19,7 @@ bond_respawn_max_duration
 attempt_respawn_reconnection
 
 4.创建回调组
+
 5.创建服务:
 ManageLifecycleNodes服务 和 std_srvs::srv::Trigger服务
 create_service<'server_name'>(const std::string & service_name, CallbackT && callback, const rmw_qos_profile_t & qos_profile, rclcpp::CallbackGroup::SharedPtr group);
@@ -32,9 +33,12 @@ createLifecycleServiceClients：帮助程序函数用于与生命周期节点交
 
 8. 创建一个单线程执行器，并添加把回调组和节点的指针添加到地图中
 add_callback_group(rclcpp::CallbackGroup::SharedPtr group_ptr,rclcpp::node_interfaces::NodeBaseInterface::SharedPtr node_ptr,bool notify):
-把回调函数组的指针和他对应的节点绑定在一个地图里，并判断是否已经存在该执行器
+  把回调函数组的指针和他对应的节点绑定在一个地图里，并判断是否已经存在该执行器
+  最后判断节点的上下文是否有效，并判断是否已经有发布程序，根据notify参数判断是否立即发布通知
 
-9. 
+9. 创建服务器线程
+
+10. 
 
 
 
