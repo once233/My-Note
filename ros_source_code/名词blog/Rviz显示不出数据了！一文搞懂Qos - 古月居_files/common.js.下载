@@ -1,0 +1,169 @@
+const App = {
+    headerTop: function () {
+        let navClick = $('.header .nav ul li').eq(1);
+        navClick.hover(function () {
+            $('.blog-nav-list').show();
+        },function () {
+            $('.blog-nav-list').hide();
+        });
+        $('.header .blog-nav-list').hover(function () {
+            $(this).show();
+        },function () {
+            $(this).hide();
+        });
+        $('.header .hamburger').click(function () {
+            if ($('body').hasClass('navbar-show')) {
+                setTimeout(function () {
+                    $('.nav').css('left','-100%');
+                },300);
+            } else {
+                setTimeout(function () {
+                      $('.nav').css('left','0');
+                },300);
+            }
+        });
+        $('.js_close_navbar').click(function () {
+            $('.nav').css('left','-100%');
+        });
+    },
+    tabNav: function () {
+        $('.js_tab_nav li').on('click',function () {
+            var index=$(this).index();
+            $(this).addClass('active').siblings().removeClass('active');
+            $(this).parent().next().find('.js_tab_list').eq(index).addClass('show').siblings().removeClass('show');
+            $('.post-list li .introduction .text-bu').each(function (i,o) {
+                if ($(o).height() > 45) {
+                    $(o).addClass('clamp-two');
+                    $(o).next().show();
+                    $(o).next().on('click', function () {
+                        $(this).prev().removeClass('clamp-two');
+                        $(this).hide();
+                        return false;
+                    });
+                }
+              // console.log($(o));
+            });
+            return false;
+        });
+    },
+    columnSwiper: function () {
+        var pageBanner = new Swiper('.column-nav .swiper-container', {
+            slidesPerView: 1,
+            pagination: '.column-nav .swiper-pagination',
+            paginationType: 'fraction',
+            nextButton: '.column-nav .swiper-button-next',
+            prevButton: '.column-nav .swiper-button-prev'
+     
+        });
+    },
+    backTop: function () {
+        $(window).scroll(function () {
+            var scrollTop = $(document).scrollTop();
+            if (scrollTop > 50) {
+                $('.js_topping').addClass('top-show');
+                $('.automatic').addClass('fixed');
+            } else {
+                $('.js_topping').removeClass('top-show');
+                $('.automatic').removeClass('fixed');
+            }
+        });
+        $('.js_topping').click(function () {
+            $('html,body').animate({scrollTop: '0px'}, 600);
+            return false;
+        });
+    },
+    getRightBar($container){
+        let RightBar = {
+            $container: $container,
+            height: {
+                container:$container.height(),
+                header:80,//头部
+                footer:$('.footer').height() +102,//底部
+                body: $(document).height(), //内容
+                screen:window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,//屏幕
+                view: 0, //去掉头部的可视区
+            },
+            init(){
+                this.height.view = this.height.screen - this.height.header;
+            },
+            move(){
+                this.refresh();
+                // 容器高度 <= 可视区 + footer：永远top固定
+                if (this.height.container <= this.height.view - this.height.footer) {
+                    this.fixedToTop();
+                    return ;
+                }
+                // 容器高度 <= 可视区：top固定后考虑footer影响
+                if (this.height.container <= this.height.view) {
+                    if (this.getTopHeight() + this.getViewHeigth() > this.height.body - this.height.footer) {
+                        this.fixedToBottom();
+                        return ;
+                    }
+                    this.fixedToTop();
+                    return ;
+                }
+                // 容器高度 >= 可视区：bottom固定
+                if (this.getTopHeight() + this.getViewHeigth() > this.getContainerHeight()) {
+            // 比左侧高就什么不干
+            //if(this.height.container >= this.$container.height()){
+                    // if (this.height.container >= this.height.body) {
+                    //       return ;
+                    // }
+                    if(this.height.container >= $('.main-left').height()){
+                        return ;
+                    }
+                    this.fixedToBottom();
+                    return ;
+                }
+            },
+            getTopHeight(){
+                return this.height.scroll_top;
+            },
+            getContainerHeight(){
+                return this.$container.height();
+            },
+            getViewHeigth(){
+                return this.height.screen - this.height.header;
+            },
+            fixedToTop(){
+                this.$container.addClass('js-top-fixed');
+            },
+            fixedToBottom(){
+                this.$container.removeClass('js-top-fixed');
+                this.$container.addClass('js-fixed');
+                this.$container.css('bottom', Math.max(0, this.height.scroll_top + this.height.screen - (this.height.body - this.height.footer - 60)));
+            },
+            refresh(){
+                this.$container.removeClass('js-top-fixed');
+                this.$container.removeClass('js-fixed');
+                this.$container.css('bottom', 'none');
+            }
+    
+        };
+        return RightBar;
+    },
+    rightFixed: function () {
+        let right_bar_arr = [
+        this.getRightBar($('.js-sidebar'))
+    
+        ];
+        for (let i in right_bar_arr) {
+            right_bar_arr[i].init();
+        }
+        $(window).scroll(function () {
+            for (let i in right_bar_arr) {
+                right_bar_arr[i].height.scroll_top = $(document).scrollTop();
+                right_bar_arr[i].height.body = $(document).height();
+                right_bar_arr[i].move();
+            }
+        });
+    }
+};
+$(document).ready(function () {
+    App.headerTop();
+    App.tabNav();
+    App.columnSwiper();
+    App.backTop();
+    App.rightFixed();
+});
+
