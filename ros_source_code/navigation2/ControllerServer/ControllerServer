@@ -13,11 +13,29 @@ ControllerServer 内部的操作都封装成了一个个状态
   failure_tolerance
 2.构造costmap的对象
 3.构造nav2_util::NodeThread对象，并把costmap对象传入Thread对象
+
 各种状态执行的函数
+
 on_configure：
 1. 获取当前server节点的指针：
+
 2. 声明并初始化参数：
    有关：目标检查器插件
-   ♦ 获取当前的checker_id，并判断当前的checker_id是不是等于默认的checker_id,如果是的话，声明默认。
-   ♦ getting goal checker plugins
-   ♦ 
+   ♦ 获取当前的checker_id，并判断当前的checker_id是不是等于默认的checker_id,如果是的话，声明默认。 progress_checker_id_
+   ♦ 获取当前节点的目标检查器id，如果id没有被声明的话就声明对应id的目标检查器插件。 getting goal checker plugins
+   ♦ 获取当前节点的控制器id，如果对应id的插件没被声明，则声明插件
+   有关：控制器配置
+   ♦ 获取controller_frequency
+   ♦ 获取min_x_velocity_threshold
+   ♦ 获取min_y_velocity_threshold
+   ♦ 获取min_theta_velocity_threshold
+   ♦ 获取speed_limit_topic
+   ♦ 获取failure_tolerance
+   
+3. 配置costmap   
+
+4. 实例化和初始化各种插件
+  有关：目标检查器插件
+  ♦ 从当前节点获取进程检查器插件的类型，再实例化当前类型的进程检查器和初始化
+  ♦ 从当前节点获取目标点检查器插件的类型，再实例化当前类型的目标点检查器和初始化，最后把
+5. 
