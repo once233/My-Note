@@ -42,4 +42,8 @@ on_configure：
   ♦ 从当前节点获取控制器插件id的类型，并逐一实例化、配置参数
     controller->configure( node, controller_ids_[i],costmap_ros_->getTfBuffer(), costmap_ros_);
     最后把把当前控制器的id加入控制器id管理器
-5. 
+    
+5. 实例化OdomSubscriber和
+位置信息发布器create_publisher<geometry_msgs::msg::Twist>
+
+
