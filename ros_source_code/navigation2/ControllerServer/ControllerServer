@@ -12,7 +12,7 @@ ControllerServer 内部的操作都封装成了一个个状态
   speed_limit_topic
   failure_tolerance
 2.构造costmap的对象
-3.ba1
+3.构造nav2_util::NodeThread对象，并把costmap对象传入Thread对象
 各种状态执行的函数
 on_configure：
 1. 获取当前server节点的指针：
