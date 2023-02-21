@@ -57,5 +57,18 @@ on_activate：
 3、创建bond纽带类，和节点管理器互相监控状态
 
 on_deactivate：
+1. 让动作服务器action_server_、控制器插件controller、cosmap_ros_停止工作
+2. 发布速度设置为0的消息
+3. 关闭速度控制发布器和重置动态设置参数的节点
+4. 断开与节点的监听纽带
+
+on_cleanup：
+1. 把Controller释放掉，（和析构？）并把controllers记录器也清空
+2. 把记录目标点检查器的容器清空
+3. 如果costmap_ros_的状态为非激活状态，则清空costmap_ros_的数据
+4. 重置动作服务器、odom数据订阅、costmap_thread、速度控制发布器vel_publisher_和速度限制订阅
+
+on_shutdown:
+
 
 
