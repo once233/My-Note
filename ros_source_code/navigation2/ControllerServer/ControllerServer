@@ -52,8 +52,10 @@ std::make_unique<ActionServer>(shared_from_this(),"follow_path",std::bind(&Contr
 create_subscription<nav2_msgs::msg::SpeedLimit>(speed_limit_topic, rclcpp::QoS(10),std::bind(&ControllerServer::speedLimitCallback, this, std::placeholders::_1));
 
 on_activate：
-1. 
+1. 让costmap_ros_、Controller、vel_publisher_、action_server_的状态变为激活
+2、为节点增加动态改变参数的回调
+3、创建bond纽带类，和节点管理器互相监控状态
 
-
+on_deactivate：
 
 
