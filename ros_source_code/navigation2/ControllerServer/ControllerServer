@@ -44,7 +44,16 @@ on_configure：
     最后把把当前控制器的id加入控制器id管理器
     
 5. 实例化OdomSubscriber和位置信息发布器[create_publisher<geometry_msgs::msg::Twist>]
-6. 实例化动作服务器std::make_unique<ActionServer>(shared_from_this(),"follow_path",std::bind(&ControllerServer::computeControl, this),nullptr,std::chrono::milliseconds(500),true);
+
+6. 实例化动作服务器
+std::make_unique<ActionServer>(shared_from_this(),"follow_path",std::bind(&ControllerServer::computeControl, this),nullptr,std::chrono::milliseconds(500),true);
+
+7. 创建速度限制信息的订阅
+create_subscription<nav2_msgs::msg::SpeedLimit>(speed_limit_topic, rclcpp::QoS(10),std::bind(&ControllerServer::speedLimitCallback, this, std::placeholders::_1));
+
+on_activate：
+1. 
+
 
 
 
