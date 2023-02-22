@@ -27,3 +27,17 @@ std::atomic_bool::exchange:用val替换包含的值，并返回之前的值(设�
 尽量使用std::make_unique和std::make_shared而不直接使用new
 std::make_shared是c++11的一部分，std::make_unique不是。它是在c++14里加入标准库的
 make函数用来把一个任意参数的集合完美转移给一个构造函数从而生成动态分配内存的对象，并返回一个指向那个对象的灵巧指针。
+
+[std::weak_ptr]
+https://blog.csdn.net/sinat_31608641/article/details/107702175
+std::weak_ptr 是一种智能指针，它对被 std::shared_ptr 管理的对象存在非拥有性（“弱”）引用,在访问所引用的对象前必须先转换为 std::shared_ptr
+std::weak_ptr 用来表达临时所有权的概念：当某个对象只有存在时才需要被访问，而且随时可能被他人删除时，可以使用 std::weak_ptr 来跟踪该对象。需要获得临时所有权时，则将其转换为 std::shared_ptr，此时如果原来的 std::shared_ptr 被销毁，则该对象的生命期将被延长至这个临时的 std::shared_ptr 同样被销毁为止。
+方法：
+     reset释放被管理的对象
+     swap交换被管理的对象
+     use_count返回管理该对象的shared_ptr的数量
+     expired检查应用对象是否已删除
+     lock创建管理被引用对象的shared_ptr(可以用来保证指针确实存在)
+     owner_before
+     
+     
