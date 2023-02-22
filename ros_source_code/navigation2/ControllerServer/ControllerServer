@@ -69,6 +69,6 @@ on_cleanup：
 4. 重置动作服务器、odom数据订阅、costmap_thread、速度控制发布器vel_publisher_和速度限制订阅
 
 on_shutdown:
-
+打印关闭中并返回成功
 
 
