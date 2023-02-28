@@ -153,3 +153,21 @@ systemctl is-enabled NetworkManager
 sed –i s/ONBOOT=no/ONBOOT=yes/ /etc/sysconfig/network-scripts/ifcfg-ens33
 将网卡设置为开机自启就会自动联网了。
 -------------------------------------------------------------------------
+
+cmake交叉编译
+在cmake目录下建立工具链文件（toolchain file），习惯上一般以.toolchain.cmake结尾
+内容：
+set(CMAKE_SYSTEM_NAME Linux)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+ 
+set(TOOLS /home/farmer/gcc-arm-none-eabi-10-2020-q4-major-x86_64-linux)
+set(CMAKE_C_COMPILER "${TOOLS}/bin/arm-none-eabi-gcc")
+set(CMAKE_CXX_COMPILER "${TOOLS}/bin/arm-none-eabi-g++")
+set(CMAKE_AR "${TOOLS}/bin/arm-none-eabi-gcc-ar")
+ 
+add_compile_options(-mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffunction-sections -fdata-sections -g -Os -MMD -MP -Wall)
+
+在build目录下要编译时，执行：
+cmake ... --toolchain <path/to/toolchain-file>
+# or
+cmake ... -DCMAKE_TOOLCHAIN_FILE=<path/to/toolchain-file>
