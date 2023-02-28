@@ -168,6 +168,6 @@ set(CMAKE_AR "${TOOLS}/bin/arm-none-eabi-gcc-ar")
 add_compile_options(-mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -ffunction-sections -fdata-sections -g -Os -MMD -MP -Wall)
 
 在build目录下要编译时，执行：
-cmake ... --toolchain <path/to/toolchain-file>
+cmake -DCMAKE_TOOLCHAIN_FILE=../linux-arm.toolchain.cmake ../
 # or
 cmake ... -DCMAKE_TOOLCHAIN_FILE=<path/to/toolchain-file>
