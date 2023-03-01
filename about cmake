@@ -1,0 +1,11 @@
+[指定install的安装目录]
+
+方法一-在执行cmake时指定：
+cmake -DCMAKE_INSTALL_PREFIX=<你想要安装的路径>
+
+方法二-设置CMAKE_INSTALL_PREFIX 变量：
+SET(CMAKE_INSTALL_PREFIX <install_path>) (要加在 PROJECT(< project_name>) 之后)。
+ 
+方法三-在设置完install的安装目录之后，执行install时可以通过DESTINATION直接指定安装目录之下的目录
+set(CMAKE_INSTALL_PREFIX /usr/local)
+install(TARGETS test DESTINATION bin)  #将test安装到/usr/local/bin目录下
