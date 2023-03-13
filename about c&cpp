@@ -45,5 +45,41 @@ std::weak_ptr 用来表达临时所有权的概念：当某个对象只有存在
 std::string因为操作过程中，会重新分配内存，生成一个对应的std::string副本，用时1065ms，
 std::string_view不持有字符串拷贝，与源字符串共享内存空间，其他是视图，避免了std::string频繁的字符串分配和拷贝操作，只用了85ms，效率显而易见。
 
-     
-     
+   
+   
+[std::future]
+std::future 是一个类模板，用来保存一个异步操作的结果，即这是一个未来值，只能在未来某个时候进行获取。
+①．get()：等待异步操作执行结束并返回结果，若得不到结果就会一直等待。
+②．wait()：用于等待异步操作执行结束，但并不返回结果。
+③．wait_for()：阻塞当前流程，等待异步任务运行一段时间后返回其状态 std::future_status，状态是枚举值：
+deferred：异步操作还没开始；
+ready：异步操作已经完成；
+timeout：异步操作超时。
+
+[std::async] 
+std::async 是一个函数模板，用来启动一个异步任务。相对于 thread ，std::future 是更高级的抽象，异步返回结果保存在 std::future 中，使用者可以不必进行线程细节的管理。
+std::async 有两种启动策略：
+①．std::launch::async:：函数必须以异步方式运行，即创建新的线程。
+②．std::launch::deferred：函数只有在 std:async 所返回的期值的 get 或 wait 得到调用时才执行、并且调用方会阻塞至运行结束，否则不执行。
+若没有指定策略，则会执行默认策略，将会由操作系统决定是否启动新的线程。
+future<int> m_future = async(launch::async, callback);
+future_status m_status;
+  do {
+    m_status = m_future.wait_for(chrono::seconds(1));
+    switch (m_status){
+    case std::future_status::ready:
+      cout << "数据查询完成" << " threadID:" << this_thread::get_id() << endl;
+      break;
+    case std::future_status::timeout:
+      cout << "数据查询中..." << " threadID:" << this_thread::get_id() << endl;
+      break;
+    case std::future_status::deferred:
+      cout << "数据查询延迟" << " threadID:" << this_thread::get_id() << endl;
+      m_future.wait();
+      break;
+    default:
+      break;
+    }
+  }while (m_status != future_status::ready);
+  int ret = m_future.get();
+  cout << "数据查询结果:"<< ret << " threadID:" << this_thread::get_id() << endl;
