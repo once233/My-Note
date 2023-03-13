@@ -39,5 +39,11 @@ std::weak_ptr 用来表达临时所有权的概念：当某个对象只有存在
      expired检查应用对象是否已删除
      lock创建管理被引用对象的shared_ptr(可以用来保证指针确实存在)
      owner_before
+
+[std::string_view c++17]
+比std::string高效：
+std::string因为操作过程中，会重新分配内存，生成一个对应的std::string副本，用时1065ms，
+std::string_view不持有字符串拷贝，与源字符串共享内存空间，其他是视图，避免了std::string频繁的字符串分配和拷贝操作，只用了85ms，效率显而易见。
+
      
      
