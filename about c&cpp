@@ -83,3 +83,14 @@ future_status m_status;
   }while (m_status != future_status::ready);
   int ret = m_future.get();
   cout << "数据查询结果:"<< ret << " threadID:" << this_thread::get_id() << endl;
+
+[tamplate]
+模板类的声明与定义
+当把模板类分开为  .h声明文件 和  .cpp实现文件时，在模板类的main文件使用模板功能时，编译结果完全正确，却无法链接成功。
+注意：编译各个文件均完全无误，当链接成执行程序时候报错，报错信息为无法链接到被调用函数！
+但是，如果把main放到.cpp文件中就没有任何问题，或者把 .cpp 和 .h 文件放在一起也没有问题。
+解决：
+1. 在调用模板类时引入其.cpp实现文件
+2. 将模板类的.cpp实现文件全部写进.h中
+为什么：
+https://www.cnblogs.com/Braveliu/articles/3443280.html
