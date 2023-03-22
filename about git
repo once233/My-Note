@@ -3,3 +3,6 @@
 2. 设置token: 
    首次设置token：git remote add origin https://<GitHub用户名>:<token值>@github.com/1234567/develop.git
    重设token：git remote set-url origin https://<GitHub用户名>:<token值>@github.com/1234567/develop.git
+
+[删除远程分支]
+git push origin --delete 'branch'
