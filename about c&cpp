@@ -94,3 +94,7 @@ future_status m_status;
 2. 将模板类的.cpp实现文件全部写进.h中
 为什么：
 https://www.cnblogs.com/Braveliu/articles/3443280.html
+
+[工厂模式实现多态(基类指针转化为派生类指针)]
+derive *de = reinterpret_cast<derive *>(ptr<base>);
+不能用std::shared_ptr去接收转化出来的指针
