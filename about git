@@ -6,3 +6,7 @@
 
 [删除远程分支]
 git push origin --delete 'branch'
+
+[删除远程文件夹 or 文件]
+git rm -r --cached 'dir'
+git rm  --cached 'file'
