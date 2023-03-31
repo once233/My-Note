@@ -9,3 +9,10 @@ SET(CMAKE_INSTALL_PREFIX <install_path>) (要加在 PROJECT(< project_name>) 之
 方法三-在设置完install的安装目录之后，执行install时可以通过DESTINATION直接指定安装目录之下的目录
 set(CMAKE_INSTALL_PREFIX /usr/local)
 install(TARGETS test DESTINATION bin)  #将test安装到/usr/local/bin目录下
+
+[find_package 指定路径]
+1、set(yaml-cpp_DIR ~/yaml-cpp)
+	  find_package(yaml-cpp REQUIRED)
+2、set(yaml-cpp required PATHS ~/yaml-cpp)
+3、cmake -DCMAKE_PREFIX_PATH="~/yaml-cpp" ..
+
