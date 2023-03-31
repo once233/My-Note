@@ -16,3 +16,6 @@ install(TARGETS test DESTINATION bin)  #将test安装到/usr/local/bin目录下
 2、set(yaml-cpp required PATHS ~/yaml-cpp)
 3、cmake -DCMAKE_PREFIX_PATH="~/yaml-cpp" ..
 
+[查看make的详细输出]
+make VERBOSE=on
+
