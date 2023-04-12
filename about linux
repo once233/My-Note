@@ -189,3 +189,19 @@ systemctl stop mongodb
 systemctl enable  mongodb
 #查看状态（可查看进程打印）
 systemctl status mongodb
+
+
+[增加硬盘容量后，linux扩容]
+1、备份： 虚拟机->快照->拍摄快照
+2、sudo df -h 查看分区信息，找到需要改变的盘
+3、sudo fdisk /dev/sdx
+4、输入分区号码删除分区
+5、输入p，回车
+6、回车，选择开始区域为默认区域
+7、回车，选择结束区域为默认区域
+8、y
+9、p
+10、w
+11、reboot
+12 sudo resize2fs /dev/sdx
+13、df -h 查看是否分配好了
