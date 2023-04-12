@@ -173,3 +173,19 @@ add_compile_options(-mthumb -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard -
 cmake -DCMAKE_TOOLCHAIN_FILE=../linux-arm.toolchain.cmake ../
 # or
 cmake ... -DCMAKE_TOOLCHAIN_FILE=<path/to/toolchain-file>
+
+
+[某个软件加入自启动]
+1、在/lib/systemd/system/目录创建服务脚本xxx.service，并编辑service文件
+2、chmod 777 /lib/systemd/system/xxx.service
+3、
+#刷新配置(在启动前，必须先执行，否则报警告)
+systemctl daemon-reload
+#启动服务
+systemctl start mongodb
+#关闭服务
+systemctl stop mongodb
+#服务加入开机自启
+systemctl enable  mongodb
+#查看状态（可查看进程打印）
+systemctl status mongodb
