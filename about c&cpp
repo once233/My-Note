@@ -98,3 +98,7 @@ https://www.cnblogs.com/Braveliu/articles/3443280.html
 [工厂模式实现多态(基类指针转化为派生类指针)]
 derive *de = reinterpret_cast<derive *>(ptr<base>);
 不能用std::shared_ptr去接收转化出来的指针
+
+[map与unorder_map]
+
+
