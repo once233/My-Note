@@ -1,1 +1,6 @@
 使用Linux线程库时，用g++编译需要加 -lpthread
+
+[gcc链接库]
+可以使用gcc的-l<lib_name>选项来指定链接库：
+如-lfoo，将会搜索libfoo.so这个库。
+如-l:foo.so，将会搜索foo.so这个库。
