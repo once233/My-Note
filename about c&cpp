@@ -100,5 +100,13 @@ derive *de = reinterpret_cast<derive *>(ptr<base>);
 不能用std::shared_ptr去接收转化出来的指针
 
 [map与unorder_map]
+unordered_map和map的功能类似，都是KV模型（Key/Value模型）。
+底层不同，map的底层是红黑树，unordered_map的底层是哈希表。
+map有排序的功能，而unordered_map是无序的。
+从效率上看，unordered_map增删查改的时间复杂度为O（1），而map增删查改的时间复杂度为O（logN）。
+从空间上看，unordered_map消耗的空间比map空间更大。
+使用场景：对数据有排序或者空间要求时，选择map；对效率有要求时，选择unordered_map。
 
-
+[unordered_set和set]
+unordered_set和set都是K模型（Key模型）
+两种的区别同map,红黑树和哈希表（unordered）
