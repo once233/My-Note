@@ -61,3 +61,8 @@ return ld
 
 有关节点启动流程
 加载动态库->实例节点->configure节点-> Activate节点->(create bond)
+
+有关LifecycleManager与节点的关系（官方源码的节点控制比较粗糙）
+LifecycleManager也是一个节点，以server的角色存在。要管理的节点信息以参数的形式传入LifecycleManager。
+LifecycleManager会创建LifecycleServiceClient ，一个节点对应一个LifecycleServiceClient,并设置所有节点的状态为configure。
+（如何设置：LifecycleServiceClient会呼叫ManageLifecycleNodes，也就是LifecycleManager创建的服务，控制所有在对应LifecycleManager管理下的所有节点，官方的源码，只能一次设置所有节点）
