@@ -7,7 +7,7 @@ def generate_launch_description():        # 自动生成launch文件的函数
         default_value=os.path.join(bringup_dir, 'params', 'nav2_params.yaml'), #默认值
         description='Full path to the ROS2 parameters file to use for all launched nodes')
     
-        configured_params = RewrittenYaml(
+        configured_params = RewrittenYaml( #根据参数文件， 以及替换更新的部分参数，生成新的yaml文件对象
         source_file=params_file,
         root_key=namespace,
         param_rewrites={},
