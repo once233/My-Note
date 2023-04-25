@@ -54,3 +54,10 @@ ld = LaunchDescription()  # 返回launch文件的描述信息
 ld.add_action(load_nodes)
 ld.add_action(load_composable_nodes)
 return ld   
+
+
+有关LifecycleNode
+如果需要使用节点生命周期管理机制，类必须继承于LifecycleNode
+
+有关节点启动流程
+加载动态库->实例节点->configure节点-> Activate节点->(create bond)
