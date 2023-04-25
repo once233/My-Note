@@ -1,0 +1,10 @@
+由于组件仅编译在共享库中，因此它没有main函数。
+组件通常是子类rclcpp::Node。由于它不受线程控制，因此不应在其构造函数中执行任何长时间运行或阻塞任务。
+相反，它可以使用计时器来获得定期通知。此外，它还可以创建发布器，订阅器，服务器和客户端。
+
+将这样的类作为组件的一个重要方面是类使用rclcpp_components包中的宏来注册自己（参考源代码中的最后一行）。
+这使得组件在将其库加载到正在运行的进程时可被发现 - 它充当入口点。
+
+此外，一旦创建了组件，就必须将其注册到工具可以发现的索引。
+add_library(talker_component SHARED src/talker_component.cpp)
+rclcpp_components_register_nodes(talker_component "composition::Talker")
