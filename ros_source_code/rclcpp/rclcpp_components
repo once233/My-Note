@@ -6,7 +6,7 @@
 这使得组件在将其库加载到正在运行的进程时可被发现 - 它充当入口点。
 
 此外，一旦创建了组件，就必须将其注册到工具可以发现的索引。
-
+可通过ros2 component list 查看
 使用方法
 c++：
 add_library(talker_component SHARED src/talker_component.cpp)
