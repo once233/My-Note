@@ -6,5 +6,33 @@
 这使得组件在将其库加载到正在运行的进程时可被发现 - 它充当入口点。
 
 此外，一旦创建了组件，就必须将其注册到工具可以发现的索引。
+
+使用方法
+c++：
 add_library(talker_component SHARED src/talker_component.cpp)
 rclcpp_components_register_nodes(talker_component "composition::Talker")
+
+py:
+ bringup_cmd_group = GroupAction([
+        Node(
+            name='nav2_container',
+            package='rclcpp_components',
+            executable='component_container_isolated',
+            parameters=[configured_params, {'autostart': autostart}],
+            arguments=['--ros-args', '--log-level', log_level],
+            remappings=remappings,
+            output='screen'),
+        IncludeLaunchDescription(
+            PythonLaunchDescriptionSource(os.path.join(launch_dir, 'navigation_launch.py')),
+            launch_arguments={'namespace': namespace,
+                              'use_sim_time': use_sim_time,
+                              'autostart': autostart,
+                              'params_file': params_file,
+                              'use_composition': use_composition,
+                              'use_respawn': use_respawn,
+                              'container_name': 'nav2_container'}.items()),
+    ])
+
+
+
+
