@@ -1,0 +1,13 @@
+[安装docker]
+https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository
+
+[docker version报无权限连接...]
+把当前用户加入docker的用户组即可
+sudo gpasswd -a ‘username’ docker
+newgrp docker #更新
+
+[从docker官方库查找镜像]
+docker search ros2
+
+[docker 下载镜像]
+
