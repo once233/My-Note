@@ -10,4 +10,9 @@ newgrp docker #更新
 docker search ros2
 
 [docker 下载镜像]
+docker pull
 
+[docker镜像安装的位置]
+sudo ls /var/lib/docker/image/overlay2/
+镜像文件在imagedb下，加密
+可通过docker images |grep -aiwE ‘osrf’查看
