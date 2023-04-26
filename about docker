@@ -16,3 +16,41 @@ docker pull
 sudo ls /var/lib/docker/image/overlay2/
 镜像文件在imagedb下，加密
 可通过docker images |grep -aiwE ‘osrf’查看
+
+[docker build]
+通过Dockerfile创建镜像
+docker build -t name/name 'dockerfile path'
+
+[查看运行容器]
+docker ps
+
+[查看所有容器]
+docker ps -a
+
+[创建容器]
+docker run -it osrf/ros:humble-desktop-full /bin/bash
+docker run -it --name=容器名称(自己命名) 镜像名称:镜像版本 号 /bin/bash
+docker run -it --name (空格) 容器名称(自己命名) 镜像名称:镜像版本 号 /bin/bash
+-it是创建的交互式:创建完成之后直接进度终端
+-id是创建守护式:创建完成之后不进入容器
+-it创建的容器exit,后台不会继续运行
+-id创建的容器exit,后台继续运行
+
+[进入容器]
+docker exec -it 容器名称 /bin/bash
+
+[启动容器]
+docker start 容器名称
+
+[停止容器]
+docker stop 容器名称
+
+[删除容器]
+docker rm 容器名称
+
+[查看容器信息]
+docker inspect 容器名称
+
+[退出容器]
+exit
+
