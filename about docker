@@ -29,6 +29,8 @@ docker ps -a
 
 [创建容器]
 docker run -it -p 11000:11000 osrf/ros:humble-desktop-full /bin/bash # 把主机端口11000的数据转发到docker
+可用sudo iptables -t nat -L -n --line-numbers 查看转发表
+
 docker run -it --name=容器名称(自己命名) 镜像名称:镜像版本 号 /bin/bash
 docker run -it --name (空格) 容器名称(自己命名) 镜像名称:镜像版本 号 /bin/bash
 -it是创建的交互式:创建完成之后直接进度终端
