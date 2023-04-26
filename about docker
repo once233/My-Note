@@ -52,6 +52,9 @@ docker rm 容器名称
 
 [查看容器信息]
 docker inspect 容器名称
+查看ip
+sudo docker inspect --format='{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(sudo docker ps -aq)
+
 
 [退出容器]
 exit
