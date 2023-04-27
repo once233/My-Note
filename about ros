@@ -63,6 +63,14 @@ URDF
 -----------------------------------------------------------------------------------------
 
 
-[ros2]
-常用指令
+[ros2常用指令]
 https://blog.csdn.net/aibingjin/article/details/123899829
+
+[colcon]
+colcon build --symlink-install
+将编译的结果以软链接的方式进行安装，这个在程序开发的过程中非常实用。
+比如如果是 python 的 ros package, 后续将不需要再重新 colcon build, 直接修改源码就可以再次运行，加快了开发的效率。
+同样对于 C++ 工程而言，如果你是修改 rclcpp 或者系统中已经安装的同名的文件包的话，
+在编译时搜寻的头文件将是自己 workspace 下的，而不是系统目录下的头文件(/opt/ros/xx/include)，这点与 ROS1 中的 catkin_make 中的 devel 开发方式保持一致。
+
+
