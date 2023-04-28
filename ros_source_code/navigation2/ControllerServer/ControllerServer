@@ -1,6 +1,41 @@
 ControllerServer 内部的操作都封装成了一个个状态
 
-构造函数
+[名词]
+控制器服务器 Controller Server
+[nav2_controller_server]
+输入：全局路径，代价地图
+输出：速度指令
+默认为 DWB 控制器。
+发布速度：~/cmd_vel (geometry_msgs/Twist)
+包含多个插件：
+轨迹生成器插件 DWB Controller
+评分插件 Critic Plugins
+目标检查器插件 Goal Checker
+
+DWB控制器 DWB Controller
+轨迹生成器插件
+负责生成局部轨迹并输出指令速度。
+目前有两个插件（一次只能加载一个）：
+标准轨迹生成器
+有限加速器
+
+评分插件 Critic Plugins
+对轨迹生成器生成的轨迹进行评分。 可以加载多个插件并将它们的分数添加到每个轨迹的最终分数中。
+示例：
+BaseObstacle：基于路径经过代价地图的位置
+ObstacleFootprint：基于验证机器人足迹上的所有点都没有接触到代价地图中标记的障碍物。
+GoalDist：基于轨迹使机器人与目标姿势的接近程度。
+
+目标检查器 Goal Checker
+验证机器人是否达到了目标
+目前有两个插件（一次只能加载一个）：
+SimpleGoalChecker - 检查位置以查看机器人是否已达到目标。
+StoppedGoalChecker - 检查位置以及机器人是否已停止。
+
+
+
+
+[构造函数]
 1. 声明以下参数为默认值
   controller_frequency
   progress_checker_plugin
@@ -14,11 +49,11 @@ ControllerServer 内部的操作都封装成了一个个状态
 2.构造costmap的对象
 3.构造nav2_util::NodeThread对象，并把costmap对象传入Thread对象
 
-各种状态执行的函数
 
+
+[各种状态执行的函数]
 on_configure：
 1. 获取当前server节点的指针：
-
 2. 声明并初始化参数：
    有关：目标检查器插件
    ♦ 获取当前的checker_id，并判断当前的checker_id是不是等于默认的checker_id,如果是的话，声明默认。 progress_checker_id_
