@@ -1,0 +1,7 @@
+terminal1 
+-export ROS_DISCOVERY_SERVER=127.0.0.1:11811
+-ros2 run demo_nodes_cpp listener --ros-args --remap __node:=listener_discovery_server
+
+terminal2 
+-export ROS_DISCOVERY_SERVER=127.0.0.1:11811
+-ros2 run demo_nodes_cpp talker --ros-args --remap __node:=talker_discovery_server
