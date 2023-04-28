@@ -1,0 +1,21 @@
+[规划 Planning ]
+规划器会帮助找到成本最低的路径。
+成本包含很多方面（物体接近度、持续时间、向后运动、旋转……）
+
+[代价地图配置 Costmap Configuration]
+每一层的细则（"static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"）：
+- 静态地图层Static Map Layer：来自一个不变的数据
+   外部来源（静态地图）
+- 障碍物层Obstacle Layer：在读取时跟踪障碍物
+   通过传感器数据（2D、LaserScan）
+- 体素层Voxel Layer：使用跟踪障碍物
+   点云2（3D）
+- 膨胀层Inflation Layer：膨胀障碍物
+   表示机器人的配置空间
+   
+   
+[规划服务器配置 Planner Server Configuration]
+allow_unknown (bool, default: true)
+tolerance (double, default: 0.0)
+
+
