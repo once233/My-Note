@@ -1,0 +1,10 @@
+[恢复服务器 Recovery Server]
+定义机器人可以执行的恢复操作。
+
+[nav2_costmap_2d]
+清除代价地图
+
+[nav2_recoveries]
+BackUp 备份 - 给定距离的线性平移
+Spin 旋转 - 按给定角度原地旋转
+Wait 等待 - 停止机器人
