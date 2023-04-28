@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<!-- saved from url=(0041)https://blog.51cto.com/u_12369060/4993707 -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+        <title>ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客</title>
+    <meta name="keywords" content="ROS2极简总结-Nav2-概述（上）规划器,博客,51CTO博客">
+<meta name="description" content="ROS2极简总结-Nav2-概述（上）规划器，meta-package：元功能包（或综合功能包）包含为一系列功能包的组合。Navigation2是一个元功能包，它使移动平台能够达到目标。加载、服务和存储地图([nav2_map_server])在地图上机器人([nav2_amcl])围绕障碍物规划从A到B的路径（[nav2_planner]）">    <meta name="applicable-device" content="pc">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="msvalidate.01" content="91C5324FE68C0A46FA65F3FEC225EA65">
+    
+<meta http-equiv="x-dns-prefetch-control" content="on">
+<link rel="preconnect" href="https://cdn.51cto.com/">
+<link rel="dns-prefetch" href="https://cdn.51cto.com/">
+<link rel="preconnect" href="https://static2.51cto.com/edu/">
+<link rel="dns-prefetch" href="https://static2.51cto.com/edu/">
+<link rel="preconnect" href="https://s2.51cto.com/">
+<link rel="dns-prefetch" href="https://s2.51cto.com/">
+<link rel="preload" as="image" href="https://s2.51cto.com/images/100/base/empty.png?x-oss-process=image/format,webp/ignore-error,1">
+    <link rel="canonical" href="https://blog.51cto.com/u_12369060/4993707">
+    <link type="favicon" rel="shortcut icon" href="https://blog.51cto.com/favicon.ico">
+        <script async="" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/sensorsdata.min.js.下载"></script><script src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/push.js.下载"></script><script src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/hm.js.下载"></script><script src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/antidomxss_v702.js.下载"></script><script src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/interfaceacting230329.js.下载"></script><script type="application/ld+json">{"@context":"https://ziyuan.baidu.com/contexts/cambrian.jsonld","@id":"https://blog.51cto.com/u_12369060/4993707","appid":"1576672126670053","title":"ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客","images":["https://s2.51cto.com/images/blog/202112/31043857_61ce18e1f2b1f83944.png","https://s2.51cto.com/images/blog/202112/31043858_61ce18e254ee390027.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_30,g_se,x_10,y_10,shadow_20,type_ZmFuZ3poZW5naGVpdGk=","https://s2.51cto.com/images/blog/202112/31043858_61ce18e26c3d322192.png?x-oss-process=image/watermark,size_16,text_QDUxQ1RP5Y2a5a6i,color_FFFFFF,t_30,g_se,x_10,y_10,shadow_20,type_ZmFuZ3poZW5naGVpdGk="],"description":"meta-package：元功能包（或综合功能包）包含为一系列功能包的组合。Navigation 2 是一个元功能包，它使移动平台能够达到目标。加载、服务和存储地图 ([nav2_map_server])\t在地图上机器人 ([nav2_am","pubDate":"2022-02-09T16:52:58","upDate":"2022-02-09T16:52:58"}</script>
+                                <link href="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/pc_detailinline.min.css" rel="stylesheet">             <style type="text/css">#waf_nc_block{position:fixed;_position:absolute;width:100%;height:100%;top:0;bottom:0;left:0;z-index:99999}.waf-nc-mask{background:#000;opacity:.5;filter:alpha(opacity=50);width:100%;height:100%}.waf-nc-wrapper{width:348px;height:236px;text-align:center;position:absolute;top:50%;left:50%;margin-top:-160px;margin-left:-200px;margin-bottom:16px;background:#fff;box-shadow:0 0 10px 0 rgba(0,0,0,0.15)}.waf-nc-title{margin-top:28px;font-size:24px;font-weight:500;color:#181818;letter-spacing:1.71px;text-align:center}.waf-nc-description{margin-top:24px;font-size:14px;color:#666;text-align:center}.waf-nc-traceid-class{margin-top:8px;font-size:12px;color:#999;text-align:center}#nocaptcha{margin-left:24px;margin-top:14px}.nc_bg{background:#fff3ea!important}.btn_slide{background:#ff6a00!important;border:0!important;color:#fff!important;width:48px!important;height:48px!important;font-size:30px;font-weight:900!important;line-height:48px!important}.btn_ok{background:#ff6a00!important;border:0!important;color:#fff!important;width:48px!important;height:48px!important;font-size:30px;font-weight:900!important;line-height:48px!important}.nc_scale{background:rgba(241,241,242,1)!important;height:48px!important}.nc-lang-cnt{height:48px!important;margin-left:10px!important;line-height:48px!important;font-size:14px!important}</style><script src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/awsc.js.下载"></script><link rel="stylesheet" href="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/pc_detailinline.min.css"><link rel="stylesheet" href="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/pc_detail.min.css"><script charset="utf-8" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/jquery-2.2.4.min.js.下载"></script><script charset="utf-8" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/interaction_iframe.js.下载"></script><script charset="utf-8" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/swiper-4.5.3.js.下载"></script><script charset="utf-8" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/pc_base.min.js.下载"></script><script charset="utf-8" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/mprime.js.下载"></script><script charset="utf-8" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/pc_detail.min.js.下载"></script><link href="https://static2.51cto.com/edu/blog/blog-static/static/css/pc_base.min.css?v=2731609498" rel="prefetch"><link href="https://static2.51cto.com/edu/blog/blog-static/static/css/pc_newIndexinline.min.css?v=7cd4246e43" rel="prefetch"><link href="https://static2.51cto.com/edu/blog/blog-static/static/css/pc_newListinline.min.css?v=fcde138dd1" rel="prefetch"><link href="https://static2.51cto.com/edu/blog/blog-static/static/css/pc_topicdetailinline.min.css?v=512bf305aa" rel="prefetch"><link href="https://static2.51cto.com/edu/blog/blog-static/markdown/dist/js/main.js?v=9fee5bb838" rel="prefetch"><link href="https://static2.51cto.com/edu/blog/blog-static/static/js/pc_list_js.min.js?v=8973c321c1" rel="prefetch"><link href="https://static2.51cto.com/edu/blog/blog-static/static/js/pc_topic_static.min.js?v=8533cb9e02" rel="prefetch"><link href="https://static2.51cto.com/edu/blog/blog-static/static/js/pc_blogger_js.min.js?v=c7a4e3d003" rel="prefetch"><style></style></head>
+<body class="webp">
+<img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/share_default.jpeg" border="0" style="width:0; height:0; position:absolute;">
+<div class="Content-box" style="min-height: 660px;">
+    <div class="Content detail-content-new">
+    <!--关注-->
+    <div class="fixtitle" style="display: block;">
+        <div class="clearfix Page">
+            <h3 class="fl title">ROS2极简总结-Nav2-概述（上）规划器</h3>
+            <div class="messbox fr">
+                                                            <a id="checkFollow1_12359060" class="follow-1 checkFollow on">关注</a>
+                                                    <a href="https://blog.51cto.com/u_12369060" class="name" target="_blank" title="zhangrelay">zhangrelay</a>
+                <strong>
+                    <a href="https://blog.51cto.com/u_12369060" class="avatar" target="_blank">
+                        <img class="is-vip-img is-vip-img-4" data-uid="12359060" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/noavatar_small.gif">
+                    </a>
+                </strong>
+            </div>
+        </div>
+    </div>
+    <!--大模块引入-->
+    <div class="clearfix Page" id="page_center" style="position:relative;">
+                <aside class="detail-content-directory common-content-directory">
+     <!-- 文章目录 -->
+     <section class="common-section common-spacing table-contents" style="background:none">
+        <div class="clearfix common-sub-title">
+            <strong title="文章目录">文章目录</strong>
+            <i class="iconblog blogquxiao18" id="closeDirectory"></i>
+        </div>
+        <div class="directory" id="directory-parent2">
+            <ul class="directory-list directory-list-left" id="directory-left">
+                                                                   <li class="lv1">
+                            <div class="title">
+                                <span data-id="#h0">
+                                                                        规划概述 Planning                                </span>
+                            </div>
+                        </li>
+                                                                                            <li class="lv1 on">
+                            <div class="title">
+                                <span data-id="#h1">
+                                                                        插件&nbsp;Plugins                                </span>
+                            </div>
+                        </li>
+                                                                                            <li class="lv1">
+                            <div class="title">
+                                <span data-id="#h2">
+                                                                        规划&nbsp;Planning&nbsp;                                </span>
+                            </div>
+                        </li>
+                                                                                            <li class="lv1">
+                            <div class="title">
+                                <span data-id="#h3">
+                                                                        代价地图&nbsp;Costmap                                </span>
+                            </div>
+                        </li>
+                                                                                            <li class="lv1">
+                            <div class="title">
+                                <span data-id="#h4">
+                                                                        障碍物膨胀 Inflatation of obstacles&nbsp; &nbsp;                                </span>
+                            </div>
+                        </li>
+                                                                                            <li class="lv1">
+                            <div class="title">
+                                <span data-id="#h5">
+                                                                        代价地图配置&nbsp;Costmap Configuration                                </span>
+                            </div>
+                        </li>
+                                                                                            <li class="lv1">
+                            <div class="title">
+                                <span data-id="#h6">
+                                                                        规划服务器&nbsp;Planner Server                                </span>
+                            </div>
+                        </li>
+                                                                                            <li class="lv1">
+                            <div class="title">
+                                <span data-id="#h7">
+                                                                        规划服务器配置&nbsp;Planner Server Configuration                                </span>
+                            </div>
+                        </li>
+                                                        </ul>
+        </div>
+    </section>
+</aside>
+                <article class="detail-content-left">
+    <div class="common-section common-spacing mb30 article-detail">
+    <div class="title">
+        <h1>ROS2极简总结-Nav2-概述（上）规划器</h1>
+         
+                <span class="original">原创</span>
+        
+    </div>
+    <div class="messbox">
+        <p class="clearfix mess-line1">
+            <a class="fl" href="https://blog.51cto.com/u_12369060" rel="nofollow">zhangrelay</a>
+            <time class="fl" pubdate="2022-02-09 16:52:58">2022-02-09 16:52:58</time>
+                                        <span class="fr" id="copyright-btn">©著作权</span>
+                    </p>
+        <p class="clearfix mess-tag">
+                            <strong class="fl">
+                    <em class="fl">文章标签</em>
+                                            <a href="https://blog.51cto.com/topic/nav2.html" class="fl  shence_tag" target="_blank">Nav2</a>
+                                            <a href="https://blog.51cto.com/topic/ros2.html" class="fl  shence_tag" target="_blank">ROS2</a>
+                                            <a href="https://blog.51cto.com/search/result?q=%E5%AF%BC%E8%88%AA" class="fl  shence_tag" target="_blank" rel="nofollow">导航</a>
+                                            <a href="https://blog.51cto.com/search/result?q=%E6%9C%BA%E5%99%A8%E4%BA%BA%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F" class="fl  shence_tag" target="_blank" rel="nofollow">机器人操作系统</a>
+                                            <a href="https://blog.51cto.com/search/result?q=%E8%A7%84%E5%88%92%E5%99%A8" class="fl  shence_tag" target="_blank" rel="nofollow">规划器</a>
+                                    </strong>
+                                        <strong class="fl">
+                    <em class="fl">文章分类</em>
+                                                                                                                    <a href="https://blog.51cto.com/nav/code" class="fl shence_cate" target="_blank" rel="nofollow">代码人生</a>
+                                                            </strong>
+                                <strong class="fl"><em class="fl">阅读数</em><b class="fl">56</b></strong></p>
+    </div>
+                <div class="copytext" id="copytext">
+             ©著作权归作者所有：来自51CTO博客作者zhangrelay的原创作品，请联系作者获取转载授权，否则将追究法律责任        </div>
+        <div class="article-content-wrap">
+                    <div class="artical-content-bak main-content editor-side-new">
+                <div class="con editor-preview-side" id="result" data-version="0"><div class="container am-engine"><p><br></p><p>meta-package：元功能包（或综合功能包）为一系列功能包的组合。</p><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><p>Navigation 2 是一个元功能包，它使移动平台能够到达预定目标。</p><ul><li><ul><li><br></li></ul></li><li>加载、服务和存储地图 ([nav2_map_server])</li><li>在地图上定位机器人 ([nav2_amcl])</li><li>围绕障碍物规划从 A 到 B 的路径（[nav2_planner]）</li><li>控制机器人跟随路径（[nav2_controller]）</li><li>将传感器数据转换为世界的代价地图表示 ([nav2_costmap_2d])</li><li>使用行为树（[nav2__behavior_trees] 和 [nav2_bt_navigator]）构建复杂的机器人行为</li><li>计算发生故障时的恢复行为 ([nav2_recoveries])</li><li>按照顺序航点（[nav2_waypoint_follower]）</li><li>管理服务器的生命周期 ([nav2_lifecycle_manager])</li><li>启用自定义算法和行为的插件 ([nav2_core])<ul><li><br></li></ul></li></ul><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><h2 id="h0">规划概述 Planning</h2><p><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/31043857_61ce18e1f2b1f83944.png" style="visibility: visible; width: 100%; height: 824px;" alt="ROS2极简总结-Nav2-概述（上）规划器_Nav2"></p><p>注意黄色标出部分。 扩展如下：</p><p><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/31043858_61ce18e254ee390027.png" style="visibility: visible; width: 100%; height: 665px;" alt="ROS2极简总结-Nav2-概述（上）规划器_规划器_02"></p><p>其中目标-路径-/cmd_vel-机器人。</p><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><h2 id="h1">插件&nbsp;Plugins</h2><p>[nav2_core]：托管插件的抽象接口（虚拟基类）</p><p><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/31043858_61ce18e26c3d322192.png" style="visibility: visible; width: 100%; height: 474px;" alt="ROS2极简总结-Nav2-概述（上）规划器_导航_03"></p><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><h2 id="h2">规划&nbsp;Planning&nbsp;</h2><p>规划器会帮助找到成本最低的路径。</p><p>成本包含很多方面（物体接近度、持续时间、向后运动、旋转……）</p><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><h2 id="h3">代价地图&nbsp;Costmap</h2><p>[nav2_costmap_2d] 代价图计算障碍物周围的成本，并标出机器人安全和不安全的地方。</p><p><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/31043858_61ce18e2b56e243304.png" style="visibility: visible; width: 100%; height: 807px;" alt="ROS2极简总结-Nav2-概述（上）规划器_机器人操作系统_04"></p><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><h2 id="h4">障碍物膨胀 Inflatation of obstacles&nbsp; &nbsp;</h2><p><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/31043858_61ce18e2cd26f70725.png" style="visibility: visible; width: 100%; height: 354px;" alt="ROS2极简总结-Nav2-概述（上）规划器_机器人操作系统_05"></p><p>图Figure 1：工作空间W到配置空间C的转换</p><p> (a) W 空间中的圆形机器人和障碍物 (b) 基于机器人足迹的变换 (c) C 空间中的点机器人和膨胀障碍物</p><p>图Figure 2：障碍物膨胀</p><p> (a) 点机器人（无充气） (b) 小型圆形机器人 (c) 大型圆形机器人</p><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><h2 id="h5">代价地图配置&nbsp;Costmap Configuration</h2><p>每一层的细则（"static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"）：</p><p>- 静态地图层Static Map Layer：来自一个不变的数据</p><p> &nbsp; &nbsp;外部来源（静态地图）</p><p> - 障碍物层Obstacle Layer：在读取时跟踪障碍物</p><p> &nbsp; &nbsp;通过传感器数据（2D、LaserScan）</p><p> - 体素层Voxel Layer：使用跟踪障碍物</p><p> &nbsp; &nbsp;点云2（3D）</p><p> - 膨胀层Inflation Layer：膨胀障碍物</p><p> &nbsp; &nbsp;表示机器人的配置空间</p><p>turtlebot-burger，配置如下：</p><p>局部代价地图</p><div><div class="data-codeblock-content" style="border:1px solid rgb(232,232,232);max-width:750px;color:rgb(38,38,38);margin:0px;padding:0px;background:rgb(249,249,249);"><div class="CodeMirror" style="color:rgb(89,89,89);margin:0px;padding:0px;background:rgba(0,0,0,0) none repeat scroll 0% 0%;"><div class="hljs-cto"><div class="operation_box"><button data-clipboard-target="#code_id_0" class="copy_btn disable">登录后复制</button> <a title="登录后一键下载全文代码" class="downloadCode"><i class="iconblog blogimport  "></i></a> </div><pre class="cm-s-default has-pre-numbering" style="color: rgb(89, 89, 89); margin: 0px; padding: 15px 0px 17px; background: none 0% 0% repeat scroll rgba(0, 0, 0, 0);"><div class="language-">local_costmap:<br>  local_costmap:<br>    ros__parameters:<br>      update_frequency: 5.0<br>      publish_frequency: 2.0<br>      global_frame: odom<br>      robot_base_frame: base_link<br>      use_sim_time: False<br>      rolling_window: true<br>      width: 3<br>      height: 3<br>      resolution: 0.05<br>      robot_radius: 0.1<br>      plugins: ["obstacle_layer", "voxel_layer", "inflation_layer"]<br>      inflation_layer:<br>        plugin: "nav2_costmap_2d::InflationLayer"<br>        cost_scaling_factor: 1.0<br>      obstacle_layer:<br>        plugin: "nav2_costmap_2d::ObstacleLayer"<br>        enabled: True<br>        observation_sources: scan<br>        scan:<br>          topic: /scan<br>          max_obstacle_height: 2.0<br>          clearing: True<br>          marking: True<br>          data_type: "LaserScan"<br>      voxel_layer:<br>        plugin: "nav2_costmap_2d::VoxelLayer"<br>        enabled: True<br>        publish_voxel_map: True<br>        origin_z: 0.0<br>        z_resolution: 0.05<br>        z_voxels: 16<br>        max_obstacle_height: 2.0<br>        mark_threshold: 0<br>        observation_sources: pointcloud<br>        pointcloud:<br>          topic: /intel_realsense_r200_depth/points<br>          max_obstacle_height: 2.0<br>          clearing: True<br>          marking: True<br>          data_type: "PointCloud2"<br>      static_layer:<br>        map_subscribe_transient_local: True<br>      always_send_full_costmap: True<br>  local_costmap_client:<br>    ros__parameters:<br>      use_sim_time: False<br>  local_costmap_rclcpp_node:<br>    ros__parameters:<br>      use_sim_time: False</div><ul class="pre-numbering" id="code_id_0" style="display: block;"><li>1.</li><li>2.</li><li>3.</li><li>4.</li><li>5.</li><li>6.</li><li>7.</li><li>8.</li><li>9.</li><li>10.</li><li>11.</li><li>12.</li><li>13.</li><li>14.</li><li>15.</li><li>16.</li><li>17.</li><li>18.</li><li>19.</li><li>20.</li><li>21.</li><li>22.</li><li>23.</li><li>24.</li><li>25.</li><li>26.</li><li>27.</li><li>28.</li><li>29.</li><li>30.</li><li>31.</li><li>32.</li><li>33.</li><li>34.</li><li>35.</li><li>36.</li><li>37.</li><li>38.</li><li>39.</li><li>40.</li><li>41.</li><li>42.</li><li>43.</li><li>44.</li><li>45.</li><li>46.</li><li>47.</li><li>48.</li><li>49.</li><li>50.</li><li>51.</li><li>52.</li></ul></pre></div></div></div></div><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><p>全局代价地图：</p><div><div class="data-codeblock-content" style="border:1px solid rgb(232,232,232);max-width:750px;color:rgb(38,38,38);margin:0px;padding:0px;background:rgb(249,249,249);"><div class="CodeMirror" style="color:rgb(89,89,89);margin:0px;padding:0px;background:rgba(0,0,0,0) none repeat scroll 0% 0%;"><div class="hljs-cto"><div class="operation_box"><button data-clipboard-target="#code_id_1" class="copy_btn disable">登录后复制</button> <a title="登录后一键下载全文代码" class="downloadCode"><i class="iconblog blogimport  "></i></a> </div><pre class="cm-s-default has-pre-numbering" style="color: rgb(89, 89, 89); margin: 0px; padding: 15px 0px 17px; background: none 0% 0% repeat scroll rgba(0, 0, 0, 0);"><div class="language-">global_costmap:<br>  global_costmap:<br>    ros__parameters:<br>      update_frequency: 1.0<br>      publish_frequency: 1.0<br>      global_frame: map<br>      robot_base_frame: base_link<br>      use_sim_time: False<br>      robot_radius: 0.1<br>      resolution: 0.05<br>      plugins: ["static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"]<br>      obstacle_layer:<br>        plugin: "nav2_costmap_2d::ObstacleLayer"<br>        enabled: True<br>        observation_sources: scan<br>        scan:<br>          topic: /scan<br>          max_obstacle_height: 2.0<br>          clearing: True<br>          marking: True<br>          data_type: "LaserScan"<br>      voxel_layer:<br>        plugin: "nav2_costmap_2d::VoxelLayer"<br>        enabled: True<br>        publish_voxel_map: True<br>        origin_z: 0.0<br>        z_resolution: 0.05<br>        z_voxels: 16<br>        max_obstacle_height: 2.0<br>        mark_threshold: 0<br>        observation_sources: pointcloud<br>        pointcloud:<br>          topic: /intel_realsense_r200_depth/points<br>          max_obstacle_height: 2.0<br>          clearing: True<br>          marking: True<br>          data_type: "PointCloud2"<br>      static_layer:<br>        plugin: "nav2_costmap_2d::StaticLayer"<br>        map_subscribe_transient_local: True<br>      inflation_layer:<br>        plugin: "nav2_costmap_2d::InflationLayer"<br>        cost_scaling_factor: 1.0<br>        inflation_radius: 0.55<br>      always_send_full_costmap: True<br>  global_costmap_client:<br>    ros__parameters:<br>      use_sim_time: False<br>  global_costmap_rclcpp_node:<br>    ros__parameters:<br>      use_sim_time: False</div><ul class="pre-numbering" id="code_id_1" style="display: block;"><li>1.</li><li>2.</li><li>3.</li><li>4.</li><li>5.</li><li>6.</li><li>7.</li><li>8.</li><li>9.</li><li>10.</li><li>11.</li><li>12.</li><li>13.</li><li>14.</li><li>15.</li><li>16.</li><li>17.</li><li>18.</li><li>19.</li><li>20.</li><li>21.</li><li>22.</li><li>23.</li><li>24.</li><li>25.</li><li>26.</li><li>27.</li><li>28.</li><li>29.</li><li>30.</li><li>31.</li><li>32.</li><li>33.</li><li>34.</li><li>35.</li><li>36.</li><li>37.</li><li>38.</li><li>39.</li><li>40.</li><li>41.</li><li>42.</li><li>43.</li><li>44.</li><li>45.</li><li>46.</li><li>47.</li><li>48.</li><li>49.</li><li>50.</li><li>51.</li></ul></pre></div></div></div></div><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><h2 id="h6">规划服务器&nbsp;Planner Server</h2><p>规划服务器[nav2_planner]：尝试为到达目标点找到全局规划路径。</p><p>默认是 nav2_navfn_planner：</p><ul><li><ul><li><br></li></ul></li><li>支持2种搜索算法： 
+  </li></ul><ul><li><ul><li><br></li></ul></li><li>Dijkstra：找到最短路径</li><li>A*：使用启发式来引导自身，但不保证找到最短路径<ul><li><br></li></ul></li></ul><ul><li>使用全局代价地图（仍可以通过机器人传感器更新）<ul><li><br></li></ul></li></ul><p>在以下位置发布路径：~/plan (nav2_msgs/Path)</p><div style="width:100%;overflow-y:auto"><table class="data-table" style="width:100%;border-collapse:collapse;"><colgroup><col span="1" width="436"><col span="1" width="436"></colgroup><tbody><tr style="height:0px;"><td style="min-width:auto;margin:4px 8px;border:1px solid rgb(217,217,217);padding:4px 8px;vertical-align:top;"><p>Dijkstra</p></td><td class="table-last-row" style="min-width:auto;margin:4px 8px;border:1px solid rgb(217,217,217);padding:4px 8px;vertical-align:top;"><p>A*</p></td></tr><tr style="height:0px;"><td class="table-last-column" style="min-width:auto;margin:4px 8px;border:1px solid rgb(217,217,217);padding:4px 8px;vertical-align:top;"><p><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/31043859_61ce18e306bce26195.png" style="visibility: visible; width: 526px; height: 376px;" alt="ROS2极简总结-Nav2-概述（上）规划器_规划器_06"></p></td><td class="table-last-column table-last-row" style="min-width:auto;margin:4px 8px;border:1px solid rgb(217,217,217);padding:4px 8px;vertical-align:top;"><p><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/31043859_61ce18e34a84e70940.png" style="visibility: visible; width: 526px; height: 376px;" alt="ROS2极简总结-Nav2-概述（上）规划器_机器人操作系统_07"></p></td></tr></tbody></table></div><h2 id="h7">规划服务器配置&nbsp;Planner Server Configuration</h2><ul><li><ul><li><br></li></ul></li><li>~allow_unknown (bool, default: true)</li><li>~tolerance (double, default: 0.0)<ul><li><br></li></ul></li></ul><p>参考turtlebot-burger</p><div><div class="data-codeblock-content" style="border:1px solid rgb(232,232,232);max-width:750px;color:rgb(38,38,38);margin:0px;padding:0px;background:rgb(249,249,249);"><div class="CodeMirror" style="color:rgb(89,89,89);margin:0px;padding:0px;background:rgba(0,0,0,0) none repeat scroll 0% 0%;"><div class="hljs-cto"><div class="operation_box"><button data-clipboard-target="#code_id_2" class="copy_btn disable">登录后复制</button> <a title="登录后一键下载全文代码" class="downloadCode"><i class="iconblog blogimport  "></i></a> </div><pre class="cm-s-default has-pre-numbering" style="color: rgb(89, 89, 89); margin: 0px; padding: 15px 0px 17px; background: none 0% 0% repeat scroll rgba(0, 0, 0, 0);"><div class="language-">planner_server:<br>  ros__parameters:<br>    expected_planner_frequency: 20.0<br>    use_sim_time: False<br>    planner_plugins: ["GridBased"]<br>    GridBased:<br>      plugin: "nav2_navfn_planner/NavfnPlanner"<br>      tolerance: 0.5<br>      use_astar: false<br>      allow_unknown: true</div><ul class="pre-numbering" id="code_id_2" style="display: block;"><li>1.</li><li>2.</li><li>3.</li><li>4.</li><li>5.</li><li>6.</li><li>7.</li><li>8.</li><li>9.</li><li>10.</li></ul></pre></div></div></div></div><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><p>下一节为控制（Controller）。</p><hr style="background-color:rgb(232,232,232);border:1px solid transparent;margin:18px 0px;"><p><br></p></div></div>
+            </div>
+        
+        <div id="asideoffset"></div>
+        <div class="clearfix label-list">
+
+            <!--            <span>本文包含：</span>-->
+            <!--          -->
+            <!--            <a href="" target="_blank"></a>-->
+
+        </div>
+    </div>
+    <div class="action-box">
+        <ul>
+                        <li>
+                <strong class="is-praise  " type="1" blog_id="4993707" userid="12359060">
+                    <a href="javascript:;"><i></i></a>
+                    <span><b class="praise-num"></b>赞</span>
+                </strong>
+            </li>
+            <li>
+                <strong class="favorites-opt">
+                    <a href="javascript:;"><i></i></a>
+                    <span><b class="favorites-num"></b>收藏</span>
+                </strong>
+            </li>
+            <li>
+                <strong class="Topraise">
+                    <a href="javascript:;"><i class="iconblog blogpinglun"></i></a>
+                    <span><b class="comments_num"></b>评论</span>
+                </strong>
+            </li>
+            <li class="share">
+                <strong class="">
+                    <a href="javascript:;"><i class="iconblog blogfen"></i></a>
+                    <span>分享</span>
+                </strong>
+            </li>
+                            <li>
+                    <strong class="article-report">
+                        <a href="javascript:;"><i class="iconblog blogjubaobeifen report-icon" style="font-size: 23px"></i></a>
+                        <span>举报</span>
+                    </strong>
+                </li>
+                    </ul>
+    </div>
+    <div class="clearfix lists">
+                    <p class="fl"><span>上一篇：</span><a href="https://blog.51cto.com/u_12369060/4993704">ABB之ROS功能更新2021</a></p>
+                            <p class="fr"><span>下一篇：</span><a href="https://blog.51cto.com/u_12369060/4993708">github下载慢的一种解决方法（临时用）</a></p>
+            </div>
+    <div class="text-aticle">
+
+    </div>
+</div>
+    
+
+<div class="common-section common-spacing mb30 comment-box" id="comment">
+    <div class="comment-textarea clearfix">
+        <div class="avatar">
+            <a href="https://blog.51cto.com/" class="header-img" target="_blank">
+                <img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/noavatar_middle.gif">
+            </a>
+        </div>
+        <div class="textarea-box">
+            <div class="textarea-show clearfix">
+                <span>提问和评论都可以，用心的回复会被更多人看到</span>
+                <strong>评论</strong>
+            </div>
+            <div class="textarea-hide">
+                <div class="top">
+                    <textarea class="textareadiv textareadiv-publish" name="" id="textareadiv-publish" placeholder="提问和评论都可以，用心的回复会被更多人看到和认可" maxlength="500"></textarea>
+                </div>
+                <div class="bot clearfix">
+                    <strong class="fr publish-btn" flag="1" id="publish-btn">发布评论</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="comment-num" style="display:none;">
+        <strong>全部评论</strong>
+        <span>(<b id="CommentNum"></b>)</span>
+        <span class="fr sort" type="up_num" order="0"><i class="iconblog blogzuire"></i>最热</span>
+        <span class="fr sort on" type="create_time" order="0"><i class="iconblog blogzuixinblogzuixin"></i>最新</span>
+    </div>
+    <div class="comment-List-box"></div>
+</div>
+    
+    <section class="common-section common-spacing mb30">
+        <div class="clearfix common-sub-title">
+            <strong>相关文章</strong>
+        </div>
+        <ul class="recommend-about">
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/4984845" data-report-query="xiangguantuijian&amp;01" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-Nav2-概述（下）恢复器</div>
+                            <p> 恢复器概述Recovery Overview注意最右侧黄色部分，具体如下。插件PluginsBackUp 备份	Spin 旋转	Wait 等待恢复服务器 Recovery Server定义机器人可以执行的恢复操作。[nav2_costmap_2d]清除代价地图[nav2_recoveries]旋转 - 按给定角度原地旋转	备份 - 给定距离的线性平移	停止 - 停止机器人recoveries_server:  ros__parameters...</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         Nav2                                    </span>
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         恢复器                                    </span>
+                                                                    <span class="tag-item">
+                                         导航                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/3768323" data-report-query="xiangguantuijian&amp;02" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-Nav2-概述（中）控制器</div>
+                            <p> 上一节，主要介绍导航功能包Nav2的规划部分，本节为控制部分：控制器概述Controller注意黄色部分，具体看下图。插件Plugins控制器	过程检查	目标检查控制器服务器Controller Server[nav2_controller_server]输入：全局路径，代价地图	输出：速度指令默认为 DWB 控制器。发布速度：~/cmd_vel (geometry_msgs/Twist)包含多个插件：轨迹生成器插件	评分插件	目标检...</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         Nav2                                    </span>
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         控制器                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                                    <span class="tag-item">
+                                         生成器                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/4984846" data-report-query="xiangguantuijian&amp;03" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-Nav2-行为树</div>
+                            <p> ROS2极简总结专题，其实主要是概念的讲解为主，不涉及程序等，之前没有更新完成，此时继续。参考文献：Navigation using ROS 2Navigation导航首先需要目标，然后计算出到达目标所需要的路径，将路径解算为机器人的速度和角度控制量并驱动机器人行驶到目标位置（合理误差范围内）。依据官方教程Nav2结构如下所示：BT如果展开又是厚厚一本书啊……Nav2 - BT（行为树）导航服务器使用行为树 XML 作为导航控制流由 [nav2_bt_navig...</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         Nav2                                    </span>
+                                                                    <span class="tag-item">
+                                         行为树                                    </span>
+                                                                    <span class="tag-item">
+                                         BT                                    </span>
+                                                                    <span class="tag-item">
+                                         Behavior Tree                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/4984847" data-report-query="xiangguantuijian&amp;04" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-Nav2-地图和自适应蒙特卡洛定位</div>
+                            <p> 导航通常需要地图和自定位，一个是全局感，一个是自我认知。Map	AMCLMap地图服务器Map Server地图服务器nav2_map_server	map_server：加载地图，在“/map”主题上提供静态地图。	map_saver：将地图保存到文件中（ros2 run nav2_map_server map_saver_cli -f my_map）第 1 步：创建一个名为 yaml 的参数文件或在启动文件中设置相同的参数# map_server_params.</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         Nav2                                    </span>
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         地图                                    </span>
+                                                                    <span class="tag-item">
+                                         AMCL                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/4993599" data-report-query="xiangguantuijian&amp;05" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-SLAM</div>
+                            <p> 参考文献：Navigation using ROS 2 MappingSLAM - Simultaneous Localization And Mapping同步和建图机器人仿真或实际运动环境的最简描述。建图 - SLAMSLAM：同时估计机器人的位置姿态和环境的地图	：给定地图推断位置		建图：推断给置的地图</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                                    <span class="tag-item">
+                                         SLAM                                    </span>
+                                                                    <span class="tag-item">
+                                         turtlebot3                                    </span>
+                                                                    <span class="tag-item">
+                                         cartographer                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/5005601" data-report-query="xiangguantuijian&amp;06" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-MoveIt2</div>
+                            <p> 用于 ROS 2 的 MoveIt 运动规划框架。The MoveIt Motion Planning Framework forROS 2.参考文献：MoveIt2MoveIt2功能运动规划	生成高自由度轨迹		可在杂乱的环境中运动并避免局部最小值		操纵	通过抓取生成分析环境并与环境交互</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                                    <span class="tag-item">
+                                         最小值                                    </span>
+                                                                    <span class="tag-item">
+                                         闭环控制                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/3435268" data-report-query="xiangguantuijian&amp;07" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-新增概念</div>
+                            <p> 参考文献：ROS2 EXTENDED CONCEPTS在前2篇博文中总结了ROS2的基本概念，这些内容大致与ROS1类似或改进，属于ROS2/ROS1的核心概念。本节</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                                    <span class="tag-item">
+                                         生命周期                                    </span>
+                                                                    <span class="tag-item">
+                                         配置文件                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/3435292" data-report-query="xiangguantuijian&amp;08" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-文件系统</div>
+                            <p> 参考文献：ROS2 Filesystem概述什么是功能包？	工作空间结构如何？</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                                    <span class="tag-item">
+                                         工作空间                                    </span>
+                                                                    <span class="tag-item">
+                                         bash                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/3435376" data-report-query="xiangguantuijian&amp;09" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-核心概念（二）</div>
+                            <p> 参考文献：ROS2 Foundation - An introduction to core concepts纲要计算图</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                                    <span class="tag-item">
+                                         启动文件                                    </span>
+                                                                    <span class="tag-item">
+                                         客户端                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/3435389" data-report-query="xiangguantuijian&amp;10" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-核心概念（一）</div>
+                            <p> 参考文献：ROS2 Foundation - An introduction to core concepts纲要计算图（Computation Graph）</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                                    <span class="tag-item">
+                                         客户端                                    </span>
+                                                                    <span class="tag-item">
+                                         数据                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/4993660" data-report-query="xiangguantuijian&amp;11" target="_blank" class="title">
+                            <div class="tit">ROS2极简总结-命令行接口基础</div>
+                            <p> 参考文献：ROS 2 CLI BASICS -A quick dive into ROS 2 Command Line Interface之前，个人博客大量教程分节介绍过这些命令行，此文做一个总述，更方便了解全貌。大纲安装和导入	基本命令结构	发布者和者	服务	行动和参数	工具安装和导入两种安装类型 - 二进制包（）或源代码编译。</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                                    <span class="tag-item">
+                                         bash                                    </span>
+                                                                    <span class="tag-item">
+                                         服务器                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/3655282" data-report-query="xiangguantuijian&amp;12" target="_blank" class="title">
+                            <div class="tit">ROS1和ROS2如何选？（机器人操作系统2021）ROS2极简总结-新增概念</div>
+                            <p> 关于ROS1和ROS2如何选地文章非常多，毕竟时间有限，一个快过保，一个不成熟，太难了是不是？其实不是，想省事选ROS1，即便是过保，想想国内win7现在使用率还有20%呢，但是xp不行了仅有1%了。</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS1                                    </span>
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                                    <span class="tag-item">
+                                         服务器                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/4984859" data-report-query="xiangguantuijian&amp;13" target="_blank" class="title">
+                            <div class="tit">ROS1和ROS2如何选？（机器人操作系统2021）
+ROS2极简总结-新增概念</div>
+                            <p> 关于ROS1和ROS2如何选地文章非常多，毕竟时间有限，一个快过保，一个不成熟，太难了是不是？其实不是，想省事选ROS1，即便是过保，想想国内win7现在使用率还有20%呢，但是xp不行了仅有1%了。封闭场合用用挺好，比如51单片机现在很多学校还在开设课程呢，不慌。不怕折腾选ROS2，第三方功能（插件）比较少，bug多到怀疑人生，很多demo能跑起来就很开心，是不是？文档，开发还没完成布局，都是碎片化的教程呢^_^未来很美好，但当下苦哈哈啊。热乎乎的ROS Answers，注意提问时间和</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS1                                    </span>
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         机器人操作系统                                    </span>
+                                                                    <span class="tag-item">
+                                         原力计划                                    </span>
+                                                                    <span class="tag-item">
+                                         服务器                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_15473553/5359411" data-report-query="xiangguantuijian&amp;14" target="_blank" class="title">
+                            <div class="tit">《动手学ROS2》10.11 Nav2进阶学习</div>
+                            <p> 《动手学ROS2》10.11 Nav2进阶学习本系列教程作者：小鱼公众号：鱼香ROSQQ交流群：139707339教学视频地址：小鱼的B站完整文档地址：鱼香R</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         动手学ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         Nav2进阶学习                                    </span>
+                                                                    <span class="tag-item">
+                                         微信                                    </span>
+                                                                    <span class="tag-item">
+                                         服务器                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_12369060/5119985" data-report-query="xiangguantuijian&amp;15" target="_blank" class="title">
+                            <div class="tit">ROS2规划系统ros2_planning_system</div>
+                            <p> 先记录一下，稍后仔细研究：​plansys2：​​https://github.com/IntelligentRoboticsLabs/ros2_planning_system​​​examples：​​https://github.com/IntelligentRoboticsLabs/ros2_planning_system_examples​​&nbsp;</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         github                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                            <li>
+                    <div class="about-aticle-list">
+                        <a href="https://blog.51cto.com/u_15473553/5359412" data-report-query="" target="_blank" class="title">
+                            <div class="tit">《动手学ROS2》10.8 为FishBot配置Nav2</div>
+                            <p> 《动手学ROS2》10.8 为FishBot配置Nav2本系列教程作者：小鱼公众号：鱼香ROSQQ交流群：139707339教学视频地址：小鱼的B站完整文档地址：鱼香RO</p>
+                        </a>
+                        <!-- 标签页 -->
+                                                    <div class="tag-box">
+                                                                    <span class="tag-item">
+                                         ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         动手学ROS2                                    </span>
+                                                                    <span class="tag-item">
+                                         配置Nav2                                    </span>
+                                                                    <span class="tag-item">
+                                         fish                                    </span>
+                                                                    <span class="tag-item">
+                                         参数文件                                    </span>
+                                                            </div>
+                                                                    </div>
+
+                </li>
+                    </ul>
+    </section>
+
+</article>
+        
+<aside class="detail-content-right">
+    <!--右上角统计-->
+    <section class="common-section common-spacing mb24 user-intr" style="visibility: hidden;">
+        <div class="user-content">
+            <div class="top">
+                <div class="avatar">
+                    <div class="avatar-img">
+                        <a href="https://blog.51cto.com/u_12369060" target="_blank" rel="nofollow">
+                            <img class="is-vip-img is-vip-img-4" data-uid="12359060" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/noavatar_small.gif">
+                        </a>
+                    </div>
+                </div>
+                <div class="clearfix username">
+                    <a href="https://blog.51cto.com/u_12369060" target="_blank"><span class="blog-user" title="zhangrelay" style="max-width: 272px;">zhangrelay</span></a>
+                    <div class="icon">
+                        <ul class="clearfix detail-list"></ul>
+                    </div>
+                </div>
+            </div>
+            <div class="identify-list"></div>
+            <div class="bottom" id="userStat"><div class="num-name num-top">
+                <ul class="first-num">
+                    <li>
+                        <div class="num"><a href="https://blog.51cto.com/u_12369060/original" target="_blank" rel="nofollow">1759</a></div>
+                        <div class="label-name"><a href="https://blog.51cto.com/u_12369060/original" target="_blank" rel="nofollow">原创</a></div>
+                    </li>
+                    <li>
+                        <div class="num">114.8<span>万</span></div>
+                        <div class="label-name">人气</div>
+                    </li>
+                    <li>
+                        <div class="num"><a href="https://blog.51cto.com/u_12369060/followers" target="_blank" rel="nofollow">22<span></span></a></div>
+                        <div class="label-name"><a href="https://blog.51cto.com/u_12369060/followers" target="_blank" rel="nofollow">粉丝</a></div>
+                    </li>
+                    <li>
+                        <div class="num">7<span></span></div>
+                        <div class="label-name">评论</div>
+                    </li>
+                </ul>
+            </div>
+            <div class="lines"></div>
+            <div class="num-name num-bottom">
+                <ul>
+                    <li>
+                        <div class="num"><a href="https://blog.51cto.com/u_12369060/translate" target="_blank" rel="nofollow">178</a></div>
+                        <div class="label-name"><a href="https://blog.51cto.com/u_12369060/translate" target="_blank" rel="nofollow">翻译</a></div>
+                    </li>
+                    <li>
+                        <div class="num"><a href="https://blog.51cto.com/u_12369060/reproduce" target="_blank" rel="nofollow">79</a></div>
+                        <div class="label-name"><a href="https://blog.51cto.com/u_12369060/reproduce" target="_blank" rel="nofollow">转载</a></div>
+                    </li>
+                    <li>
+                        <div class="num"><a href="https://blog.51cto.com/u_12369060/following" target="_blank" rel="nofollow">1</a></div>
+                        <div class="label-name"><a href="https://blog.51cto.com/u_12369060/following" target="_blank" rel="nofollow">关注</a></div>
+                    </li>
+                    <li>
+                        <div class="num">15</div>
+                        <div class="label-name">收藏</div>
+                    </li>
+                    <div class="clear"></div>
+                </ul>
+            </div></div>
+            <div id="medalListBox" class="medal-list"><div title="自成一派" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/81ba9de79b69d05f4333211abd2d0d4a008a05.png"></div><div title="一眼万年" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/195f76d50ffb2cd8b16664147e48ea8edd9fd6.png"></div><div title="锋芒毕露" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/f6f53e943b8feeab330770a0ec42efed855946.png"></div><div title="崭露头角" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/31b28da6607cbc93cd900122f89b19420ac8c5.png"></div><div title="一代宗师" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/61ba4e730b80264ca0076678a0dbd3e16f64bb.png"></div><div title="炉火纯青" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/c1c0bc692d7397c63280391ec9fc97b029aa51.png"></div><div title="博闻强识" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/a8ef82362559226c848000f191ce5a08f03207.png"></div><div title="持之以恒" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/b67592a476d24a33731174926f050c7209f5df.png"></div><div title="挑战自我" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/03ea5c8040c00c2cbaf04751aae5540380427a.png"></div><div title="初学乍练" class="medalItem item"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/e6f51ba16aff6795ae8301531aecaf9001d3b3.png"></div></div>
+            <div class="operating clearfix ">
+                                                            <a id="checkFollow2_12359060" class="follow-1 checkFollow on" rel="nofollow">关注</a>
+                                                    <button class="sx" data="https://home.51cto.com/space?uid=12359060" id="ToSx"><a href="javascript:;" rel="nofollow"><i class="iconblog blogsixin"></i>私信</a></button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 分类列表 -->
+            <section class="common-section common-spacing mb24" style="visibility: hidden;">
+            <div class="clearfix common-sub-title">
+                <strong title="分类列表">分类列表</strong>
+                            </div>
+            <ul class="common-list" id="classification-list">
+                                    <li>
+                        <a href="https://blog.51cto.com/u_12369060/category1.html" target="_blank" title="#  ROS2学习笔记与高校课程分享"><span># ROS2学习笔记与高校课程分享</span><span>160篇</span></a>
+                    </li>
+                                    <li>
+                        <a href="https://blog.51cto.com/u_12369060/category5.html" target="_blank" title="#  机器人仿真"><span># 机器人仿真</span><span>61篇</span></a>
+                    </li>
+                            </ul>
+        </section>
+        <!-- 近期文章 -->
+            <section class="common-section common-spacing mb24" style="visibility: hidden;">
+            <div class="clearfix common-sub-title">
+                <strong title="近期文章">近期文章</strong>
+            </div>
+            <ul class="common-list">
+                                    <li>
+                        <a href="https://blog.51cto.com/u_16088628/6233197" target="_blank" title="MySQL Replication, 主从和双主配置">1.MySQL Replication, 主从和双主配置</a>
+                    </li>
+                                    <li>
+                        <a href="https://blog.51cto.com/u_16087105/6233535" target="_blank" title="StaX解析XML">2.StaX解析XML</a>
+                    </li>
+                                    <li>
+                        <a href="https://blog.51cto.com/u_11702014/6233136" target="_blank" title="吹得这么牛皮的RPC，到底是个什么鬼？该如何实现呢？">3.吹得这么牛皮的RPC，到底是个什么鬼？该如何实现呢？</a>
+                    </li>
+                                    <li>
+                        <a href="https://blog.51cto.com/u_15874125/6233440" target="_blank" title="一文看懂数据分析必备计算功能—内存计算">4.一文看懂数据分析必备计算功能—内存计算</a>
+                    </li>
+                                    <li>
+                        <a href="https://blog.51cto.com/u_16087105/6233529" target="_blank" title="java泛型">5.java泛型</a>
+                    </li>
+                            </ul>
+        </section>
+        <section class="common-fix fix-table">
+         <!-- 新人活动 -->
+         <a class="ac-box mb24" href="https://blog.51cto.com/activity-first-publish#xiang" target="_blank"><img alt="新人福利" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/DetailsBride.gif"></a>
+        <!-- 文章目录 -->
+                   <div class="common-section common-spacing table-contents common-content-directory">
+            <div class="clearfix common-sub-title">
+                <strong title="文章目录">文章目录</strong>
+            </div>
+            <div class="directory" id="directory-parent1">
+                <ul class="directory-list" id="directory-right">
+                                                                        <li class="lv1">
+                                <div class="title">
+                                    <span data-id="#h0">
+                                                                                规划概述 Planning                                    </span>
+                                </div>
+                            </li>
+                                                                                                <li class="lv1 on">
+                                <div class="title">
+                                    <span data-id="#h1">
+                                                                                插件&nbsp;Plugins                                    </span>
+                                </div>
+                            </li>
+                                                                                                <li class="lv1">
+                                <div class="title">
+                                    <span data-id="#h2">
+                                                                                规划&nbsp;Planning&nbsp;                                    </span>
+                                </div>
+                            </li>
+                                                                                                <li class="lv1">
+                                <div class="title">
+                                    <span data-id="#h3">
+                                                                                代价地图&nbsp;Costmap                                    </span>
+                                </div>
+                            </li>
+                                                                                                <li class="lv1">
+                                <div class="title">
+                                    <span data-id="#h4">
+                                                                                障碍物膨胀 Inflatation of obstacles&nbsp; &nbsp;                                    </span>
+                                </div>
+                            </li>
+                                                                                                <li class="lv1">
+                                <div class="title">
+                                    <span data-id="#h5">
+                                                                                代价地图配置&nbsp;Costmap Configuration                                    </span>
+                                </div>
+                            </li>
+                                                                                                <li class="lv1">
+                                <div class="title">
+                                    <span data-id="#h6">
+                                                                                规划服务器&nbsp;Planner Server                                    </span>
+                                </div>
+                            </li>
+                                                                                                <li class="lv1">
+                                <div class="title">
+                                    <span data-id="#h7">
+                                                                                规划服务器配置&nbsp;Planner Server Configuration                                    </span>
+                                </div>
+                            </li>
+                                                            <div class="arrow" style="top: 251.25px;"></div></ul>
+            </div>
+            <div class="table-contents"></div>
+        </div>
+        </section>
+  
+
+
+</aside>
+    </div>
+    <!--悬浮小菜单-->
+        <aside class="minmenu" style="display: block;">
+        <ul>
+            <li class="signIn" signid="2">
+                <button id="signIn">  每日签到</button>
+            </li>
+            <li class="editArticle" editid="2">
+                <!-- <div class="new_bloger ">新人福利</div> -->
+                 <button id="editArticle"><i class="iconblog blogxiewz"></i></button>
+            </li>
+            <li class="feedback">
+              <a href="https://blog.51cto.com/feedback?utm_medium=rightsuspension" target="_blank">意见<br>反馈</a>
+            </li>
+            <li class="scrollToTop">
+              <i class="iconblog bloggengduo1"></i>
+            </li>
+        </ul>
+    </aside>
+</div>
+<!-- 蒙层 -->
+<div class="Mask"></div>
+
+<div class="report-dialog-root">
+    <div class="report-dialog-container">
+        <p class="report-dialog-title">举报文章</p>
+        <div class="report-type-container model-split_top" data-type="0" id="report-specific-type">
+            <p class="report-type-tit">请选择举报类型</p>
+            <div class="report-type-enmu">
+                <span class="report-type-item type-item_first" data-type="1">内容侵权</span>
+                <span class="report-type-item type-item_first item-split" data-type="2">涉嫌营销</span>
+                <span class="report-type-item type-item_first item-split" data-type="3">内容抄袭</span>
+                <span class="report-type-item type-item_first item-split" data-type="4">违法信息</span>
+                <span class="report-type-item type-item_first item-split" data-type="5">其他</span>
+            </div>
+        </div>
+        <div class="report-type-container model-split_top report-hide-model" id="report-specific-reasons" data-type="0">
+            <p class="report-type-tit">具体原因</p>
+            <div class="report-type-enmu">
+                <span class="report-type-item type-item_second" data-type="1">包含不真实信息</span>
+                <span class="report-type-item type-item_second item-split" data-type="2">涉及个人隐私</span>
+            </div>
+        </div>
+        <div class="report-type-container model-split_top report-hide-model" id="report-original-link">
+            <p class="report-type-tit">原文链接（必填）</p>
+            <input type="text" placeholder="请输入被侵权的原文链接" class="report-orgin_input">
+        </div>
+        <div class="report-type-container model-split_top textarea-content">
+            <p class="report-type-tit">补充说明</p>
+            <textarea maxlength="200" class="report-reason_textarea" placeholder="请详细描述您的举报内容" id="report-more-info"></textarea>
+            <p class="report-textarea-tip"><span class="tip-left">0</span><span>/200</span></p>
+        </div>
+        <div class="report-type-container">
+            <p class="report-type-tit">上传截图</p>
+            <div class="report-img-container">
+                <i class="iconblog blogtianjiabeifen report-add-icon"></i>
+                <input type="file" accept="image/jpg,image/jpeg,image/png" name="file" class="repot-btn-select" onchange="selectImg(this)">
+            </div>
+            <p class="report-img_rule">格式支持JPEG/PNG/JPG，图片不超过1.9M</p>
+            <div class="report-img-show">
+                <img src="https://blog.51cto.com/u_12369060/4993707" alt="" id="report-img">
+                <div class="report-img-close">
+                    <i class="iconblog bloga-shanchutupian report-close-icon"></i>
+                </div>
+            </div>
+        </div>
+        <div class="report-btn-container">
+            <button class="report-btn-cancel">取消</button>
+            <button class="report-btn-concert">确认</button>
+        </div>
+        <div class="report-warm-tip report-hide-model">
+            已经收到您得举报信息，我们会尽快审核
+        </div>
+    </div>
+</div>
+<div class="imgViewDom disnone" style="display: none;">
+    <div class="img-content"></div>
+</div>
+
+<div class="zhiCustomBtn" style="display:none;" id="hide-zhiCustomBtn"></div>
+<!--左边悬浮操作项-->
+<aside class="action-aside action-aside-left">
+    <div class="inner">
+        <ul><li class="directoryBtn"><strong><a href="javascript:;" class="arrowing"><i class="iconblog bloggengduo"></i></a><span>目录</span></strong></li>
+                        <li>
+                <strong class="is-praise  " type="1" blog_id="4993707" userid="12359060">
+                    <a href="javascript:;"><i></i></a>
+                    <span><b class="praise-num"></b>赞</span>
+                </strong>
+            </li>
+            <li>
+                <strong class="favorites-opt">
+                    <a href="javascript:;"><i></i></a>
+                    <span><b class="favorites-num"></b>收藏</span>
+                </strong>
+            </li>
+            <li>
+                <strong class="Topraise">
+                    <a href="javascript:;"><i class="iconblog blogpinglun"></i></a>
+                    <span><b class="comments_num"></b>评论</span>
+                </strong>
+            </li>
+            <li class="share">
+                <strong class="">
+                    <a href="javascript:;"><i class="iconblog blogfen"></i></a>
+                    <span>分享</span>
+                </strong>
+            </li>
+        </ul>
+    </div>
+</aside>
+    <div class="modal-bg">
+         <div class="modal">
+            <i class="iconblog blogquxiao18 close-btn"></i>
+            <div class="content "></div>
+            <div class="tip-box">如有误判或任何疑问，可联系 <a href="javascript:;" class="zhiCustomBtn">「51CTO博客客服 」</a><span class="appeal_text">申诉及反馈</span>。</div>
+             <div class="know-box">
+                <span class="know-btn">我知道了</span>
+             </div>
+
+         </div>
+    </div>
+<div class="dialog-box">
+    <div class="mask"></div>
+    <div class="body">
+        <div id="close" class="close"></div>
+        <div id="medalListBox2"></div>
+    </div>
+</div>
+<div class="dialog-box-small">
+    <div class="mask"></div>
+    <div class="body">
+        <div id="close" class="close"></div>
+        <div id="medalBox2" class="medal-list">
+        </div>
+    </div>
+</div></div>
+  <header class="home-top" style="display: none;">
+    <div class="Page">
+        <div class="top_box">
+            <div class="left_nav">
+                               <div class="item-lf "><a class="top" href="https://www.51cto.com/" target="_blank" rel="nofollow" data-id="1"> 51CTO首页                                </a></div>
+                               <div class="item-lf "><a class="top" href="https://www.51cto.com/dev?utm_source=hometop" target="_blank" rel="nofollow" data-id="2"> 内容精选                                </a></div>
+                               <div class="item-lf "><a class="top" href="https://blog.51cto.com/" target="_blank" rel="nofollow" data-id="3"> 博客                                </a></div>
+                               <div class="item-lf "><a class="subweb" href="https://edu.51cto.com/?utm_source=hometop" target="_blank" rel="nofollow" data-id="4"> 学堂                                </a></div>
+                               <div class="item-lf "><a class="subweb" href="https://e.51cto.com/?utm_platform=pc&amp;utm_medi-um=51cto&amp;utm_source=zhuzhan&amp;utm_content=sy_topbar" target="_blank" rel="nofollow" data-id="5"> 精培                                </a></div>
+                               <div class="item-lf "><a class="subweb" href="https://b.51cto.com/index?utm_source=hometop" target="_blank" rel="nofollow" data-id="6"> 企业培训                                </a></div>
+                               <div class="item-lf "><a class="subweb" href="https://x.51cto.com/?www" target="_blank" rel="nofollow" data-id="7"> CTO训练营                                </a></div>
+                               <div class="item-lf "><a class="top" href="https://icv.51cto.com/?utm_source=hometop" target="_blank" rel="nofollow" data-id="8"> 智能汽车                                </a></div>
+                               <div class="item-lf "><a class="subweb" href="https://ost.51cto.com/?utm_source=hometop" target="_blank" rel="nofollow" data-id="9"> 开源基础软件社区                                </a></div>
+                               <div class="item-lf  hot"><a class="top" href="https://wot.51cto.com/?utm_source=dhl" target="_blank" rel="nofollow" data-id="10"> WOT全球技术创新大会                                    <span class="hot-div"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/050f59267bbc5fba674956e98e5712556c5085.png" alt=""></span>
+                                </a></div>
+                           </div>
+            <div class="top_right">
+                <div class="item-rt"><a href="http://so.51cto.com/?keywords=&amp;sort=time" target="_blank" class="search-top" rel="nofollow"><i class="iconblog blogsou blog-search"></i></a></div>
+                <div class="item-rt"><span class="wechatlist" data-id="wechatImageList">公众号矩阵</span></div>
+                <div class="item-rt"><span class="applist" data-id="appImageList">移动端</span></div>
+
+            </div>
+        </div>
+    </div>
+    <div class="nav-more-container " style="height: 0px;">
+        <div class="Page nav-contant-box" style="height: 0px; z-index: 0;">
+                                                                                                                                   <div class="nav-contant " data-id="4" style="height: 0px; z-index: 0;">
+                                           <a href="https://edu.51cto.com/courselist/index-zh5.html?utm_source=hometop" target="_blank">免费课程</a>
+                                              <a href="https://edu.51cto.com/ranking/index.html?utm_source=hometop" target="_blank">课程排行</a>
+                                              <a href="https://e.51cto.com/ncamp/list?utm_platform=pc&amp;utm_medium=51cto&amp;utm_source=zhuzhan&amp;utm_content=sy_topbar&amp;rtm_frd=13" target="_blank">直播课</a>
+                                              <a href="https://e.51cto.com/rk/?utm_platform=pc&amp;utm_medi-um=51cto&amp;utm_source=zhuzhan&amp;utm_content=sy_topbar&amp;rtm_frd=14" target="_blank">软考学堂</a>
+                                            </div>
+                                                                  <div class="nav-contant " data-id="5" style="height: 0px; z-index: 0;">
+                                           <a href="https://e.51cto.com/?utm_platform=pc&amp;utm_medi-um=51cto&amp;utm_source=zhuzhan&amp;utm_content=sy_topbar" target="_blank">精品班</a>
+                                              <a href="https://e.51cto.com/wejob/list?pid=5&amp;utm_platform=pc&amp;utm_medium=51cto&amp;utm_source=zhuzhan&amp;utm_content=sy_topbar&amp;rtm_frd=41" target="_blank">厂商认证</a>
+                                              <a href="https://e.51cto.com/wejob/list?pid=1&amp;utm_platform=pc&amp;utm_medium=51cto&amp;utm_source=zhuzhan&amp;utm_content=sy_topbar&amp;rtm_frd=42" target="_blank">IT技术</a>
+                                              <a href="https://e.51cto.com/rk/?utm_platform=pc&amp;utm_medium=51cto&amp;utm_source=zhuzhan&amp;utm_content=sy_xyzq_rightwzl&amp;rtm_frd=07&amp;utm_medium=51cto&amp;utm_source=zhuzhan&amp;utm_content=sy_topbar&amp;rtm_frd=43" target="_blank">2023年软考</a>
+                                              <a href="https://e.51cto.com/wejob/list?pid=33&amp;utm_platform=pc&amp;utm_medium=51cto&amp;utm_source=zhuzhan&amp;utm_content=sy_topbar&amp;rtm_frd=44" target="_blank">PMP项目管理</a>
+                                            </div>
+                                                                  <div class="nav-contant " data-id="6" style="height: 0px; z-index: 0;">
+                                           <a href="https://b.51cto.com/index?utm_source=hometop" target="_blank">在线学习</a>
+                                              <a href="https://b.edu.51cto.com/site/home" target="_blank">企业服务</a>
+                                            </div>
+                                                                  <div class="nav-contant " data-id="7" style="height: 0px; z-index: 0;">
+                                           <a href="https://x.51cto.com/?www" target="_blank">CTO训练营</a>
+                                              <a href="https://x.51cto.com/act/cto/tl" target="_blank">技术经理研习营</a>
+                                              <a href="https://x.51cto.com/act/cto/leatech2021?www1" target="_blank">LeaTech峰会</a>
+                                            </div>
+                                                                                              <div class="nav-contant " data-id="9" style="height: 0px; z-index: 0;">
+                                           <a href="https://ost.51cto.com/postlist" target="_blank">文章</a>
+                                              <a href="https://ost.51cto.com/resource" target="_blank">资源</a>
+                                              <a href="https://ost.51cto.com/answerlist" target="_blank">问答</a>
+                                              <a href="https://ost.51cto.com/study" target="_blank">开源课堂</a>
+                                              <a href="https://ost.51cto.com/column" target="_blank">专栏</a>
+                                              <a href="https://ost.51cto.com/activity" target="_blank">直播</a>
+                                            </div>
+                                                                                            <div class="nav-contant wechatImageList" data-id="wechatImageList" style="height: 0px; z-index: 0;">
+                                           <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/862966771f540df82857144db74b27ee5b4b23.jpeg"></div><span class="txt">51CTO</span></div>
+                                              <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/d53d67c771f5cc42bac359bceb138c4cb1713b.jpg"></div><span class="txt">开源基础软件社区</span></div>
+                                              <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/58786f9973e5e929ef521783e1ee40413b04de.jpeg"></div><span class="txt">51CTO技术栈</span></div>
+                                              <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/c77c03983d48589b1af789dfc284acb6a7c529.jpeg"></div><span class="txt">51CTO官微</span></div>
+                                              <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/544d71641d983430fc9955636e625e6bb21ff9.jpeg"></div><span class="txt">51CTO学堂</span></div>
+                                              <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/f1bd61e720bf669483d941a8486c124f32c451.jpeg"></div><span class="txt">51CTO博客</span></div>
+                                              <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/4719e7b27bae3af5e33552481b6cb913288b01.jpeg"></div><span class="txt">CTO训练营</span></div>
+                                              <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/61a991f484307eed2fe9356cc215c4d8f2dc0f.jpg"></div><span class="txt">开源基础软件社区订阅号</span></div>
+                                            </div>
+                                                        <div class="nav-contant appImageList" data-id="appImageList" style="height: 0px; z-index: 0;">
+                                           <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/24febb8152cc24e264e642f8cb8bb515efea26.jpeg"></div><span class="txt">51CTO学堂APP</span></div>
+                                              <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/43cca7d0489cc5d1f70060be760bde17d552e2.jpeg"></div><span class="txt">51CTO学堂企业版APP</span></div>
+                                              <div class="ewmbox"><div class="imgbox"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/c4d2220826890472539671d7c428f0c0ee9451.jpg"></div><span class="txt">开源基础软件社区视频号</span></div>
+                                            </div>
+                        </div>
+    </div>
+</header>
+<div class="Header  " style="height: 70px; top: 0px; display: none;">
+     <div class="header-content">
+        <div class="header-left">
+                            <div class="Logo"><a href="https://blog.51cto.com/"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/logo.png" alt="51CTO博客" width="100" title="51CTO博客">
+                    <h2>51CTO博客</h2>
+                </a></div>
+                  <ul class="Navigates  commonhide">
+            <li><a href="https://blog.51cto.com/">首页</a>
+                <div class="spam-classifications" style="display:none;">
+                    <div class="spam-classifications-content">
+                        <div class="classification-ipc" id="classification-ipc"></div>
+                        <div class="classification-primary-list-box" id="classification-primary-list-box"></div>
+
+                    </div>
+                </div>
+            </li>
+            <li><a href="https://blog.51cto.com/nav/following">关注</a></li>
+            <li><a href="https://blog.51cto.com/ranking/hot">排行榜</a></li>
+            <li class="">
+                <a href="https://blog.51cto.com/cloumn/index">订阅专栏</a>
+            </li>
+                <li class="first"><a href="https://blog.51cto.com/activity-first-publish#shouye" target="_blank"><img alt="新人福利" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/first2.gif"></a></li>
+            </ul>
+     </div>
+        <ul class="header-right">
+                <li class="search">
+                    <form class=" form-search" method="get" action="https://blog.51cto.com/search/result" target="_blank" novalidate="">
+                        <input type="text" name="q" placeholder="搜索文章、作者" id="TopSearchInput" autocomplete="off" required="">
+                         <i class="iconblog  bloga-shanchutupian"></i>
+                        <button class="iconblog blogsou" id="TopSearchBtn"></button>
+                    </form>
+                    <div class="focusSelect focusSelect_his" style="display: none;">
+
+                        <div class="searchHistoryList" style="display: none;">
+                            <div class="clearfix hishead">搜索历史
+                                <span class="clearhis"><i class="iconblog blogshanchu18 "></i>清空</span>
+                            </div>
+                            <div class="hisitem-wrap"><div class="his-item"><span title="ROS2极简总结">ROS2极简总结</span><i class="iconblog blogquxiao18 close-his-item"></i></div></div>
+                        </div>
+
+                        <div class="hotList" style="display: none;">
+                            <div class="clearfix hishead">热门搜索</div>
+                            <div class="hot-wrap"></div>
+                        </div>
+
+                    </div>
+
+                    <div class="focusSelect focusSelect_key" style="display: none;">
+                        <div class="keyitem-wrap">
+
+                        </div>
+                        <div class="clearfix checkSearchResult">
+                            <span>查看【</span>
+                            <span class="checkKey"></span>
+                            <span>】的结果</span>
+                        </div>
+                    </div>
+                </li>
+                                      <li class="write commonhide">
+                        <div class="new_bloger">首发福利</div>
+                        <a href="javascript:;" id="toPublish" onclick="Login({scene:&#39;write1&#39;})" rel="nofollow"> <i class="iconblog  blogxiewenzhang"></i>写文章</a></li>
+                      <li class="creative"><a href="https://blog.51cto.com/creative-center/index">创作中心</a></li>
+                                                         <li class="logins">
+                    <a href="https://home.51cto.com/index?from_service=blog&amp;scene=login1&amp;reback=https://blog.51cto.com/u_12369060/4993707" target="_self" class="clearfix" rel="nofollow"><span class="fl">登录</span><b class="fgline fl"></b><span class="fl">注册</span></a>
+                </li>
+                    </ul>
+
+    </div>
+<div class="search-mask" style="display: none;"></div></div>
+    <!-- if publish show -->
+    <div class="Footer">
+        <div class="Page ">
+            <div class="fl">
+                <a href="https://blog.51cto.com/" class="Logo"><img src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/logo4.png" alt="51CTO博客" width="214" title="51CTO博客"></a>
+                <p class="copy">Copyright © 2005-2023 <a href="https://www.51cto.com/" target="_blank">51CTO.COM</a>
+                    版权所有 京ICP证060544号</p>
+            </div>
+
+            <dl class="foot_ab fr">
+                <dt>关于我们</dt>
+                <dd>
+                    <table class="aboutList">
+                        <tbody><tr>
+                            <td><a href="https://blog.51cto.com/51ctoblog" target="_blank">官方博客</a></td>
+                            <td><a href="https://blog.51cto.com/nav" target="_blank">全部文章</a></td>
+                            <td><a href="https://blog.51cto.com/topic/all" target="_blank">热门标签</a></td>
+                            <td><a href="https://blog.51cto.com/class-blog/index" target="_blank" data-v-6e9e21b4="">班级博客</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://www.51cto.com/about/aboutus.html" target="_blank">了解我们</a></td>
+                            <td><a href="javascript:;" class="zhiCustomBtn">在线客服</a></td>
+                            <td><a href="https://www.51cto.com/about/map.html" target="_blank">网站地图</a></td>
+                            <td><a href="https://blog.51cto.com/feedback?utm_medium=aboutus2" target="_blank">意见反馈</a></td>
+
+                        </tr>
+                    </tbody></table>
+                </dd>
+            </dl>
+
+
+            <dl class="foot_link fr">
+                <dt>友情链接</dt>
+                <dd>
+
+                    <table class="aboutList-2">
+                        <tbody><tr>
+                            <td><a href="https://ost.51cto.com/?utm_source=blogsitemap" target="_blank">开源基础软件社区</a></td>
+                            <td><a href="https://edu.51cto.com/" target="_blank">51CTO学堂</a></td>
+                        </tr>
+                        <tr>
+                            <td><a href="https://www.51cto.com/" target="_blank">51CTO</a></td>
+                            <td> <a href="https://icv.51cto.com/" target="_blank">汽车开发者社区</a></td>
+                        </tr>
+                    </tbody></table>
+                </dd>
+            </dl>
+
+        </div>
+    </div>
+    
+
+<div class="zhiCustomBtn" style="display:none;" id="hide-zhiCustomBtn"></div>
+<script>
+    var userId="";
+var uid="";
+var user_id=12359060;
+var isLogin=0;
+var imgpath="https://s2.51cto.com/";
+var BLOG_URL="https://blog.51cto.com/";
+var HOME_URL="https://home.51cto.com/";
+var STATICPATH="https://static2.51cto.com/edu/";
+var SA_SERVER_URL_YM="https://sc.51cto.com/sa?project=production";
+var cururl="https://blog.51cto.com/u_12369060/4993707";
+var login_url="https://home.51cto.com/mobile/client-login?reback=https://blog.51cto.com/u_12369060/4993707";
+var praise_url="https://blog.51cto.com/praise/praise";
+var qrcodeSid="";
+var qr_code="";
+var router="blog/index";
+var csrfParam="_csrf";
+var csrfToken="6pQnor21HJRAcHqF3d3tQz2UyCquVbT7feZjbll0c72tUqPMw3dHsn1LLhxGxw6-_TA9b7pbg9qBjvrGTzFsow==";
+var is_load=0;
+var uc_url="https://ucenter.51cto.com/";
+var blog_url="https://blog.51cto.com/";
+var isBuy=1;
+var isPc=0;
+var writeMessage="©著作权归作者所有：来自51CTO博客作者zhangrelay的原创作品，请联系作者获取转载授权，否则将追究法律责任\r\nROS2极简总结-Nav2-概述（上）规划器\r\nhttps:\/\/blog.51cto.com\/u_12369060\/4993707";
+var isCodeCopy=0;
+var cid="";
+var fid=0;
+var commentListPage="";
+var originalUrl="https://blog.51cto.com/u_12369060/original";
+var followersUrl="https://blog.51cto.com/u_12369060/followers";
+var translateUrl="https://blog.51cto.com/u_12369060/translate";
+var reproduceUrl="https://blog.51cto.com/u_12369060/reproduce";
+var followingUrl="https://blog.51cto.com/u_12369060/following";
+var page="detail";
+var tipStatus=1;
+var addReply_url="https://blog.51cto.com/addBlogComment";
+var removeUrl="https://blog.51cto.com/delBlogComment";
+var blog_id=4993707;
+var is_comment=0;
+var comment_list="https://blog.51cto.com/getBlogCommentList";
+var index_url="https://blog.51cto.com/u_12369060";
+var img_url="https://static2.51cto.com/edu/blog/";
+var i_user_id="";
+var c_user_id=12359060;
+var collect_url="https://blog.51cto.com/addUserCollect";
+var is_old=1;
+var nicknameurl="https://blog.51cto.com/u_12369060";
+var nickname="zhangrelay";
+var shareimgUrl="/qr/qr-url?url=https%3A%2F%2Fblog.51cto.com%2Fu_12369060%2F4993707";
+var checkFollow=1;
+var seoTitle="";
+var articleABtest=0;
+            !function(f,p){"use strict";var h=new RegExp("\\.css"),y=p.head||p.getElementsByTagName("head")[0],r=+navigator.userAgent.replace(/.*(?:AppleWebKit|AndroidWebKit)\/?(\d+).*/i,"$1")<536;function s(e){return"complete"===e.readyState||"loaded"===e.readyState}function v(e,t,n){var o="onload"in e;function a(){e.onload=e.onreadystatechange=null,e=null,t()}"css"!==n||!r&&o?o?(e.onload=a,e.onerror=function(){e.onerror=null}):e.onreadystatechange=function(){s(e)&&a()}:setTimeout(function(){!function e(t,n){var o;t.sheet&&(o=!0),setTimeout(function(){o?n():e(t,n)},20)}(e,t)},1)}function u(t,n,e,o){if(t)if(h.test(t)){var a=t,r=e,c=u,i=p.createElement("link");if(r.attrs)for(var l in r.attrs)i.setAttribute(l,r.attrs[l]);r.prefetch?(i.href=a,i.rel="prefetch",c&&c()):(i.rel="stylesheet",v(i,c,"css"),i.href=a),y.appendChild(i)}else{var c=t,d=e,a=u,f=d.prefetch?p.createElement("link"):p.createElement("script");if(d.attrs)for(var s in d.attrs)f.setAttribute(s,d.attrs[s]);d.prefetch?(f.href=c,f.rel="prefetch",a&&a()):(f.charset="utf-8",v(f,a,"js"),f.async=!1,f.src=c),y.appendChild(f)}else setTimeout(function(){u()});function u(){var e=n.indexOf(t);-1<e&&n.splice(e,1),0===n.length&&o()}}function c(e="load",t){var n="object"==typeof t.option?t.option:{},t="function"==typeof t.callback?t.callback:null;return n.attrs="object"==typeof n.attrs?n.attrs:{},n.loaded="boolean"==typeof n.loaded&&n.loaded,n[e]=!0,{option:n,cb:t}}function i(c,e,t="load"){var n,o,a,r,i,l;function d(){var e=c,t=i,n=l;function o(){n&&n()}if(0===(e=Array.prototype.slice.call(e||[])).length)o();else for(var a=0,r=e.length;a<r;a++)u(e[a],e,t,o)}c&&c.length&&(i=e.option,l=e.cb,e=p,n=function(){"load"===t&&i.loaded?setTimeout(d,2e3):d()},("ready"===(o=t)?"loading"!==e.readyState:s(e))?n():(a=!1,r=function(){a||(n(),a=!0)},"load"===o?f.addEventListener("load",r):"ready"===o&&p.addEventListener("DOMContentLoaded",r),setTimeout(function(){r()},1500)))}f.PsLoader={ready:function(e,t,n={}){var o=[],a=[];e.forEach(function(e){(h.test(e)?o:a).push(e)}),n.loaded=!1,i(o,c("ready",{option:n,callback:function(){t(o)}}),"ready"),i(a,c("load",{option:n,callback:function(){t(a)}}))},load:function(e,t,n={}){i(e,c("load",{option:n,callback:t}))},prefetch:function(e,t,n={}){i(e,c("prefetch",{option:n,callback:t}))}}}(window,document);        !function(m,g){var t=["scroll","wheel","mousewheel","resize","animationend","transitionend","touchmove"];function n(e){if("object"!=typeof e)throw new Error("CLazy option is not Object");var f={defaultImg:e.defaultImg||"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",preLoad:e.preLoad||1.3,preLoadTop:e.preLoadTop||0,complete:e.complete||null,events:e.events||t,capture:e.capture||!1},v=0,p={},h={},i={},A=this;function l(e){var t=e;if("object"!=typeof t)return!1;if(!t.el)for(var r in p)if(e===p[r].el){t=p[r];break}return t}function c(e){var e=e.getBoundingClientRect(),t=f.preLoad,r=f.preLoadTop;return e.top<m.innerHeight*t&&e.bottom>r&&e.left<m.innerWidth*t&&0<e.right}function u(e,t){var r,n=e.bindType,o=e.el;switch(t){case"loading":case"error":r=f.defaultImg;break;default:r=e.src}n?e.src&&(o.style[n]='url("'+r+'")'):o.getAttribute("src")!==r&&o.setAttribute("src",r),o.setAttribute("lazy",t)}this.add=function(e,t){var r=function(e){var t,r=!1;for(t in p)if(p[t].el===e){r=p[t];break}return r}(e);if(r)return this.check(r),!1;r="e_"+ ++v;if(p[r])return this.check(p[r]),!1;for(var n,o={id:r,el:e,bindType:"IMG"===e.tagName?null:"background-image",src:(n=e,(t=t)?t.value:n.getAttribute("ps-lazy")),$parent:function(e){if(!(e instanceof HTMLElement))return m;var t=e;for(;t&&t!==g.body&&t!==g.documentElement&&t.parentNode;){if(/(scroll|auto)/.test(function(e){return y(e,"overflow")+y(e,"overflow-y")+y(e,"overflow-x")}(t)))return t;t=t.parentNode}return m}(e)},a=(h[r]=function(e){A.check(o)},p[r]=o),i=h[r],c=0;c<f.events.length;c++){s=d=u=l=void 0;var[l,u,d,s=!1]=[a.$parent,f.events[c],i,f.capture];l&&l.addEventListener(u,d,s),m!==l&&m.addEventListener(u,d,s)}this.check(o)},this.remove=function(e){for(var e=l(e),t=(e.el&&e.el.removeAttribute("ps-lazy"),e),r=h[e.id],n=0;n<f.events.length;n++){c=i=a=o=void 0;var[o,a,i,c=!1]=[t.$parent,f.events[n],r,f.capture];o&&o.removeEventListener(a,i,c),m!==o&&m.removeEventListener(a,i,c)}delete h[e.id],delete p[e.id]},this.check=function(e){var t,r,n,o,a=l(e);c(a.el)&&(m===a.$parent||c(a.$parent))?(e=function(e){u(a,e),A.remove(a),f.complete&&f.complete({el:a.el,src:a.src,state:e})},a.src?(t=a.src,r=e,n=encodeURIComponent(t),i[n]?r(i[n]):((o=new Image).onload=function(){i[n]="loaded",r(i[n])},o.onerror=function(){i[n]="error",r(i[n])},o.src=t)):e("loaded")):u(a,"loading")},this.checkAll=function(){for(var e in p)A.check(p[e])}}function y(e,t){return"undefined"!=typeof getComputedStyle?getComputedStyle(e,null).getPropertyValue(t):e.style[t]}m.PsLazy=function(e={}){function t(e){for(var t=e.path||event.composedPath&&event.composedPath()||e._getPath&&e._getPath(),r=0;r<t.length;r++){var n=t[r];if(n&&"hasAttribute"in n&&n.hasAttribute("ps-lazy-check")){o.format();break}}}function r(){var e=g.querySelector("img[data-share]");e&&!e.getAttribute("src")&&e.setAttribute("src",e.getAttribute("data-share"))}var o=this;n.call(o,e),g.addEventListener("click",t),g.addEventListener("mouseover",t),this.format=function(){var e=g.querySelectorAll("[ps-lazy]");if(!e.length)return!1;for(var t=0;t<e.length;t++)o.add(e[t])},this.format();"complete"===(e=g).readyState||"loaded"===e.readyState?r():m.addEventListener("load",r,!1)}}(window,document);        PsLoader.load(["https://static2.51cto.com/edu/blog/blog-static/static/css/pc_detailinline.min.css?v=9fdd13d7bb","https://static2.51cto.com/edu/blog/blog-static/static/css/pc_detail.min.css?v=118252b566","https://cdn.51cto.com/jquery/jquery-2.2.4.min.js","https://static2.51cto.com/edu/center/js/interaction_iframe.js","https://cdn.51cto.com/jquery/swiper-4.5.3.js","https://static2.51cto.com/edu/blog/blog-static/static/js/pc_base.min.js?v=300bc61215","https://static2.51cto.com/edu/blog/blog-static/js/mprime.js?v=2cb70144db","https://static2.51cto.com/edu/blog/blog-static/static/js/pc_detail.min.js?v=2535acb529"], function() {})
+    PsLoader.prefetch(["https://static2.51cto.com/edu/blog/blog-static/static/css/pc_base.min.css?v=2731609498","https://static2.51cto.com/edu/blog/blog-static/static/css/pc_indexinline.min.css?v=e40c304555","https://static2.51cto.com/edu/blog/blog-static/static/css/pc_newIndexinline.min.css?v=7cd4246e43","https://static2.51cto.com/edu/blog/blog-static/static/css/pc_listinline.min.css?v=a365759c73","https://static2.51cto.com/edu/blog/blog-static/static/css/pc_newListinline.min.css?v=fcde138dd1","https://static2.51cto.com/edu/blog/blog-static/static/css/pc_topicinline.min.css?v=47a9bc571c","https://static2.51cto.com/edu/blog/blog-static/static/css/pc_topicdetailinline.min.css?v=512bf305aa","https://static2.51cto.com/edu/blog/blog-static/static/css/pc_bloggerinline.min.css?v=0e63931398","https://static2.51cto.com/edu/blog/blog-static/markdown/dist/js/main.js?v=9fee5bb838","https://static2.51cto.com/edu/blog/blog-static/static/js/pc_index_js.min.js?v=5331660aa2","https://static2.51cto.com/edu/blog/blog-static/static/js/pc_list_js.min.js?v=8973c321c1","https://static2.51cto.com/edu/blog/blog-static/static/js/pc_topic.min.js?v=873da4210c","https://static2.51cto.com/edu/blog/blog-static/static/js/pc_topic_static.min.js?v=8533cb9e02","https://static2.51cto.com/edu/blog/blog-static/static/js/pc_topicdetail.min.js?v=901345e7d5","https://static2.51cto.com/edu/blog/blog-static/static/js/pc_blogger_js.min.js?v=c7a4e3d003"]);
+    var Lazy = new PsLazy({
+        defaultImg: "https://s2.51cto.com/images/100/base/empty.png?x-oss-process=image/format,webp/ignore-error,1",
+        preLoad: 1.3,
+        complete: function(opt) {},
+    })
+</script>
+
+
+<div id="waf_nc_block" style="display: none;"><div class="waf-nc-mask"></div><div id="WAF_NC_WRAPPER" class="waf-nc-wrapper"><p class="waf-nc-title">访问验证</p><p class="waf-nc-description">为了更好的访问体验，请进行如下验证</p><p id="waf-nc-traceid" class="waf-nc-traceid-class"></p><div id="nocaptcha"></div></div></div><script async="" id="zhichiScript" class="zhiCustomBtn" src="./ROS2极简总结-Nav2-概述（上）规划器_12359060的技术博客_51CTO博客_files/entrance.js.下载"></script><div style="background: url(&quot;https://static2.51cto.com/edu/blog/images/bg50.png&quot;) repeat; position: fixed; left: 0px; top: 0px; width: 100%; height: 100%; z-index: 10000000; display: none;"><div style="z-index:10000001;width:50px;height:50px;background:url(https://static2.51cto.com/edu/blog/images/loading2.gif) no-repeat center;background-size:50px 50px;position:absolute;left:50%;top:50%;margin-left:-25px;margin-top:-25px;"></div></div><div id="zhichiBtnBox" style="position: fixed; z-index: 2147483583; box-shadow: rgba(15, 66, 76, 0.25) 0px 0px 14px 0px; width: 60px; height: 60px; border-radius: 50%; background-color: rgb(231, 83, 73); background-image: url(&quot;//www.sobot.com/chat/frame/imgs/icon.png&quot;); background-repeat: no-repeat; background-position: 18px -58px; right: 40px; bottom: 20px; display: none;"><a hidefocus="" id="zhichiBtn" style="position:relative;text-decoration: none; outline: none; font-family: Microsoft Yahei, Arial, Helvetica; color: #fff; font-size: 16px; display: inline-block; margin: 0; padding: 0; border: none; line-height:43px; float:none;width:100%;height:100%;border-radius:50%;"><span class="zc-advice-icon-btn-title" style="box-shadow: rgba(107, 113, 114, 0.15) 0px 2px 4px 0px; border: 1px solid rgb(235, 239, 240); font-family: &quot;Microsoft Yahei&quot;, Arial, Helvetica; color: rgb(85, 85, 86); font-size: 13px; margin: 0px; text-align: right; background: rgb(255, 255, 255); position: absolute; top: 15px; right: 70px; text-overflow: ellipsis; white-space: nowrap; word-break: normal; display: none; border-radius: 3px; padding: 0px 5px; height: 30px; line-height: 30px;">咨询在线客服</span></a><i style="position:absolute;top:0px;right:0px;padding:1px;line-height:20px;text-align:center;color:#fff;font-weight:bold;height:18px;min-width:18px;background-color:#ed5c5c;border-radius:18px;font-size:12px;display:none;font-style:normal;" id="zhichiCount"></i></div></body></html>
