@@ -1,3 +1,22 @@
+https://blog.51cto.com/u_12369060/4993707
+
+meta-package：元功能包（或综合功能包）为一系列功能包的组合。
+Navigation 2 是一个元功能包，它使移动平台能够到达预定目标。
+
+加载、服务和存储地图 ([nav2_map_server])
+在地图上定位机器人 ([nav2_amcl])
+围绕障碍物规划从 A 到 B 的路径（[nav2_planner]）
+控制机器人跟随路径（[nav2_controller]）
+将传感器数据转换为世界的代价地图表示 ([nav2_costmap_2d])
+使用行为树（[nav2__behavior_trees] 和 [nav2_bt_navigator]）构建复杂的机器人行为
+计算发生故障时的恢复行为 ([nav2_recoveries])
+按照顺序航点（[nav2_waypoint_follower]）
+管理服务器的生命周期 ([nav2_lifecycle_manager])
+启用自定义算法和行为的插件 ([nav2_core])
+
+
+
+
 入口：
 PlannerServer:  planner_server.cpp
 
