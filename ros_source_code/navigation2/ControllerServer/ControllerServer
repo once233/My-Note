@@ -77,7 +77,22 @@ on_configure：(如果参数服务器的值为默认值，则配置一些默认�
   ♦ 从当前节点获取控制器插件id的类型，并逐一实例化、配置参数
     controller->configure( node, controller_ids_[i],costmap_ros_->getTfBuffer(), costmap_ros_);
     最后把把当前控制器的id加入控制器id管理器
-    【controller实际上是localplanner，官方默认源码用的是DWBLocalPlanner】
+    【controller是DWB控制器，是基于ROS 1中localplanner和DWA控制器的继任者】
+    官方介绍：
+    The DWB controller is the successor to the base local planner and DWA controllers in ROS 1. It was created in ROS 1 by David Lu!! at Locus Robotics as part of the robot_navigation project.It was then ported to ROS 2 for use in Nav2 as its critic-based controller algorithm.
+    DWB improves on DWA in a few major ways:
+      -It implements plugin-based critics to allow users to specify new critic functions to use in the system. They can be dynamically reconfigured, reweighted, and tuned to gain very particular behavior in your robot system.
+      -It implements plugin-based trajectory generation techniques, so that users can generate trajectories any number of ways and for any number of types of vehicles
+      -Includes a number of plugin implementations for common use
+    It is possible to tune DWB to gain both DWA and base local planner behaviors, as well as expansions using new plugins for totally use-case specific behaviors. The current trajectory generator plugins work for omnidirectional and differential drive robots, though an ackermann generator would be trivial to add. The current critic plugins work for both circular and non-circular robots and include many of the cost functions needed to build a path tracking system with various attributes.
+    
+    和ROS1 DWA控制器的区别：DWB是一个DWA算法的模块化实现。在ROS1 Navigation中，已经有一个dwa_local_planner的实现了。然而，在ROS1中，对于trajectory scoring的算法提炼却很少，而且是hardcode的，只能从是否会发生碰撞和是否达到目的地来评分，这不能反映实际导航中遇到的现实问题，譬如说路径的长短，机器人运动速度的稳定性，机器人朝向的稳定性等等。
+    在DWB中，则是优化了这方面的评分标准，也在编码方法上做了很大改进，可以使用户定制的一些得分机制加入其中。
+    在具体的ROS2 Navigation的实现当中，由于ROS2 Navigation使用的BT的task管理，ROS1 Navigation当中的move_base 跟nav_core相关的接口都被移除了，代之以行为树相关的接口实现。同时，完整地保留了DWB项目中关于Plugin的所有功能，可以启用系统自带的或者用户自己定制的plugin。这样的设计，也避免了ROS1 Navigation中一些代码的耦合太重的坏设计。
+    详细见【DWBController】。
+    
+    
+
     
 5. 实例化OdomSubscriber和位置信息发布器[create_publisher<geometry_msgs::msg::Twist>]
 
