@@ -12,7 +12,7 @@ ControllerServer 内部的操作都封装成了一个个状态
 评分插件 Critic Plugins
 目标检查器插件 Goal Checker
 
-DWB控制器 DWB Controller
+DWB控制器 DWB Controller(local planner)
 轨迹生成器插件
 负责生成局部轨迹并输出指令速度。
 目前有两个插件（一次只能加载一个）：
@@ -40,7 +40,7 @@ StoppedGoalChecker - 检查位置以及机器人是否已停止。
   controller_frequency
   progress_checker_plugin
   goal_checker_plugins
-  controller_plugins
+  controller_plugins【官方源码中，默认值为构造时赋的default_ids_】
   min_x_velocity_threshold
   min_y_velocity_threshold
   min_theta_velocity_threshold
@@ -52,7 +52,7 @@ StoppedGoalChecker - 检查位置以及机器人是否已停止。
 
 
 [各种状态执行的函数]
-on_configure：
+on_configure：(如果参数服务器的值为默认值，则配置一些默认参数，和初始化costmap、goal_checker、controller[localplanner]、actionserver，并订阅odom位置信息、speedlimit信息和创建cmd_vel速度发布器)
 1. 获取当前server节点的指针：
 2. 声明并初始化参数：
    有关：目标检查器插件
@@ -77,11 +77,15 @@ on_configure：
   ♦ 从当前节点获取控制器插件id的类型，并逐一实例化、配置参数
     controller->configure( node, controller_ids_[i],costmap_ros_->getTfBuffer(), costmap_ros_);
     最后把把当前控制器的id加入控制器id管理器
+    【controller实际上是localplanner，官方默认源码用的是DWBLocalPlanner】
     
 5. 实例化OdomSubscriber和位置信息发布器[create_publisher<geometry_msgs::msg::Twist>]
 
 6. 实例化动作服务器
 std::make_unique<ActionServer>(shared_from_this(),"follow_path",std::bind(&ControllerServer::computeControl, this),nullptr,std::chrono::milliseconds(500),true);
+有关 ActionServer:
+computeControl
+
 
 7. 创建速度限制信息的订阅
 create_subscription<nav2_msgs::msg::SpeedLimit>(speed_limit_topic, rclcpp::QoS(10),std::bind(&ControllerServer::speedLimitCallback, this, std::placeholders::_1));
