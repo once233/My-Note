@@ -98,8 +98,10 @@ on_configure：(如果参数服务器的值为默认值，则配置一些默认�
 
 6. 实例化动作服务器
 std::make_unique<ActionServer>(shared_from_this(),"follow_path",std::bind(&ControllerServer::computeControl, this),nullptr,std::chrono::milliseconds(500),true);
-有关 ActionServer:
-computeControl
+收到globalplan发送过来的goal后，controller如何工作：
+1、	查找goal中的checker和controller的信息，匹配设备是否有对应的checker和controller，如果有，则为对应的controller设置对应的globalplan
+2、	不断循环更新global path,并生成速度，进行速度控制
+
 
 
 7. 创建速度限制信息的订阅
