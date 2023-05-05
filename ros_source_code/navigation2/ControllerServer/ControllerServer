@@ -34,12 +34,11 @@ StoppedGoalChecker - 检查位置以及机器人是否已停止。
 
 
 
-
 [构造函数]
 1. 声明以下参数为默认值
   controller_frequency
-  progress_checker_plugin
-  goal_checker_plugins
+  progress_checker_plugin【检查机器人是否卡住或在完成目标方面取得了进展】
+  goal_checker_plugins【检查机器人是否达到目标姿势】
   controller_plugins【官方源码中，默认值为构造时赋的default_ids_】
   min_x_velocity_threshold
   min_y_velocity_threshold
