@@ -1,20 +1,20 @@
 有关DWB控制器寻迹流程
-1、	computeAndPublishVelocity：
+1、computeAndPublishVelocity：
 getRobotPose获取机器人当前坐标。
 getThresholdedTwist获取机器当前速度，当前速度小于速度最小值时，速度设置为0
 computeVelocityCommands根据当前位置进行速度采样，推算下一步最优速度和路径（局部规划）
 最后发布推算出的数据
 
-  1、1	computeVelocityCommands：
+  1、1 computeVelocityCommands：
   prepareGlobalPlan 提取局部地图内的全局规划并发布（可选）。提取后的plan所在坐标系仍然为globeplan的坐标系。
   critic->prepare初始化评分插件（抉择）的数据。
-    1、1、1	critic->prepare:
+    1、1、1 critic->prepare:
     初始化"RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist" 7种插件。初始化评分插件的流程，基本上都是把plan的点加入CostmapQueue，针对不同方面的评分插件，加入queue的信息也不同，有的是加入整条路径，有的只是路径的最后一个点等，最终生成最优速度控制信息和路径，是在coreScoringAlgorithm里
     coreScoringAlgorithm抉择算法选出最优速度控制参数以及最优路径
     1、1、2 prepareGlobalPlan : 
     transformGlobalPlan得到机器人在globalplan坐标系中的坐标、保证生成的路径在costmap内，最后返回在局部规划范围内的全局规划路径
     1、1、3 coreScoringAlgorithm：
-		traj_generator_->startNewIteration进行速度采样
-		scoreTrajectory获取采样得到的速度的评分，并不断筛选分数最高的速度和轨迹
+    traj_generator_->startNewIteration进行速度采样
+    scoreTrajectory获取采样得到的速度的评分，并不断筛选分数最高的速度和轨迹
 
 局部规划流程以上。
