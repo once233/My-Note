@@ -19,3 +19,9 @@ install(TARGETS test DESTINATION bin)  #将test安装到/usr/local/bin目录下
 [查看make的详细输出]
 make VERBOSE=on
 
+[设置支持c++17]
+cmakelist里增加
+set(CMAKE_CXX_STANDARD 17)
+add_definitions(-std=c++17)
+或
+cmake -DCMAKE_CXX_COMPILER=
