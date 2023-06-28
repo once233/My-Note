@@ -205,3 +205,8 @@ systemctl status mongodb
 11、reboot
 12 sudo resize2fs /dev/sdx
 13、df -h 查看是否分配好了
+
+
+[autoreconf的使用]
+生成configure文件后
+./configure --prefix=/usr --enable-static
