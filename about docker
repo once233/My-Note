@@ -37,6 +37,8 @@ docker run -it --name (空格) 容器名称(自己命名) 镜像名称:镜像版
 -id是创建守护式:创建完成之后不进入容器
 -it创建的容器exit,后台不会继续运行
 -id创建的容器exit,后台继续运行
+-v 操作在容器创建的过程时候可以将宿主机的目录挂载到容器内
+sudo docker run -itd -v ~/docker_test:/home ubuntu /bin/bash
 
 [进入容器]
 docker exec -it 容器名称 /bin/bash
