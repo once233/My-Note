@@ -210,3 +210,20 @@ systemctl status mongodb
 [autoreconf的使用]
 生成configure文件后
 ./configure --prefix=/usr --enable-static
+
+[tar指令]
+-c: 建立压缩档案 
+-x：解压 tar -xjvf file.tar.bz2   //解压 tar.bz2
+-t：查看内容
+-r：向压缩归档文件末尾追加文件
+-u：更新原压缩包中的文件
+-z：有gzip属性的 tar –czf jpg.tar.gz *.jpg //将目录里所有jpg文件打包成jpg.tar后，并且将其用gzip压缩，生成一个gzip压缩过的包，命名为jpg.tar.gz
+-j：有bz2属性的 tar –cjf jpg.tar.bz2 *.jpg //将目录里所有jpg文件打包成jpg.tar后，并且将其用bzip2压缩，生成一个bzip2压缩过的包，命名为jpg.tar.bz2
+-J：具有xz属性的
+-Z：有compress属性的 tar –cZf jpg.tar.Z *.jpg //将目录里所有jpg文件打包成jpg.tar后，并且将其用compress压缩，生成一个umcompress压缩过的包，命名为jpg.tar.Z
+-v：显示所有过程 tar –cvf jpg.tar *.jpg //将目录里所有jpg文件打包成tar.jpg
+-O：将文件解开到标准输出
+-f: 使用档案名字，切记，这个参数是最后一个参数，后面只能接档案名
+-r是表示增加文件的意思 tar -rf all.tar *.gif 
+-u是表示更新文件的意思 tar -uf all.tar logo.gif 
+-t是列出文件的意思 tar -tf all.tar 
