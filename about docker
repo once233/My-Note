@@ -61,3 +61,38 @@ sudo docker inspect --format='{{.Name}} - {{range .NetworkSettings.Networks}}{{.
 [退出容器]
 exit
 
+
+[网络配置]
+一、创建容器时指定网终模式
+	docker run -d -p 外部访问端口:容器内端口 --net="网络模式"  -v 本机目录:容器内目录 --name="容器名称" 镜像名 要执行的角本
+	docker ps 查看启动的容器列表
+	docker ps -a 查看所有的容器列表
+	docker start 容器名称	启动容器
+	docker restart 容器名称	重启容器
+	docker stop 容器名称	停止容器
+ 
+二、已经存在的容器修改网终模式
+	1.找到容器的hostconfig.json文件
+		find / -name hostconfig.json
+		/var/lib/docker/containers/a77c1xxx/hostconfig.json
+		/var/lib/docker/containers/cdaccxxx/hostconfig.json
+		/var/lib/docker/containers/1cdd6dxxx/hostconfig.json
+		/var/lib/docker/containers/15c3bcfxxx/hostconfig.json
+		修改配置
+		vi /var/lib/docker/containers/a77c1xxx/hostconfig.json
+		
+		"NetworkMode":"bridge"
+		为你想要的 模式
+		如
+		"NetworkMode":"host"
+		当为host时或不做端口印射时"PortBindings": {},可以为空对象
+		修改端口绑定	
+		"PortBindings":{
+			"3306/tcp": [{				//内部端口
+				"HostIp": "",
+				"HostPort": "3309"		外部访问端口
+			}]
+		}
+        
+重启容器
+
