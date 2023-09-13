@@ -95,4 +95,10 @@ exit
 		}
         
 重启容器
+如果遇到修改配置不生效
 
+1关闭容器
+systemctl stop docker
+2复制备份并修改好配置
+3启动容器
+systemctl start docker
