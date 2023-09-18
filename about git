@@ -10,3 +10,6 @@ git push origin --delete 'branch'
 [删除远程文件夹 or 文件]
 git rm -r --cached 'dir'
 git rm  --cached 'file'
+
+[树状图查看分支]
+git log --tags --all --graph --simplify-by-decoration --decorate --pretty=oneline  --abbrev-commit 
