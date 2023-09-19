@@ -227,3 +227,7 @@ systemctl status mongodb
 -r是表示增加文件的意思 tar -rf all.tar *.gif 
 -u是表示更新文件的意思 tar -uf all.tar logo.gif 
 -t是列出文件的意思 tar -tf all.tar 
+
+
+[apt时遇到key错误]
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
