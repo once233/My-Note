@@ -111,3 +111,12 @@ firewall-cmd --zone=public --add-port=3306/tcp --permanent
 重启防火墙
 firewall-cmd --reload
 
+[docker中使用声卡设备]
+run或docker-compose挂载设备 
+--device /dev/snd
+--env PULSE_SERVER=tcp:$Hostip:7777
+命令行：
+Hostip="$(ip -4 -o a | awk '{print $4}' | cut -d/ -f1 | grep -v 127.0.0.1 | head -n1)"
+pactl unload-module module-native-protocol-tcp
+Containerip="$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' ${DEV_CONTAINER})"
+pactl load-module module-native-protocol-tcp  port=7777 auth-ip-acl=$Containerip
