@@ -1,3 +1,5 @@
+
+
 [常用参数]
 echo -n :表示不换行输出
 echo -e :输出转义字符，把转义后的内容输出到屏幕上
@@ -15,6 +17,7 @@ IFS字段分隔符
 ...
 -IFS=$IFS.OLD
 -输出环境变量PATH所包含的所有目录以及其中的所有可执行文件
+
 
 常用的转义字符如下：
 \b 转义后相当于按退格键（backspace) ,但前提是“\b”后面存在字符；“\b”表示删除前一个字符
@@ -52,6 +55,15 @@ echo "执行的文件名：$0";
 echo "第一个参数为：$1";
 echo "第二个参数为：$2";
 echo "第三个参数为：$3";
+
+[批量复制远程文件]
+#!/bin/bash
+for host in $@; do
+  mkdir -p ~/sync/$host/catkin_ws_src
+  mkdir -p ~/sync/$host/aicconfig
+  sshpass -p 'aicrobo' scp -r aicrobo@$host:~/catkin_ws/src ~/sync/$host/catkin_ws_src
+done
+
 
 [for]
 #for语句结构
