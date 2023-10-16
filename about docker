@@ -102,3 +102,12 @@ systemctl stop docker
 2复制备份并修改好配置
 3启动容器
 systemctl start docker
+
+
+[docker-compose network_mode=“host”外网访问不了]
+主要原因：docker 默认的network是bridge，这个默认会把映射的端口加到宿主机防火墙。而host模式是不会主动加入防火墙的，所以需要添加端口。
+开放指定端口
+firewall-cmd --zone=public --add-port=3306/tcp --permanent
+重启防火墙
+firewall-cmd --reload
+
