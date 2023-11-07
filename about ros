@@ -73,4 +73,19 @@ colcon build --symlink-install
 同样对于 C++ 工程而言，如果你是修改 rclcpp 或者系统中已经安装的同名的文件包的话，
 在编译时搜寻的头文件将是自己 workspace 下的，而不是系统目录下的头文件(/opt/ros/xx/include)，这点与 ROS1 中的 catkin_make 中的 devel 开发方式保持一致。
 
+[ros gdb调试]
+如果用命令行catkin_make，在输入catkin_make时加上一个参数：
+catkin_make -DCMAKE_BUILD_TYPE=Debug
 
+或者直接修改CMakelist.txt，添加以下代码：
+SET(CMAKE_BUILD_TYPE "Debug")
+SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall"
+
+roslaunch调试：
+launch文件中添加GDB调试指令
+修改ROS launch文件，在node标签中添加参数
+launch-prefix="xterm -e gdb -ex run --args" 或launch-prefix="gdb -ex run --args" 
+
+rosrun调试：
+rosrun --prefix 'gdb -ex run --args' [package_name] [node_name] 
