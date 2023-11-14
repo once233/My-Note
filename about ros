@@ -80,7 +80,7 @@ catkin_make -DCMAKE_BUILD_TYPE=Debug
 或者直接修改CMakelist.txt，添加以下代码：
 SET(CMAKE_BUILD_TYPE "Debug")
 SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
-SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall"
+SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall"）
 
 roslaunch调试：
 launch文件中添加GDB调试指令
