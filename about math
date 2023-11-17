@@ -1,2 +1,29 @@
 [弧度]
 弧度制就是弧长比上半径
+
+
+[判断点是否在一个矩形内]
+判断是否在矩形内：
+
+只需要判断该点是否在上下两条边和左右两条边之间就行。
+
+判断一个点是否在两条线段之间夹着就转化成，判断一个点是否在某条线段的一边上，就可以利用叉乘的方向性，来判断夹角是否超过了180度
+
+
+
+只要判断(AB X AE ) * (CDX CE)  >= 0 就说明E在AD和BC中间夹着，同理(DA X DE ) * (BC X BE) >= 0计算另两边AB,CD就可以了。(备注可进一步学习：向量点乘，叉乘的意义和几何意义  )
+
+最后就是只需要判断
+
+(AB X AE ) * (CD X CE)  >= 0 && (DA X DE ) * (BC X BE) >= 0 。
+
+参考代码：
+    // 计算 |p1 p2| X |p1 p|
+     function GetCross(p1: Point, p2: Point, p: Point) {
+        return (p2.x - p1.x) * (p.y - p1.y) - (p.x - p1.x) * (p2.y - p1.y);
+     }
+     //判断点p是否在p1p2p3p4的正方形内
+     function IsPointInMatrix(p1: Point, p2: Point, p3: Point, p4: Point, p: Point) {
+         let isPointIn = GetCross(p1, p2, p) * GetCross(p3, p4, p) >= 0 && GetCross(p2, p3, p) * GetCross(p4, p1, p) >= 0;
+         return isPointIn;
+     }
