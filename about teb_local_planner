@@ -1,0 +1,676 @@
+
+[参数翻译]
+namespace aic_teb_local_planner {
+
+/**
+ * @class TebConfig
+ * @brief Config class for the teb_local_planner and its components.
+ */
+class TebConfig {
+ public:
+  std::string odom_topic;  //!< Topic name of the odometry message, provided by the robot driver or simulator
+  std::string map_frame;   //!< Global planning frame
+
+  RobotFootprintModelPtr robot_model;  //!< model of the robot's footprint
+
+  //! Trajectory related parameters
+  struct Trajectory {
+    double
+        teb_autosize;  //!< Enable automatic resizing of the trajectory w.r.t to the temporal resolution (recommended)
+                       //!< teb_autosize参数用于是否自动更新/插入或是删除路径中的点（初始化后的路径）
+                       //!< trajectory.teb_autosize函数使用。teb的优化是基于g2o的，而g2o本身需要点与边的概念，这里的点就是局部路径规划的位姿点，
+                       //!< 为了保证优化的稳定性需要保证两个位姿之间距离不能太远也不能太近，如果该参数为true时会对路径长度进行优化。
+
+    double dt_ref;  //!< Desired temporal resolution of the trajectory (should be in the magniture of the underlying
+                    //!< control rate) 这个参数在两个地方用到了：
+
+    //  第一个地方：teb_.autoResize(cfg_->trajectory.dt_ref, cfg_->trajectory.dt_hysteresis,
+    //  cfg_->trajectory.min_samples, cfg_->trajectory.max_samples, fast_mode);
+    // dt_ref 预设的dt， dt_hysteresis dt的缓冲区间， min_sample， max_samples 最小和最大路径点数，
+    // fast_mode 是否自动迭代（重复resize）直到整条路径resize完成的布尔值。
+    // 第二个地方：
+    /*
+      for(int counter = 0; counter < look_ahead_poses; ++counter)
+  {
+    //计算一个运动时间，从当前点到前向多少个点的理论时间和
+    dt += teb_.TimeDiff(counter);
+    //dt_ref为两个点之间允许的最大时间，如果超过这个时间会进行点的插入
+    if(dt >= cfg_->trajectory.dt_ref * look_ahead_poses)  // TODO: change to look-ahead time? Refine trajectory?
+    {
+        look_ahead_poses = counter + 1;
+        break;
+    }
+  }
+  这里是在优化位姿之后速度计算的地方，因为位姿变化了，所以需要重新计算一下点与点之间的时间，如果时间差比较大则需要重新插入点位。
+    */
+
+    double
+        dt_hysteresis;  //!< Hysteresis for automatic resizing depending on the current temporal resolution (dt):
+                        //!< usually 10% of dt_ref
+                        //!< 预设时间缓冲区，与dt_ref联用，如果两点之间的运动时间超过dt_ref+dt_hysteresis会进行点的插入
+                        //!< ，如果两点之间的运动时间超过dt_ref-dt_hysteresis会进行点的删除。trajectory.teb_autosize函数使用。
+    int min_samples;    //!< Minimum number of samples (should be always greater than 2)
+    int max_samples;    //!< Maximum number of samples; Warning: if too small the discretization/resolution might not be
+                        //!< sufficient for the given robot model or obstacle avoidance does not work anymore.
+    bool
+        global_plan_overwrite_orientation;  //!< Overwrite orientation of local subgoals provided by the global planner
+                                            //!< 这个参数用于决定是否重写每个点位的朝向，因为考虑到某些全局路径规划中不会给出中间点位的朝向，则这里会重写一下每个点的朝向。
+    bool
+        allow_init_with_backwards_motion;  //!< If true, the underlying trajectories might be initialized with backwards
+                                           //!< motions in case the goal is behind the start within the local costmap
+                                           //!< (this is only recommended if the robot is equipped with rear sensors)
+                                           //!< 如果为true，则当机器人初始位姿在起点位姿前面时，机器人可能通过倒退走到起点位置。
+
+    double global_plan_viapoint_sep;  //!< Min. separation between each two consecutive via-points extracted from the
+                                      //!< global plan (if negative: disabled)
+                                      //!< 遍历transformed_plan将其中二点间隔大于global_plan_viapoint_sep的点加入到
+                                      //!< ViaPointContainer。也就是从全局路径中提取局部路径。
+    bool via_points_ordered;  //!< If true, the planner adheres to the order of via-points in the storage container
+                              //!< 这个参数在g2o添加边约束时使用，如果为true，则计划器将遵守存储容器中通过点的顺序。
+    double
+        max_global_plan_lookahead_dist;  //!< Specify maximum length (cumulative Euclidean distances) of the subset
+                                         //!< of the global plan taken into account for optimization [if <=0:
+                                         //!< disabled; the length is also bounded by the local costmap size!] 单次local
+                                         //!< plan
+                                         //!< 考虑的全局plan的最大距离。从全局路径到局部路径优化时需要截取长度，长度由costmap与max_global_plan_lookahead_dist共同决定，取其中更小的那个
+    double
+        global_plan_prune_distance;  //!< Distance between robot and via_points of global plan which is used for pruning
+    bool
+        exact_arc_length;  //!< If true, the planner uses the exact arc length in velocity, acceleration and turning
+                           //!< rate computations [-> increased cpu time], otherwise the euclidean approximation is
+                           //!< used.
+                           //!< 用于g2o中添加边约束是使用，如果为true，则规划器在速度、加速度和转弯率计算中使用精确的弧长[增加的cpu时间]，否则使用欧氏近似。
+    double
+        force_reinit_new_goal_dist;  //!< Reinitialize the trajectory if a previous goal is updated with a seperation
+                                     //!< of more than the specified value in meters (skip hot-starting)
+                                     //!< force_reinit_new_goal_dist 和force_reinit_new_goal_angular合用
+                                     //!< 一个是距离阈值一个是角度阈值，当目标点的距离超过一定距离时会更新轨迹，这里的目标点应该是局部路径规划的终点？这个点是会一直随着路径更新的。
+    double
+        force_reinit_new_goal_angular;  //!< Reinitialize the trajectory if a previous goal is updated with an angular
+                                        //!< difference of more than the specified value in radians (skip hot-starting)
+                                        //!< 与force_reinit_new_goal_dist联用，一个是距离阈值一个是角度阈值。如果上一个目标更新的旋转差大于指定的弧度值，则强制规划器重新初始化轨迹
+
+    int feasibility_check_no_poses;  //!< Specify up to which pose (under the feasibility_check_lookahead_distance) on
+                                     //!< the predicted plan the feasibility should be checked each sampling interval;
+                                     //!< if -1, all poses up to feasibility_check_lookahead_distance are checked.
+                                     //!< 用于优化后的轨迹检查，前向检查多少个位姿点的可行性。判断优化后的一段轨迹需要判断是否可以运动，这个参数用于判断可以运动的轨迹的长度。
+    double feasibility_check_lookahead_distance;  //!< Specify up to which distance (and with an index below
+                                                  //!< feasibility_check_no_poses) from the robot the feasibility should
+                                                  //!< be checked each sampling interval; if -1, all poses up to
+                                                  //!< feasibility_check_no_poses are checked.
+    bool
+        publish_feedback;  //!< Publish planner feedback containing the full trajectory and a list of active obstacles
+                           //!< (should be enabled only for evaluation or debugging purposes)
+                           //!< 用于可视化发布，发布包含完整轨迹和活动障碍物列表的计划器反馈（应仅出于评估或调试目的启用）
+    double min_resolution_collision_check_angular;  //! Min angular resolution used during the costmap collision check.
+                                                    //! If not respected, intermediate samples are added. [rad]
+
+    int control_look_ahead_poses;  //! Index of the pose used to extract the velocity command
+                                   //! 这个参数用于在速度计算时取前向多少个点的位姿作为终点计算。teb的速度比较简单，就是受cfg_.trajectory.control_look_ahead_poses影响，
+                                   //! 取向前多少个位姿点的姿态。然后用当前点的位姿与目标点做差。在前面运动优化部分有计算过每个位姿之间的理论运动时间。
+                                   //! 例如这里如果要取前向第五个点，那么时间就是前面计算过的点1-2-3-4-5的时间和，距离就是点1与点5的距离差。
+                                   //! 速度的话就是两点间距离/前面计算过的点与点之间理想时间和。
+
+    int prevent_look_ahead_poses_near_goal;  //! Prevents control_look_ahead_poses to look within this many poses of the
+                                             //! goal in order to prevent overshoot & oscillation when xy_goal_tolerance
+                                             //! is very small
+                                             //! 与control_look_ahead_poses联用，control_look_ahead_poses在整条路径上使用，
+                                             //! prevent_look_ahead_poses_near_goal在终点附近做限制。
+
+  } trajectory;  //!< Trajectory related parameters
+
+  //! Robot related parameters
+  struct Robot {
+    double max_vel_x;            //!< Maximum translational velocity of the robot
+    double max_vel_x_backwards;  //!< Maximum translational velocity of the robot for driving backwards
+    double
+        max_vel_y;  //!< Maximum strafing velocity of the robot (should be zero for non-holonomic robots!
+                    //!< 全向轮在y方向的最大速度，作用与x方向的速度类似，两个作用，一个是用于添加运动学约束，二是限制y方向的最大速度。)
+
+    double
+        max_vel_trans;  //!< Maximum translational velocity of the robot for omni robots, which is different from
+                        //!< max_vel_x
+                        //!< 机器人的最大线速度。当它们的线性组合超过其值时，将限制max_vel_x和max_vel_y。当设置为默认值0.0时，它将被设置为等于max_vel_x。作用与5.1类似，也是在这两个地方分别起作用。
+
+    double max_vel_theta;  //!< Maximum angular velocity of the robot
+    double acc_lim_x;      //!< Maximum translational acceleration of the robot
+
+    double acc_lim_y;  //!< Maximum strafing acceleration of the robot y方向的最大加速度，用于g2o的加速度约束项。
+    double acc_lim_theta;  //!< Maximum angular acceleration of the robot
+
+    double min_turning_radius;  //!< Minimum turning radius of a carlike robot (diff-drive robot: zero); Carlike
+                                //!< 顾名思义就是最小转弯半径：
+
+    double
+        wheelbase;  //!< The distance between the drive shaft and steering axle (only required for a carlike robot with
+                    //!< 'cmd_angle_instead_rotvel' enabled); The value might be negative for back-wheeled robots!
+                    //!< Carlike
+                    //!< 驱动轴和转向轴之间的距离（仅适用于启用“cmd_angle_instead_rotvel”的车载机器人）；对于后轮机器人，该值可能为负值！同样用于角速度修正，不论4.1参数对角速度是否进行修正，这里都会根据wheelbase做二次修正：
+    bool cmd_angle_instead_rotvel;  //!< Substitute the rotational velocity in the commanded velocity message by the
+                                    //!< corresponding steering angle (check 'axles_distance')
+                                    //!< 用于判断是否为carlike机器人 参数4.1、4.2才生效。
+
+    bool is_footprint_dynamic;         //<! If true, updated the footprint before checking trajectory feasibility
+    bool use_proportional_saturation;  //<! If true, reduce all twists components (linear x and y, and angular z)
+                                       // proportionally if any exceed its corresponding bounds, instead of saturating
+                                       // each one individually
+    double transform_tolerance = 0.5;  //<! Tolerance when querying the TF Tree for a transformation (seconds)
+  } robot;                             //!< Robot related parameters
+
+  //! Goal tolerance related parameters
+  struct GoalTolerance {
+    double yaw_goal_tolerance;  //!< Allowed final orientation error 允许的目标方向的最终方向误差
+
+    double
+        xy_goal_tolerance;  //!< Allowed final euclidean distance to the goal position
+                            //!< 允许到终点位置的最终欧几里得距离。这个值用于判断当前机器人是否到达目标点位置，如果机器人到达目标点，则当前姿态与目标点的欧式距离应小于该值
+
+    bool
+        free_goal_vel;  //!< Allow the robot's velocity to be nonzero (usally max_vel) for planning purposes
+                        //!< 出于规划目的，允许机器人的速度为非零（机器人可以以最大速度到达目标）。如果为false，则判定机器人到达目标点的条件会严格一点，需要判断当前速度是否也为一个很小的值cfg_.goal_tolerance.theta_stopped_vel,
+                        //!< cfg_.goal_tolerance.trans_stopped_vel。同时planner函数在终点前面也会做对应的减速处理；如果为true，则对终点不做减速处理也不会判断终点附近的速度。
+
+    double
+        trans_stopped_vel;  //!< Below what maximum velocity we consider the robot to be stopped in translation
+                            //!< 当free_goal_vel为false时，对于是否到达目标点需要做速度判断作为到达终点的条件。判定的条件即是该值小于设定值theta_stopped_vel.低于我们认为机器人在平移中停止的最大速度
+    double
+        theta_stopped_vel;  //!< Below what maximum rotation velocity we consider the robot to be stopped in rotation
+                            //!< 作用同trans_stopped_vel，但是这里是对角速度做判断。用于到达目标点的角速度判断，机器人到达目标点的判定条件之一，当前角速度低于该值。
+    bool complete_global_plan;  // true prevents the robot from ending the path early when it cross the end goal
+  } goal_tolerance;             //!< Goal tolerance related parameters
+
+  //! Obstacle related parameters
+  struct Obstacles {
+    double min_obstacle_dist;  //!< Minimum desired separation from obstacles
+                               //!< 与障碍物的最小期望间距，参数在g2o优化项AddEdgesObstacles中使用，作为姿态点的约束。
+
+    double inflation_dist;  //!< buffer zone around obstacles with non-zero penalty costs (should be larger than
+                            //!< min_obstacle_dist in order to take effect)
+                            //!< 膨胀距离。具有非零惩罚成本的障碍物周围的缓冲区（应大于min_obstacle_dist才能生效）
+                            //!< 这个参数跟min_obstacle_dist参数在同一个地方使用，判断添加的约束类型。
+    double
+        dynamic_obstacle_inflation_dist;  //!< Buffer zone around predicted locations of dynamic obstacles with
+                                          //!< non-zero penalty costs (should be larger than min_obstacle_dist in
+                                          //!< order to take effect)
+                                          //!< 动态障碍物的膨胀半径，在g2o优化添加约束过程中，如果参数include_dynamic_obstacles为true则约束中会添加动态障碍物约束。
+
+    bool
+        include_dynamic_obstacles;  //!< Specify whether the movement of dynamic obstacles should be predicted by a
+                                    //!< constant velocity model (this also effects homotopy class planning); If false,
+                                    //!< all obstacles are considered to be static.
+                                    //!< 首先用于判断是否需要添加动态障碍物约束 其次也用于判断路径更新模式
+                                    //!< autoResize函数会更新局部路径点，根据参数include_dynamic_obstacles决定是只更新前面的一个点还是更新一段路径上的点。
+    bool include_costmap_obstacles;  //!< Specify whether the obstacles in the costmap should be taken into account
+                                     //!< directly
+                                     //!< 是否添加costmap障碍物，如果为true时会在更新障碍物地图时添加costmap的内容。
+    double
+        costmap_obstacles_behind_robot_dist;  //!< Limit the occupied local costmap obstacles taken into account for
+                                              //!< planning behind the robot (specify distance in meters)
+                                              //!< 添加代价地图中的障碍物时考虑的朝后距离？用于障碍物添加函数updateObstacleContainerWithCostmap中。
+    int obstacle_poses_affected;  //!< The obstacle position is attached to the closest pose on the trajectory to reduce
+                                  //!< computational effort, but take a number of neighbors into account as well
+                                  //!< 用于函数AddEdgesObstaclesLegacy添加障碍物边约束，似乎影响了障碍物会被添加到哪个顶点作为约束项。
+    bool
+        legacy_obstacle_association;  //!< If true, the old association strategy is used (for each obstacle, find the
+                                      //!< nearest TEB pose), otherwise the new one (for each teb pose, find only
+                                      //!< "relevant" obstacles).
+                                      //!< 用于判断以何种方式添加障碍物边
+                                      //!< 如果为true，则使用旧的关联策略（对于每个障碍物，找到最近的TEB姿势），否则使用新的关联策略。（对于每个TEB姿势，只找到“相关”障碍物）。
+
+    double
+        obstacle_association_force_inclusion_factor;  //!< The non-legacy obstacle association technique tries to
+                                                      //!< connect only relevant obstacles with the discretized
+                                                      //!< trajectory during optimization, all obstacles within a
+                                                      //!< specifed distance are forced to be included (as a multiple of
+                                                      //!< min_obstacle_dist), e.g. choose 2.0 in order to consider
+                                                      //!< obstacles within a radius of 2.0*min_obstacle_dist.
+                                                      //!< 在优化期间仅将相关障碍物与离散轨迹连接，强制包括指定距离内的所有障碍物（作为min_obstacle_dist的倍数）
+                                                      //!< 例如，选择2.0以考虑半径为2.0*min_obstocle_dist内的障碍物
+    double
+        obstacle_association_cutoff_factor;  //!< See obstacle_association_force_inclusion_factor, but beyond a
+                                             //!< multiple of [value]*min_obstacle_dist all obstacles are ignored
+                                             //!< during optimization. obstacle_association_force_inclusion_factor is
+                                             //!< processed first.
+                                             //!< 裁减距离，在添加障碍物边约束的时候，如果障碍物距离超过这个值就直接不考虑了
+                                             //!< obstacle_association_force_inclusion_factor和obstacle_association_cutoff_factor两个分别代表了添加障碍物的最近距离与最远距离
+                                             //!< 如果这两个值不想等
+                                             //!< 则它们中间还有一部分空间不满足这两个条件的，则会再做其他判断是否添加到障碍物约束中
+
+    std::string costmap_converter_plugin;  //!< Define a plugin name of the costmap_converter package (costmap cells are
+                                           //!< converted to points/lines/polygons)
+    bool costmap_converter_spin_thread;    //!< If \c true, the costmap converter invokes its callback queue in a
+                                           //!< different thread
+    int costmap_converter_rate;  //!< The rate that defines how often the costmap_converter plugin processes the current
+                                 //!< costmap (the value should not be much higher than the costmap update rate)
+    double
+        obstacle_proximity_ratio_max_vel;  //!< Ratio of the maximum velocities used as an upper bound when reducing
+                                           //!< the speed due to the proximity to a static obstacles
+                                           //!< 由于接近静态障碍物而降低速度时用作上限的最大速度的比率
+                                           //!< 用于AddEdgesVelocityObstacleRatio函数，这个函数在参数weight_velocity_obstacle_ratio>0时添加到动力学约束中。
+
+    double
+        obstacle_proximity_lower_bound;  //!< Distance to a static obstacle for which the velocity should be lower
+                                         //!< 用于AddEdgesVelocityObstacleRatio函数，作用类似于obstacle_proximity_ratio_max_vel
+    double
+        obstacle_proximity_upper_bound;  //!< Distance to a static obstacle for which the velocity should be higher//!<
+                                         //!< Obstacle related parameters
+                                         //!< 用于AddEdgesVelocityObstacleRatio函数，作用类似于obstacle_proximity_ratio_max_vel
+                                         //!< 以上三个参数在同一个函数中被使用，且同时需要参数weight_velocity_obstacle_ratio>0时才会用到，用于添加额外的约束项。
+
+  } obstacles;
+
+  //! Optimization related parameters
+  struct Optimization {
+    int no_inner_iterations;  //!< Number of solver iterations called in each outerloop iteration
+                              //!< 内循环迭代的次数。optimizeTEB里面有两层循环,分别叫外部循环和内部循环。
+                              //!< 外部循环通过调用TimedElasticBand::autoResize()来根据时间分辨率调整轨迹。内部循环调用optimizeGraph()进行优化
+    int no_outer_iterations;  //!< Each outerloop iteration automatically resizes the trajectory and invokes the
+                              //!< internal optimizer with no_inner_iterations
+                              //!< 外循环迭代的次数。作用同上，内循环每次优化完位姿后，在外循环中调用TimedElasticBand::autoResize()来根据时间分辨率调整轨迹。
+                              //!< 对于距离远的点插入一下新的位姿，对于距离近的点删一删。
+
+    bool optimization_activate;  //!< Activate the optimization
+                                 //!< g2o优化参数，是否激活优化项，感觉似乎没啥意义，肯定得开着不是。
+    bool optimization_verbose;  //!< Print verbose information 好像是一个专门用于设置优化器属性的参数
+
+    double
+        penalty_epsilon;  //!< Add a small safety margin to penalty functions for hard-constraint approximations
+                          //!< 这个参数使用的地方还是挺多的，在添加障碍物边、动态障碍物边以及速度边的时候都用到了。说是为硬约束近似的惩罚函数添加一个小的安全裕度。不是特别理解，后面慢慢研究一下
+
+    double weight_max_vel_x;  //!< Optimization weight for satisfying the maximum allowed translational velocity
+                              //!< 满足最大允许平移速度的优化权重。在函数AddEdgesVelocity中使用，对运动学约束添加权重。
+
+    double
+        weight_max_vel_y;  //!< Optimization weight for satisfying the maximum allowed strafing velocity (in use only
+                           //!< for holonomic robots)
+                           //!< 作用同上，但是只在全向轮机器人上会存在y方向速度，所以使用的时候需要约束一下，同样作为权重使用。
+    double weight_max_vel_theta;  //!< Optimization weight for satisfying the maximum allowed angular velocity
+                                  //!< 角度方向的权重，使用与前两个是一样的。
+    double
+        weight_acc_lim_x;  //!< Optimization weight for satisfying the maximum allowed translational acceleration
+                           //!< 作用与前三个类似，但是使用的地点不同，前面是添加速度边的时候的权重，这里则是在添加加速度边AddEdgesAcceleration的时候生效
+    double weight_acc_lim_y;  //!< Optimization weight for satisfying the maximum allowed strafing acceleration (in use
+                              //!< only for holonomic robots) 加速度权重，y方向
+    double weight_acc_lim_theta;  //!< Optimization weight for satisfying the maximum allowed angular acceleration
+                                  //!< 角速度权重
+    double weight_kinematics_nh;  //!< Optimization weight for satisfying the non-holonomic kinematics
+                                  //!< 满足非完整运动学的优化权值，用于机器人的约束条件。
+    double weight_kinematics_forward_drive;  //!< Optimization weight for forcing the robot to choose only forward
+                                             //!< directions (positive transl. velocities, only diffdrive robot)
+                                             //!< 与上面的参数是一样的用法，但是这个参数需要在差速轮下才能够使用
+    double weight_kinematics_turning_radius;  //!< Optimization weight for enforcing a minimum turning radius (carlike
+                                              //!< robots) 与上面的类似，但是这个参数是用在carlike机器人上的权重参数
+    double weight_optimaltime;    //!< Optimization weight for contracting the trajectory w.r.t. transition time
+                                  //!< 时间约束边的权重
+    double weight_shortest_path;  //!< Optimization weight for contracting the trajectory w.r.t. path length
+                                  //!< 最短路径边的权重
+    double weight_obstacle;       //!< Optimization weight for satisfying a minimum separation from obstacles
+                                  //!< 添加障碍物边的权重，在AddEdgesObstacles函数中使用
+    double weight_inflation;      //!< Optimization weight for the inflation penalty (should be small)
+                                  //!< 膨胀层的权重
+    double
+        weight_dynamic_obstacle;  //!< Optimization weight for satisfying a minimum separation from dynamic obstacles
+                                  //!< 动态障碍物权重，与weight_dynamic_obstacle_inflation联合使用用于添加动态障碍物权重。
+    double
+        weight_dynamic_obstacle_inflation;  //!< Optimization weight for the inflation penalty of dynamic obstacles
+                                            //!< (should be small)
+                                            //!< 动态障碍物膨胀层权重，与weight_dynamic_obstacle联合使用添加动态障碍物权重
+    double weight_velocity_obstacle_ratio;  //!< Optimization weight for satisfying a maximum allowed velocity with
+                                            //!< respect to the distance to a static obstacle
+                                            //!< 这个参数有两个地方使用：第一个是用于判断是否添加额外约束
+                                            //!< 第二个是函数AddEdgesVelocityObstacleRatio中添加对应额外约束的权重：
+    double weight_viapoint;  //!< Optimization weight for minimizing the distance to via-points
+                             //!< 经过路径点边的权重，用于函数AddEdgesViaPoints
+
+    double
+        weight_prefer_rotdir;  //!< Optimization weight for preferring a specific turning direction (-> currently
+                               //!< only activated if an oscillation is detected, see 'oscillation_recovery'
+                               //!< 权重的自适应因子，在TebOptimalPlanner::optimizeTEB函数的外循环中，每次内循环结束后，内循环权重都会乘以自适应因子
+
+    double weight_adapt_factor;  //!< Some special weights (currently 'weight_obstacle') are repeatedly scaled by this
+                                 //!< factor in each outer TEB iteration (weight_new = weight_old*factor); Increasing
+                                 //!< weights iteratively instead of setting a huge value a-priori leads to better
+                                 //!< numerical conditions of the underlying optimization problem.
+    double
+        obstacle_cost_exponent;  //!< Exponent for nonlinear obstacle cost (cost = linear_cost *
+                                 //!< obstacle_cost_exponent). Set to 1 to disable nonlinear cost (default)
+                                 //!< 非线性障碍物成本的指数（成本=linear_cost*障碍物成本导出）。设置为1以禁用非线性成本（默认值）
+
+  } optim;  //!< Optimization related parameters
+
+  /*
+  这边的参数是Homotopy方法的一些配置参数，teb中的一些函数存在两种方法，其中TebOptimalPlanner类是单一的TEB规划器。
+  使用全局规划器生成的初始轨迹来初始化TEB局部规划器。HomotopyClassPlanner类像是多个TebOptimalPlanner类实例的组合。
+  HomotopyClassPlanner类中也会实例化一个由全局规划器生成的路径作为参考的对象。
+  除此之外，它还会使用probabilistic roadmap (PRM)
+  methods在障碍物周边采样一些keypoints，将这些keypoints连接起来，去除方向没有朝向目标点的连接和与障碍物重叠的连接。
+  这样就形成了一个网络，然后将起始点和终点接入到这个网络。
+  使用Depth First Search（深度优先方法）搜索所有可行的路径。
+  将这些路径作为参考，实例化多个TebOptimalPlanner类的实例。采用多线程并行优化，得到多条优化后的路径。将这些路径进行可行性分析，选出代价值最小的最优路径。
+  不得不说HomotopyClassPlanner类里的方法是一个鲁棒性和可靠性更高的方法。
+  因为单一的TEB规划 (TEB without homology class exploration)在某些场景会陷入局部最小值，可能出现卡死的情况
+  */
+  struct HomotopyClasses {
+    bool enable_homotopy_class_planning;  //!< Activate homotopy class planning (Requires much more resources that
+                                          //!< simple planning, since multiple trajectories are optimized at once).
+    bool enable_multithreading;  //!< Activate multiple threading for planning multiple trajectories in parallel.
+                                 //!< 是否激活多线程并行规划多个轨迹
+    bool simple_exploration;     //!< If true, distinctive trajectories are explored using a simple left-right approach
+                              //!< (pass each obstacle on the left or right side) for path generation, otherwise sample
+                              //!< possible roadmaps randomly in a specified region between start and goal.
+    int max_number_classes;  //!< Specify the maximum number of allowed alternative homotopy classes (limits
+                             //!< computational effort) 指定允许的替代homotopy类的最大数量（限制计算工作量）
+    int max_number_plans_in_current_class;  //!< Specify the maximum number of trajectories to try that are in the same
+                                            //!< homotopy class as the current trajectory (helps avoid local minima)
+                                            //!< 要尝试的与当前最佳轨迹在同一homotopy类中的轨迹的最大数量（将其设置为2或更多有助于避免局部极小值）。必须小于等于max_number_classes
+    double
+        selection_cost_hysteresis;  //!< Specify how much trajectory cost must a new candidate have w.r.t. a
+                                    //!< previously selected trajectory in order to be selected (selection if
+                                    //!< new_cost < old_cost*factor).
+                                    //!< 指定新的候选轨迹必须具有相对于先前选择的轨迹小于一定范围的轨迹成本才能被选择（如果new_cost＜old_cost*因子则选择）
+    double
+        selection_prefer_initial_plan;  //!< Specify a cost reduction in the interval (0,1) for the trajectory in the
+                                        //!< equivalence class of the initial plan. 在初始计划的等价类中指定轨迹的间隔
+    double
+        selection_obst_cost_scale;  //!< Extra scaling of obstacle cost terms just for selecting the 'best' candidate.
+                                    //!< 仅用于选择“最佳”候选者的障碍成本术语的额外缩放（new_obst_cost:obst_cost*因子）
+    double
+        selection_viapoint_cost_scale;  //!< Extra scaling of via-point cost terms just for selecting the 'best'
+                                        //!< candidate.
+                                        //!< 通过点成本条款的额外扩展，仅用于选择“最佳”候选人。（new_viapt_cost:viapt_cost*因子）
+    bool selection_alternative_time_cost;  //!< If true, time cost is replaced by the total transition time.
+                                           //!< 如果为true，则时间成本将替换为总转换时间
+    double
+        selection_dropping_probability;  //!< At each planning cycle, TEBs other than the current 'best' one will be
+                                         //!< randomly dropped with this probability. Prevents becoming 'fixated' on
+                                         //!< sub-optimal alternative homotopies.
+                                         //!< 在每个计划周期，除了当前“最佳”的TEB之外，TEB将以这种概率随机丢弃。防止“专注”于次优替代同源物。
+    double switching_blocking_period;  //!< Specify a time duration in seconds that needs to be expired before a switch
+                                       //!< to new equivalence class is allowed
+                                       //!< 指定允许切换到新等效类之前需要过期的持续时间（以秒为单位）
+
+    int roadmap_graph_no_samples;  //! < Specify the number of samples generated for creating the roadmap graph, if
+                                   //! simple_exploration is turend off.
+                                   //! 如果simple_exploration处于关闭状态，则指定为创建路线图而生成的样本数
+    double roadmap_graph_area_width;  //!< Random keypoints/waypoints are sampled in a rectangular region between start
+                                      //!< and goal. Specify the width of that region in meters.
+                                      //!< 指定将在起点和终点之间生成采样的区域的宽度[m]（高度等于起点到终点的距离）
+    double
+        roadmap_graph_area_length_scale;  //!< The length of the rectangular region is determined by the distance
+                                          //!< between start and goal. This parameter further scales the distance
+                                          //!< such that the geometric center remains equal!
+                                          //!< 矩形区域的长度由起点和终点之间的距离决定。此参数进一步缩放距离，使几何中心保持相等！
+    double
+        h_signature_prescaler;  //!< Scale number of obstacle value in order to allow huge number of obstacles. Do
+                                //!< not choose it extremly low, otherwise obstacles cannot be distinguished from
+                                //!< each other (0.2<H<=1).
+                                //!< 为了允许大量的障碍物，缩放障碍物的数值。不要选择极低，否则无法区分障碍物（0.2<H<=1）
+
+    double h_signature_threshold;  //!< Two h-signatures are assumed to be equal, if both the difference of real parts
+                                   //!< and complex parts are below the specified threshold.
+                                   //!< 如果实部和复部的差值都低于指定的阈值，则假设两个h符号相等
+
+    double obstacle_keypoint_offset;  //!< If simple_exploration is turned on, this parameter determines the distance on
+                                      //!< the left and right side of the obstacle at which a new keypoint will be
+                                      //!< cretead (in addition to min_obstacle_dist).
+    double
+        obstacle_heading_threshold;  //!< Specify the value of the normalized scalar product between obstacle heading
+                                     //!< and goal heading in order to take them (obstacles) into account for
+                                     //!< exploration [0,1]
+                                     //!< 指定障碍物航向和目标航向之间的标准化标量乘积的值，以便在探索时考虑它们（障碍物）
+
+    bool
+        viapoints_all_candidates;  //!< If true, all trajectories of different topologies are attached to the current
+                                   //!< set of via-points, otherwise only the trajectory sharing the same one as the
+                                   //!< initial/global plan.
+                                   //!< 如果为true，则不同拓扑的所有轨迹都附加到过孔点集，否则仅附加与初始/全局计划共享相同轨迹的轨迹（在test_optim_node中没有影响）。
+
+    bool visualize_hc_graph;  //!< Visualize the graph that is created for exploring new homotopy classes.
+                              //!< 可视化为探索新的homotopy类而创建的图
+    double
+        visualize_with_time_as_z_axis_scale;  //!< If this value is bigger than 0, the trajectory and obstacles are
+                                              //!< visualized in 3d using the time as the z-axis scaled by this
+                                              //!< value. Most useful for dynamic obstacles.
+                                              //!< 该值用于可视化参数，如果该值大于0，则使用时间作为按该值缩放的z轴，在3d中可视化轨迹和障碍物。对动态障碍物最有用
+
+    bool delete_detours_backwards;  //!< If enabled, the planner will discard the plans detouring backwards with respect
+                                    //!< to the best plan
+    double detours_orientation_tolerance;  //!< A plan is considered a detour if its start orientation differs more than
+                                           //!< this from the best plan
+    double length_start_orientation_vector;  //!< Length of the vector used to compute the start orientation of a plan
+    double max_ratio_detours_duration_best_duration;  //!< Detours are discarted if their execution time / the execution
+                                                      //!< time of the best teb is > this
+  } hcp;
+
+  //! Recovery/backup related parameters
+  struct Recovery {
+    bool
+        shrink_horizon_backup;  //!< Allows the planner to shrink the horizon temporary (50%) in case of automatically
+                                //!< detected issues.
+                                //!< 允许计划器在自动检测到问题的情况下临时缩小范围（50%）。teb局部路径规划有时候也会失败。
+                                //!< 此时需要进入故障恢复，丢弃一部分路径，这个参数决定了是否丢弃一部分路径，如果设置为true，会裁减掉50%。
+    double
+        shrink_horizon_min_duration;  //!< Specify minimum duration for the reduced horizon in case an infeasible
+                                      //!< trajectory is detected.
+                                      //!< 这个参数在TebLocalPlannerReconfigure.cfg列表中是没有的，但是在函数中被使用，与10.1在同一位置。
+                                      //!< 用于判断当前时间与上一次成功规划之间的时间间隔，如果时间间隔超过该值就不做继续的处理的，说明失败有一段时间了，该进入错误模式了。
+    bool
+        oscillation_recovery;  //!< Try to detect and resolve oscillations between multiple solutions in the same
+                               //!< equivalence class (robot frequently switches between left/right/forward/backwards)
+                               //!< 跟前两个参数一样都是在恢复模式下使用，当该参数设置为true时，会进行机器人振荡行为判断。
+                               //!< 判断机器人是否在某个位置来回振荡运行。即：始终在一个小范围内活动，且角速度来回反复横跳。
+    double oscillation_v_eps;  //!< Threshold for the average normalized linear velocity: if oscillation_v_eps and
+                               //!< oscillation_omega_eps are not exceeded both, a possible oscillation is detected
+    double oscillation_omega_eps;  //!< Threshold for the average normalized angular velocity: if oscillation_v_eps and
+                                   //!< oscillation_omega_eps are not exceeded both, a possible oscillation is detected
+    double oscillation_recovery_min_duration;  //!< Minumum duration [sec] for which the recovery mode is activated
+                                               //!< after an oscillation is detected.
+                                               //!< 振荡判断的时间参数，作用同shrink_horizon_min_duration
+    double oscillation_filter_duration;        //!< Filter length/duration [sec] for the detection of oscillations
+    bool
+        divergence_detection_enable;  //!< True to enable divergence detection.
+                                      //!< 是否使能收敛性判断，对teb优化后的位姿进行收敛性判断。判断其与全局路径之间是否收敛。
+    int divergence_detection_max_chi_squared;  //!< Maximum acceptable Mahalanobis distance above which it is assumed
+                                               //!< that the optimization diverged. 收敛性判断依据。
+                                               //!< chi2函数来获得（加权）最小二乘误差等，这些可以用来判断某条边的误差是否过大。
+
+  } recovery;  //!< Parameters related to recovery and backup strategies
+
+  /**
+   * @brief Construct the TebConfig using default values.
+   * @warning If the \b rosparam server or/and \b dynamic_reconfigure (rqt_reconfigure) node are used,
+   *	     the default variables will be overwritten: \n
+   *	     E.g. if \e base_local_planner is utilized as plugin for the navigation stack, the initialize() method will
+   *register a dynamic_reconfigure server. A subset (not all but most) of the parameters are considered for dynamic
+   *modifications. All parameters considered by the dynamic_reconfigure server (and their \b default values) are set in
+   *\e PROJECT_SRC/cfg/TebLocalPlannerReconfigure.cfg. \n In addition the rosparam server can be queried to get
+   *parameters e.g. defiend in a launch file. The plugin source (or a possible binary source) can call
+   *loadRosParamFromNodeHandle() to update the parameters. In \e summary, default parameters are loaded in the following
+   *order (the right one overrides the left ones): \n <b>TebConfig Constructor defaults << dynamic_reconfigure defaults
+   *<< rosparam server defaults</b>
+   */
+  TebConfig() {
+    odom_topic = "odom";
+    map_frame = "odom";
+    robot_model = boost::make_shared<PointRobotFootprint>();
+
+    // Trajectory
+
+    trajectory.teb_autosize = true;
+    trajectory.dt_ref = 0.3;
+    trajectory.dt_hysteresis = 0.1;
+    trajectory.min_samples = 3;
+    trajectory.max_samples = 500;
+    trajectory.global_plan_overwrite_orientation = true;
+    trajectory.allow_init_with_backwards_motion = false;
+    trajectory.global_plan_viapoint_sep = -1;
+    trajectory.via_points_ordered = false;
+    trajectory.max_global_plan_lookahead_dist = 1;
+    trajectory.global_plan_prune_distance = 1;
+    trajectory.exact_arc_length = false;
+    trajectory.force_reinit_new_goal_dist = 1;
+    trajectory.force_reinit_new_goal_angular = 0.5 * M_PI;
+    trajectory.feasibility_check_no_poses = 5;
+    trajectory.feasibility_check_lookahead_distance = -1;
+    trajectory.publish_feedback = false;
+    trajectory.min_resolution_collision_check_angular = M_PI;
+    trajectory.control_look_ahead_poses = 1;
+    trajectory.prevent_look_ahead_poses_near_goal = 0;
+
+    // Robot
+
+    robot.max_vel_x = 0.4;
+    robot.max_vel_x_backwards = 0.2;
+    robot.max_vel_y = 0.0;
+    robot.max_vel_trans = 0.0;
+    robot.max_vel_theta = 0.3;
+    robot.acc_lim_x = 0.5;
+    robot.acc_lim_y = 0.5;
+    robot.acc_lim_theta = 0.5;
+    robot.min_turning_radius = 0;
+    robot.wheelbase = 1.0;
+    robot.cmd_angle_instead_rotvel = false;
+    robot.is_footprint_dynamic = false;
+    robot.use_proportional_saturation = false;
+
+    // GoalTolerance
+
+    goal_tolerance.xy_goal_tolerance = 0.2;
+    goal_tolerance.yaw_goal_tolerance = 0.2;
+    goal_tolerance.free_goal_vel = false;
+    goal_tolerance.trans_stopped_vel = 0.1;
+    goal_tolerance.theta_stopped_vel = 0.1;
+    goal_tolerance.complete_global_plan = true;
+
+    // Obstacles
+
+    obstacles.min_obstacle_dist = 0.5;
+    obstacles.inflation_dist = 0.6;
+    obstacles.dynamic_obstacle_inflation_dist = 0.6;
+    obstacles.include_dynamic_obstacles = true;
+    obstacles.include_costmap_obstacles = true;
+    obstacles.costmap_obstacles_behind_robot_dist = 1.5;
+    obstacles.obstacle_poses_affected = 25;
+    obstacles.legacy_obstacle_association = false;
+    obstacles.obstacle_association_force_inclusion_factor = 1.5;
+    obstacles.obstacle_association_cutoff_factor = 5;
+    obstacles.costmap_converter_plugin = "";
+    obstacles.costmap_converter_spin_thread = true;
+    obstacles.costmap_converter_rate = 5;
+    obstacles.obstacle_proximity_ratio_max_vel = 1;
+    obstacles.obstacle_proximity_lower_bound = 0;
+    obstacles.obstacle_proximity_upper_bound = 0.5;
+
+    // Optimization
+
+    optim.no_inner_iterations = 5;
+    optim.no_outer_iterations = 4;
+    optim.optimization_activate = true;
+    optim.optimization_verbose = false;
+    optim.penalty_epsilon = 0.05;
+    optim.weight_max_vel_x = 2;  // 1
+    optim.weight_max_vel_y = 2;
+    optim.weight_max_vel_theta = 1;
+    optim.weight_acc_lim_x = 1;
+    optim.weight_acc_lim_y = 1;
+    optim.weight_acc_lim_theta = 1;
+    optim.weight_kinematics_nh = 1000;
+    optim.weight_kinematics_forward_drive = 1;
+    optim.weight_kinematics_turning_radius = 1;
+    optim.weight_optimaltime = 1;
+    optim.weight_shortest_path = 0;
+    optim.weight_obstacle = 50;
+    optim.weight_inflation = 0.1;
+    optim.weight_dynamic_obstacle = 50;
+    optim.weight_dynamic_obstacle_inflation = 0.1;
+    optim.weight_velocity_obstacle_ratio = 0;
+    optim.weight_viapoint = 1;
+    optim.weight_prefer_rotdir = 50;
+
+    optim.weight_adapt_factor = 2.0;
+    optim.obstacle_cost_exponent = 1.0;
+
+    // Homotopy Class Planner
+
+    hcp.enable_homotopy_class_planning = true;
+    hcp.enable_multithreading = true;
+    hcp.simple_exploration = false;
+    hcp.max_number_classes = 5;
+    hcp.selection_cost_hysteresis = 1.0;
+    hcp.selection_prefer_initial_plan = 0.95;
+    hcp.selection_obst_cost_scale = 100.0;
+    hcp.selection_viapoint_cost_scale = 1.0;
+    hcp.selection_alternative_time_cost = false;
+    hcp.selection_dropping_probability = 0.0;
+
+    hcp.obstacle_keypoint_offset = 0.1;
+    hcp.obstacle_heading_threshold = 0.45;
+    hcp.roadmap_graph_no_samples = 15;
+    hcp.roadmap_graph_area_width = 6;  // [m]
+    hcp.roadmap_graph_area_length_scale = 1.0;
+    hcp.h_signature_prescaler = 1;
+    hcp.h_signature_threshold = 0.1;
+    hcp.switching_blocking_period = 0.0;
+
+    hcp.viapoints_all_candidates = true;
+
+    hcp.visualize_hc_graph = false;
+    hcp.visualize_with_time_as_z_axis_scale = 0.0;
+    hcp.delete_detours_backwards = true;
+    hcp.detours_orientation_tolerance = M_PI / 2.0;
+    hcp.length_start_orientation_vector = 0.4;
+    hcp.max_ratio_detours_duration_best_duration = 3.0;
+
+    // Recovery
+
+    recovery.shrink_horizon_backup = true;
+    recovery.shrink_horizon_min_duration = 10;
+    recovery.oscillation_recovery = true;
+    recovery.oscillation_v_eps = 0.1;
+    recovery.oscillation_omega_eps = 0.1;
+    recovery.oscillation_recovery_min_duration = 10;
+    recovery.oscillation_filter_duration = 10;
+  }
+
+  /**
+   * @brief Load parmeters from the ros param server.
+   * @param nh const reference to the local ros::NodeHandle
+   */
+  void loadRosParamFromNodeHandle(const ros::NodeHandle& nh);
+
+  /**
+   * @brief Reconfigure parameters from the dynamic_reconfigure config.
+   * Change parameters dynamically (e.g. with <c>rosrun rqt_reconfigure rqt_reconfigure</c>).
+   * A reconfigure server needs to be instantiated that calls this method in it's callback.
+   * In case of the plugin \e teb_local_planner default values are defined
+   * in \e PROJECT_SRC/cfg/TebLocalPlannerReconfigure.cfg.
+   * @param cfg Config class autogenerated by dynamic_reconfigure according to the cfg-file mentioned above.
+   */
+  void reconfigure(TebLocalPlannerReconfigureConfig& cfg);
+
+  /**
+   * @brief Check parameters and print warnings in case of discrepancies
+   *
+   * Call this method whenever parameters are changed using public interfaces to inform the user
+   * about some improper uses.
+   */
+  void checkParameters() const;
+
+  /**
+   * @brief Check if some deprecated parameters are found and print warnings
+   * @param nh const reference to the local ros::NodeHandle
+   */
+  void checkDeprecated(const ros::NodeHandle& nh) const;
+
+  /**
+   * @brief Return the internal config mutex
+   */
+  boost::mutex& configMutex() { return config_mutex_; }
+
+ private:
+  boost::mutex config_mutex_;  //!< Mutex for config accesses and changes
+};
+
+}  // namespace aic_teb_local_planner
+
+#endif
