@@ -31,3 +31,6 @@ git push <remote> --delete <tag_name>：删除远程仓库中的某个标签。
 
 [免输入密码]
  git config --global credential.helper store 配置后输入一次密码就不用输入了
+
+[克隆大项目失败]
+加上--depth 1 ： https://github.com/eProsima/Fast-DDS.git  --depth 1
