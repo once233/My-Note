@@ -1,3 +1,7 @@
+[git加速网站]
+git clone https://ghproxy.com/+git地址
+
+
 [添加token]
 1. 生成token: settings->developer settings ->personal access tokens-generate new token
 2. 设置token: 
