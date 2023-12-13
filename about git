@@ -37,3 +37,6 @@ git push <remote> --delete <tag_name>：删除远程仓库中的某个标签。
 
 [克隆包括第三方包]
 git clone --recursive
+
+[确保第三方库已克隆]
+git checkout --recurse-submodules
