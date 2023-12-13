@@ -40,3 +40,4 @@ git clone --recursive
 
 [确保第三方库已克隆]
 git checkout --recurse-submodules
+git submodule update --recursive
