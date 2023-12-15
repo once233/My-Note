@@ -1,3 +1,5 @@
+http://47.111.11.73/thread-329793-1-1.html
+
 29.5.2打开PCM设备
 从本小节开始，将正式介绍如何编写一个音频应用程序，首先我们需要在应用程序中包含alsa-lib库的头文件<alsa/asoundlib.h>，这样才能在应用程序中调用alsa-lib库函数以及使用相关宏。
 第一步需要打开PCM设备，调用函数snd_pcm_open()，该函数原型如下所示：
@@ -164,3 +166,552 @@ enum snd_pcm_format_t {
   SND_PCM_FORMAT_S20 = SND_PCM_FORMAT_S20_LE,
   SND_PCM_FORMAT_U20 = SND_PCM_FORMAT_U20_LE
 };
+
+
+
+PCM设备的状态
+本小节向大家介绍PCM设备的状态有哪些，alsa-lib提供了函数snd_pcm_state()用于获取PCM设备当前的状态，其函数原型如下所示：
+snd_pcm_state_t snd_pcm_state(snd_pcm_t *pcm);
+复制代码
+
+
+可以看到它的返回值是一个snd_pcm_state_t类型的变量，snd_pcm_state_t其实是一个枚举类型，描述了PCM设备包含的所有状态，如下所示：
+enum snd_pcm_state_t {
+        SND_PCM_STATE_OPEN = 0,
+        SND_PCM_STATE_SETUP,
+        SND_PCM_STATE_PREPARED,
+        SND_PCM_STATE_RUNNING,
+        SND_PCM_STATE_XRUN,
+        SND_PCM_STATE_DRAINING,
+        SND_PCM_STATE_PAUSED,
+        SND_PCM_STATE_SUSPENDED,
+        SND_PCM_STATE_DISCONNECTED,
+        SND_PCM_STATE_LAST = SND_PCM_STATE_DISCONNECTED,
+        SND_PCM_STATE_PRIVATE1 = 1024
+}
+SND_PCM_STATE_OPEN
+复制代码
+
+
+该状态表示PCM设备处于打开状态，譬如当调用snd_pcm_open()后，PCM设备就处于该状态。
+SND_PCM_STATE_SETUP
+复制代码
+
+
+alsa-lib文档中的解释为“Setup installed”！该状态表示设备已经初始化完成了，参数已经配置好了。
+SND_PCM_STATE_PREPARED
+复制代码
+
+
+该状态表示设备已经准备好了，可以开始了“Ready to start”！譬如可以开始播放了、可以开始录音了。
+前面提到了这个状态，当应用程序调用snd_pcm_hw_params()函数之后，设备就处于SND_PCM_STATE_PREPARED状态了。应用程序中，可以调用snd_pcm_prepare()函数使设备处于SND_PCM_STATE_PREPARED状态，该函数原型如下所示：
+int snd_pcm_prepare(snd_pcm_t *pcm);
+复制代码
+
+
+该行数调用成功返回0，失败将返回一个负数错误码。
+函数调用成功，PCM设备将处于SND_PCM_STATE_PREPARED状态。事实上，应用程序调用时snd_pcm_hw_params()时，函数内部会自动调用snd_pcm_prepare()，所以为什么调用snd_pcm_hw_params()之后设备就已经处于SND_PCM_STATE_PREPARED状态了；调用snd_pcm_hw_params()函数，其实应该发生了两种状态的转变为：首先由SND_PCM_STATE_OPEN变为SND_PCM_STATE_SETUP状态、再由SND_PCM_STATE_SETUP变为SND_PCM_STATE_PREPARED状态。
+SND_PCM_STATE_RUNNING
+复制代码
+
+
+该状态表示设备正在运行，譬如正在播放、正在录音。
+上小节我们提到，应用程序可以调用snd_pcm_start()函数以启动PCM设备，启动成功之后，设备开始播放或采集，此时设备处于SND_PCM_STATE_RUNNING状态。
+此外，当设备处于SND_PCM_STATE_PREPARED状态时，应用程序调用snd_pcm_readi/snd_pcm_writei进行读写数据时，这些函数内部会自动调用snd_pcm_start()函数；譬如播放模式下，调用snd_pcm_writei写入数据后，会自动开启PCM设备进行播放，这里要注意，一定是在数据写入到环形缓冲区之后、才开启PCM设备播放音频，因为一旦开启之后，环形缓冲区中必须要有至少一个周期的数据可供音频设备播放，否则将会发生欠载（underrun）、函数调用以错误形式返回；在录音模式下，调用snd_pcm_readi()函数后，自动开启PCM进行音频采集。
+所以这就是为什么示例代码 29.5.1、示例代码 29.5.2、示例代码 29.6.3这几个示例中并没有调用snd_pcm_start()函数的原因。
+当设备处于运行状态时，应用程序可调用snd_pcm_drop()或snd_pcm_drain()函数使设备停止运行，譬如停止播放、停止音频采集；它们的函数原型如下所示：
+int snd_pcm_drain(snd_pcm_t *pcm);
+int snd_pcm_drop(snd_pcm_t *pcm);
+复制代码
+
+
+函数调用成功返回0；失败返回负值错误码。
+这两个函数都可使设备停止运行，它们的区别如下：
+snd_pcm_drop()函数将立即停止PCM，丢弃挂起的帧；
+snd_pcm_drain()函数并不会立即停止PCM，而是处理完挂起的帧之后再停止PCM；对于播放，会等待所有待播放的帧播放完毕（应该就是环形缓冲区中的待播放数据），然后停止PCM；对于录音，停止PCM之前会检索残留帧。
+当调用snd_pcm_drop()或snd_pcm_drain()停止PCM设备后，设备将回到SND_PCM_STATE_SETUP状态。
+SND_PCM_STATE_XRUN
+复制代码
+
+
+当发生XRUN时，设备会处于SND_PCM_STATE_XRUN状态，XRUN前面给大家解释过了，这里不再重述！当处于SND_PCM_STATE_XRUN状态时，应用程序可以调用snd_pcm_prepare()使设备恢复，使其回到SND_PCM_STATE_PREPARED状态。
+SND_PCM_STATE_DRAINING
+复制代码
+
+
+这个状态笔者没弄清楚，alsa-lib文档中的解释为“Draining: running (playback) or stopped (capture)”。
+SND_PCM_STATE_PAUSED
+pause就是暂停的意思，所以该状态表示设备处于暂停状态。譬如当设备正在运行时（也就是处于SND_PCM_STATE_RUNNING状态），应用程序调用snd_pcm_pause()函数可让设备暂停，其函数原型如下所示：
+int snd_pcm_pause(snd_pcm_t *pcm, int enable);
+复制代码
+
+
+函数snd_pcm_pause()既可以使的设备暂停、同样也可使其恢复（从暂停恢复运行，即SND_PCM_STATE_RUNNING--->SND_PCM_STATE_RUNNING），通过参数enable控制；当enable等于1，表示使设备暂停；enable等于0表示使设备恢复运行。
+snd_pcm_pause()函数调用成功返回0；失败返回一个负值错误码。
+这里有个问题需要注意，并不是所有的音频设备硬件上支持暂停的功能，可以通过snd_pcm_hw_params_can_pause()函数来判断设备是否支持暂停，其函数原型如下所示：
+int snd_pcm_hw_params_can_pause(const snd_pcm_hw_params_t *params);
+复制代码
+
+
+函数返回1表示硬件支持暂停；返回0表示硬件不支持暂停。
+SND_PCM_STATE_SUSPENDED
+复制代码
+
+
+该状态表示硬件已经挂起suspended，如果硬件发生了挂起，应用程序可以调用snd_pcm_resume()函数从挂起中恢复，并确保不会丢失样本数据（精细恢复）。snd_pcm_resume()函数原型如下所示：
+int snd_pcm_resume(snd_pcm_t *pcm);
+复制代码
+
+
+函数调用成功返回0；失败返回一个负值错误码。
+当然，并非所有硬件都支持此功能，可以调用snd_pcm_hw_params_can_resume()函数判断硬件是否支持从挂起中恢复，其函数原型如下所示：
+int snd_pcm_hw_params_can_resume(const snd_pcm_hw_params_t *params);
+函数调用返回1表示支持，返回0表示不支持。
+SND_PCM_STATE_DISCONNECTED
+复制代码
+
+
+该状态表示硬件已经断开连接。
+状态之间的转换
+
+
+PCM播放示例代码-加入状态控制
+通过上面的介绍，我们已经知道了PCM设备不同状态之间转换，譬如播放音乐时，如何暂停、如何停止、又如何恢复。本小节我们来编写一个PCM播放程序，在示例代码 29.6.3的基础上，加入对播放过程的控制，譬如用户按下空格键可以暂停播放、再次按下空格则恢复播放。
+示例代码笔者已经写好，如下所示。
+本例程源码对应的路径为：开发板光盘->11、Linux C应用编程例程源码->29_alsa-lib->pcm_playback_ctl.c。
+示例代码 29.8.1 PCM播放示例程序（加入状态控制）
+/***************************************************************
+Copyright &#169; ALIENTEK Co., Ltd. 1998-2021. All rights reserved.
+文件名 : pcm_playback_ctl.c
+作者 : 邓涛
+版本 : V1.0
+描述 : 一个简单地PCM播放示例代码--使用异步方式、用户可通过按键
+        对播放过程进行控制。
+其他 : 无
+论坛 : <a href="www.openedv.com" target="_blank">www.openedv.com</a>
+日志 : 初版 V1.0 2021/7/20 邓涛创建
+***************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+#include <termios.h>
+#include <signal.h>
+#include <alsa/asoundlib.h>
+
+/************************************
+宏定义
+************************************/
+#define PCM_PLAYBACK_DEV    "hw:0,0"
+
+/************************************
+WAV音频文件解析相关数据结构申明
+************************************/
+typedef struct WAV_RIFF {
+    char ChunkID[4];                    /* "RIFF" */
+    u_int32_t ChunkSize;                 /* 从下一个地址开始到文件末尾的总字节数 */
+    char Format[4];                     /* "WAVE" */
+} __attribute__ ((packed)) RIFF_t;
+
+typedef struct WAV_FMT {
+    char Subchunk1ID[4];                    /* "fmt " */
+    u_int32_t Subchunk1Size;                     /* 16 for PCM */
+    u_int16_t AudioFormat;                  /* PCM = 1*/
+    u_int16_t NumChannels;                  /* Mono = 1, Stereo = 2, etc. */
+    u_int32_t SampleRate;                   /* 8000, 44100, etc. */
+    u_int32_t ByteRate;                     /* = SampleRate * NumChannels * BitsPerSample/8 */
+    u_int16_t BlockAlign;                   /* = NumChannels * BitsPerSample/8 */
+    u_int16_t BitsPerSample;                /* 8bits, 16bits, etc. */
+} __attribute__ ((packed)) FMT_t;
+static FMT_t wav_fmt;
+
+typedef struct WAV_DATA {
+    char Subchunk2ID[4];                    /* "data" */
+    u_int32_t Subchunk2Size;                /* data size */
+} __attribute__ ((packed)) DATA_t;
+
+/************************************
+static静态全局变量定义
+************************************/
+static snd_pcm_t *pcm = NULL;                       //pcm句柄
+static unsigned int buf_bytes;                          //应用程序缓冲区的大小（字节为单位）
+static void *buf = NULL;                            //指向应用程序缓冲区的指针
+static int fd = -1;                                     //指向WAV音频文件的文件描述符
+static snd_pcm_uframes_t period_size = 1024;                 //周期大小（单位: 帧）
+static unsigned int periods = 16;                       //周期数（设备驱动层buffer的大小）
+static struct termios old_cfg;                          //用于保存终端当前的配置参数
+
+/************************************
+static静态函数
+************************************/
+static void snd_playback_async_callback(snd_async_handler_t *handler)
+{
+    snd_pcm_t *handle = snd_async_handler_get_pcm(handler);//获取PCM句柄
+    snd_pcm_sframes_t avail;
+    int ret;
+
+    avail = snd_pcm_avail_update(handle);//获取环形缓冲区中有多少帧数据需要填充
+    while (avail >= period_size) {  //我们一次写入一个周期
+
+        memset(buf, 0x00, buf_bytes);   //buf清零
+        ret = read(fd, buf, buf_bytes);
+        if (0 >= ret)
+            goto out;
+
+        ret = snd_pcm_writei(handle, buf, period_size);
+        if (0 > ret) {
+            fprintf(stderr, "snd_pcm_writei error: %s\n", snd_strerror(ret));
+            goto out;
+        }
+        else if (ret < period_size) {//实际写入的帧数小于指定的帧数
+            //此时我们需要调整下音频文件的读位置
+            //将读位置向后移动（往回移）(period_size-ret)*frame_bytes个字节
+            //frame_bytes表示一帧的字节大小
+            if (0 > lseek(fd, (ret-period_size) * wav_fmt.BlockAlign, SEEK_CUR)) {
+                perror("lseek error");
+                goto out;
+            }
+        }
+
+        avail = snd_pcm_avail_update(handle);   //再次获取、更新avail
+    }
+
+    return;
+out:
+    snd_pcm_drain(pcm); //停止PCM
+    snd_pcm_close(handle); //关闭pcm设备
+    tcsetattr(STDIN_FILENO, TCSANOW, &old_cfg); //退出前恢复终端的状态
+    free(buf);
+    close(fd);      //关闭打开的音频文件
+    exit(EXIT_FAILURE); //退出程序
+}
+
+static int snd_pcm_init(void)
+{
+    snd_pcm_hw_params_t *hwparams = NULL;
+    snd_async_handler_t *async_handler = NULL;
+    int ret;
+
+    /* 打开PCM设备 */
+    ret = snd_pcm_open(&pcm, PCM_PLAYBACK_DEV, SND_PCM_STREAM_PLAYBACK, 0);
+    if (0 > ret) {
+        fprintf(stderr, "snd_pcm_open error: %s: %s\n",
+                    PCM_PLAYBACK_DEV, snd_strerror(ret));
+        return -1;
+    }
+
+    /* 实例化hwparams对象 */
+    snd_pcm_hw_params_malloc(&hwparams);
+
+    /* 获取PCM设备当前硬件配置,对hwparams进行初始化 */
+    ret = snd_pcm_hw_params_any(pcm, hwparams);
+    if (0 > ret) {
+        fprintf(stderr, "snd_pcm_hw_params_any error: %s\n", snd_strerror(ret));
+        goto err2;
+    }
+
+    /**************
+     设置参数
+    ***************/
+    /* 设置访问类型: 交错模式 */
+    ret = snd_pcm_hw_params_set_access(pcm, hwparams, SND_PCM_ACCESS_RW_INTERLEAVED);
+    if (0 > ret) {
+        fprintf(stderr, "snd_pcm_hw_params_set_access error: %s\n", snd_strerror(ret));
+        goto err2;
+    }
+
+    /* 设置数据格式: 有符号16位、小端模式 */
+    ret = snd_pcm_hw_params_set_format(pcm, hwparams, SND_PCM_FORMAT_S16_LE);
+    if (0 > ret) {
+        fprintf(stderr, "snd_pcm_hw_params_set_format error: %s\n", snd_strerror(ret));
+        goto err2;
+    }
+
+    /* 设置采样率 */
+    ret = snd_pcm_hw_params_set_rate(pcm, hwparams, wav_fmt.SampleRate, 0);
+    if (0 > ret) {
+        fprintf(stderr, "snd_pcm_hw_params_set_rate error: %s\n", snd_strerror(ret));
+        goto err2;
+    }
+
+    /* 设置声道数: 双声道 */
+    ret = snd_pcm_hw_params_set_channels(pcm, hwparams, wav_fmt.NumChannels);
+    if (0 > ret) {
+        fprintf(stderr, "snd_pcm_hw_params_set_channels error: %s\n", snd_strerror(ret));
+        goto err2;
+    }
+
+    /* 设置周期大小: period_size */
+    ret = snd_pcm_hw_params_set_period_size(pcm, hwparams, period_size, 0);
+    if (0 > ret) {
+        fprintf(stderr, "snd_pcm_hw_params_set_period_size error: %s\n", snd_strerror(ret));
+        goto err2;
+    }
+
+    /* 设置周期数（驱动层环形缓冲区buffer的大小）: periods */
+    ret = snd_pcm_hw_params_set_periods(pcm, hwparams, periods, 0);
+    if (0 > ret) {
+        fprintf(stderr, "snd_pcm_hw_params_set_periods error: %s\n", snd_strerror(ret));
+        goto err2;
+    }
+
+    /* 使配置生效 */
+    ret = snd_pcm_hw_params(pcm, hwparams);
+    snd_pcm_hw_params_free(hwparams);   //释放hwparams对象占用的内存
+    if (0 > ret) {
+        fprintf(stderr, "snd_pcm_hw_params error: %s\n", snd_strerror(ret));
+        goto err1;
+    }
+
+    buf_bytes = period_size * wav_fmt.BlockAlign; //变量赋值，一个周期的字节大小
+
+    /* 注册异步处理函数 */
+    ret = snd_async_add_pcm_handler(&async_handler, pcm, snd_playback_async_callback, NULL);
+    if (0 > ret) {
+        fprintf(stderr, "snd_async_add_pcm_handler error: %s\n", snd_strerror(ret));
+        goto err1;
+    }
+
+    return 0;
+
+err2:
+    snd_pcm_hw_params_free(hwparams);   //释放内存
+err1:
+    snd_pcm_close(pcm); //关闭pcm设备
+    return -1;
+}
+
+static int open_wav_file(const char *file)
+{
+    RIFF_t wav_riff;
+    DATA_t wav_data;
+    int ret;
+
+    fd = open(file, O_RDONLY);
+    if (0 > fd) {
+        fprintf(stderr, "open error: %s: %s\n", file, strerror(errno));
+        return -1;
+    }
+
+    /* 读取RIFF chunk */
+    ret = read(fd, &wav_riff, sizeof(RIFF_t));
+    if (sizeof(RIFF_t) != ret) {
+        if (0 > ret)
+            perror("read error");
+        else
+            fprintf(stderr, "check error: %s\n", file);
+        close(fd);
+        return -1;
+    }
+
+    if (strncmp("RIFF", wav_riff.ChunkID, 4) ||//校验
+        strncmp("WAVE", wav_riff.Format, 4)) {
+        fprintf(stderr, "check error: %s\n", file);
+        close(fd);
+        return -1;
+    }
+
+    /* 读取sub-chunk-fmt */
+    ret = read(fd, &wav_fmt, sizeof(FMT_t));
+    if (sizeof(FMT_t) != ret) {
+        if (0 > ret)
+            perror("read error");
+        else
+            fprintf(stderr, "check error: %s\n", file);
+        close(fd);
+        return -1;
+    }
+
+    if (strncmp("fmt ", wav_fmt.Subchunk1ID, 4)) {//校验
+        fprintf(stderr, "check error: %s\n", file);
+        close(fd);
+        return -1;
+    }
+
+    /* 打印音频文件的信息 */
+    printf("<<<<音频文件格式信息>>>>\n\n");
+    printf("  file name:     %s\n", file);
+    printf("  Subchunk1Size: %u\n", wav_fmt.Subchunk1Size);
+    printf("  AudioFormat:   %u\n", wav_fmt.AudioFormat);
+    printf("  NumChannels:   %u\n", wav_fmt.NumChannels);
+    printf("  SampleRate:    %u\n", wav_fmt.SampleRate);
+    printf("  ByteRate:      %u\n", wav_fmt.ByteRate);
+    printf("  BlockAlign:    %u\n", wav_fmt.BlockAlign);
+    printf("  BitsPerSample: %u\n\n", wav_fmt.BitsPerSample);
+
+    /* sub-chunk-data */
+    if (0 > lseek(fd, sizeof(RIFF_t) + 8 + wav_fmt.Subchunk1Size,
+                SEEK_SET)) {
+        perror("lseek error");
+        close(fd);
+        return -1;
+    }
+
+    while(sizeof(DATA_t) == read(fd, &wav_data, sizeof(DATA_t))) {
+
+        /* 找到sub-chunk-data */
+        if (!strncmp("data", wav_data.Subchunk2ID, 4))//校验
+            return 0;
+
+        if (0 > lseek(fd, wav_data.Subchunk2Size, SEEK_CUR)) {
+            perror("lseek error");
+            close(fd);
+            return -1;
+        }
+    }
+
+    fprintf(stderr, "check error: %s\n", file);
+    return -1;
+}
+
+/************************************
+main主函数
+************************************/
+int main(int argc, char *argv[])
+{
+    snd_pcm_sframes_t avail;
+    struct termios new_cfg;
+    sigset_t sset;
+    int ret;
+
+    if (2 != argc) {
+        fprintf(stderr, "Usage: %s <audio_file>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    /* 屏蔽SIGIO信号 */
+    sigemptyset(&sset);
+    sigaddset(&sset, SIGIO);
+    sigprocmask(SIG_BLOCK, &sset, NULL);
+
+    /* 打开WAV音频文件 */
+    if (open_wav_file(argv[1]))
+        exit(EXIT_FAILURE);
+
+    /* 初始化PCM Playback设备 */
+    if (snd_pcm_init())
+        goto err1;
+
+    /* 申请读缓冲区 */
+    buf = malloc(buf_bytes);
+    if (NULL == buf) {
+        perror("malloc error");
+        goto err2;
+    }
+
+    /* 终端配置 */
+    tcgetattr(STDIN_FILENO, &old_cfg);  //获取终端<标准输入-标准输出构成了一套终端>
+    memcpy(&new_cfg, &old_cfg, sizeof(struct termios));//备份
+    new_cfg.c_lflag &= ~ICANON; //将终端设置为非规范模式
+    new_cfg.c_lflag &= ~ECHO;   //禁用回显
+    tcsetattr(STDIN_FILENO, TCSANOW, &new_cfg);//使配置生效
+
+    /* 播放：先将环形缓冲区填满数据 */
+    avail = snd_pcm_avail_update(pcm);  //获取环形缓冲区中有多少帧数据需要填充
+    while (avail >= period_size) {  //我们一次写入一个周期
+
+        memset(buf, 0x00, buf_bytes);   //buf清零
+        ret = read(fd, buf, buf_bytes);
+        if (0 >= ret)
+            goto err3;
+
+        ret = snd_pcm_writei(pcm, buf, period_size);//向环形缓冲区中写入数据
+        if (0 > ret) {
+            fprintf(stderr, "snd_pcm_writei error: %s\n", snd_strerror(ret));
+            goto err3;
+        }
+        else if (ret < period_size) {//实际写入的帧数小于指定的帧数
+            //此时我们需要调整下音频文件的读位置
+            //将读位置向后移动（往回移）(period_size-ret)*frame_bytes个字节
+            //frame_bytes表示一帧的字节大小
+            if (0 > lseek(fd, (ret-period_size) * wav_fmt.BlockAlign, SEEK_CUR)) {
+                perror("lseek error");
+                goto err3;
+            }
+        }
+
+        avail = snd_pcm_avail_update(pcm);  //再次获取、更新avail
+    }
+
+    sigprocmask(SIG_UNBLOCK, &sset, NULL);  //取消SIGIO信号屏蔽
+
+    char ch;
+    for ( ; ; ) {
+
+        ch = getchar(); //获取用户输入的控制字符
+        switch (ch) {
+        case 'q':   //Q键退出程序
+            sigprocmask(SIG_BLOCK, &sset, NULL);//屏蔽SIGIO信号
+            goto err3;
+        case ' ':   //空格暂停/恢复
+            switch (snd_pcm_state(pcm)) {
+
+            case SND_PCM_STATE_PAUSED:  //如果是暂停状态则恢复运行
+                ret = snd_pcm_pause(pcm, 0);
+                if (0 > ret)
+                    fprintf(stderr, "snd_pcm_pause error: %s\n", snd_strerror(ret));
+                break;
+            case SND_PCM_STATE_RUNNING: //如果是运行状态则暂停
+                ret = snd_pcm_pause(pcm, 1);
+                if (0 > ret)
+                    fprintf(stderr, "snd_pcm_pause error: %s\n", snd_strerror(ret));
+                break;
+            }
+            break;
+        }
+    }
+
+err3:
+    snd_pcm_drop(pcm); //停止PCM
+    tcsetattr(STDIN_FILENO, TCSANOW, &old_cfg); //退出前恢复终端的状态
+    free(buf);     //释放内存
+err2:
+    snd_pcm_close(pcm); //关闭pcm设备
+err1:
+    close(fd);      //关闭打开的音频文件
+    exit(EXIT_FAILURE);
+}
+复制代码
+
+
+上述示例程序是在示例代码 29.6.1基础上进行修改了，加入了用户控制单元，程序设定：
+q：在终端按下q键退出应用程序；
+终端按下空格键暂停播放，再次按下恢复播放。
+下面给大家简单地介绍下上述示例代码的设计，在main()函数中，我们首先屏蔽了SIGIO信号，如下：
+/* 屏蔽SIGIO信号 */
+sigemptyset(&sset);
+sigaddset(&sset, SIGIO);
+sigprocmask(SIG_BLOCK, &sset, NULL);
+复制代码
+
+
+这主要是为了程序设计上的安全考虑，等把环形缓冲区填满数据之后，再取消SIGIO信号屏蔽。当然，你也可以不这样做。
+接着打开用户传入的音频文件、初始化PCM播放设备、申请应用程序所需的缓冲区：
+/* 打开WAV音频文件 */
+if (open_wav_file(argv[1]))
+    exit(EXIT_FAILURE);
+
+/* 初始化PCM Playback设备 */
+if (snd_pcm_init())
+    goto err1;
+
+/* 申请读缓冲区 */
+buf = malloc(buf_bytes);
+if (NULL == buf) {
+    perror("malloc error");
+    goto err2;
+}
+复制代码
+
+
+接着对终端进行设置，将终端配置为非规范模式、取消回显，配置为非规范模式之后，用户输入的字符会直接被应用程序读取到，而无需按下回车键；取消回显，意味着用户输入的字符，在终端不会显示出来，这些内容在串口应用编程章节给大家详细介绍过，这里就不再啰嗦！
+/* 终端配置 */
+tcgetattr(STDIN_FILENO, &old_cfg);        //获取终端<标准输入-标准输出构成了一套终端>
+memcpy(&new_cfg, &old_cfg, sizeof(struct termios));//备份
+new_cfg.c_lflag &= ~ICANON; //将终端设置为非规范模式
+new_cfg.c_lflag &= ~ECHO;   //禁用回显
+tcsetattr(STDIN_FILENO, TCSANOW, &new_cfg);//使配置生效
+复制代码
+
+
