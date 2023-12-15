@@ -1,0 +1,166 @@
+29.5.2打开PCM设备
+从本小节开始，将正式介绍如何编写一个音频应用程序，首先我们需要在应用程序中包含alsa-lib库的头文件<alsa/asoundlib.h>，这样才能在应用程序中调用alsa-lib库函数以及使用相关宏。
+第一步需要打开PCM设备，调用函数snd_pcm_open()，该函数原型如下所示：
+int snd_pcm_open(snd_pcm_t **pcmp, const char *name, snd_pcm_stream_t stream, int mode)
+复制代码
+
+
+该函数一共有4个参数，如下所示：
+pcmp：snd_pcm_t用于描述一个PCM设备，所以一个snd_pcm_t对象表示一个PCM设备；snd_pcm_open函数会打开参数name所指定的设备，实例化snd_pcm_t对象，并将对象的指针（也就是PCM设备的句柄）通过pcmp返回出来。
+name：参数name指定PCM设备的名字。alsa-lib库函数中使用逻辑设备名而不是设备文件名，命名方式为"hw:i,j"，i表示声卡的卡号，j则表示这块声卡上的设备号；譬如"hw:0,0"表示声卡0上的PCM设备0，在播放情况下，这其实就对应/dev/snd/pcmC0D0p（如果是录音，则对应/dev/snd/pcmC0D0c）。除了使用"hw:i,j"这种方式命名之外，还有其它两种常用的命名方式，譬如"plughw:i,j"、"default"等，关于这些名字的不同，本章最后再向大家进行简单地介绍，这里暂时先不去理会这个问题。
+stream：参数stream指定流类型，有两种不同类型：SND_PCM_STREAM_PLAYBACK和SND_PCM_STREAM_CAPTURE；SND_PCM_STREAM_PLAYBACK表示播放，SND_PCM_STREAM_CAPTURE则表示采集。
+mode：最后一个参数mode指定了open模式，通常情况下，我们会将其设置为0，表示默认打开模式，默认情况下使用阻塞方式打开设备；当然，也可将其设置为SND_PCM_NONBLOCK，表示以非阻塞方式打开设备。
+设备打开成功，snd_pcm_open函数返回0；打开失败，返回一个小于0的错误编号，可以使用alsa-lib提供的库函数snd_strerror()来得到对应的错误描述信息，该函数与C库函数strerror()用法相同。
+与snd_pcm_open相对应的是snd_pcm_close()，函数snd_pcm_close()用于关闭PCM设备，函数原型如下所示：
+int snd_pcm_close(snd_pcm_t *pcm);
+复制代码
+
+
+使用示例：
+调用snd_pcm_open()函数打开声卡0的PCM播放设备0：
+snd_pcm_t *pcm_handle = NULL;
+int ret;
+
+ret = snd_pcm_open(&pcm_handle, "hw:0,0", SND_PCM_STREAM_PLAYBACK, 0);
+if (0 > ret) {
+        fprintf(stderr, "snd_pcm_open error: %s\n", snd_strerror(ret));
+        return -1;
+}
+复制代码
+
+
+29.5.3设置硬件参数
+打开PCM设备之后，接着我们需要对设备进行设置，包括硬件配置和软件配置。软件配置就不再介绍了，使用默认配置即可！我们主要是对硬件参数进行配置，譬如采样率、声道数、格式、访问类型、period周期大小、buffer大小等。
+实例化snd_pcm_hw_params_t对象
+alsa-lib使用snd_pcm_hw_params_t数据类型来描述PCM设备的硬件配置参数，在配置参数之前，我们需要实例化一个snd_pcm_hw_params_t对象，使用snd_pcm_hw_params_malloc或snd_pcm_hw_params_alloca()来实例化一个snd_pcm_hw_params_t对象，如下所示：
+snd_pcm_hw_params_t *hwparams = NULL;
+
+snd_pcm_hw_params_malloc(&hwparams);
+复制代码
+
+
+或
+snd_pcm_hw_params_alloca(&hwparams);
+复制代码
+
+
+它们之间的区别也就是C库函数malloc和alloca之间的区别。当然，你也可以直接使用malloc()或alloca()来分配一个snd_pcm_hw_params_t对象，亦或者直接定义全局变量或栈自动变量。与snd_pcm_hw_params_malloc/snd_pcm_hw_params_alloca相对应的是snd_pcm_hw_params_free，snd_pcm_hw_params_free()函数用于释放snd_pcm_hw_params_t对象占用的内存空间。函数原型如下所示：
+void snd_pcm_hw_params_free(snd_pcm_hw_params_t *obj)
+复制代码
+
+
+初始化snd_pcm_hw_params_t对象
+snd_pcm_hw_params_t对象实例化完成之后，接着我们需要对其进行初始化操作，调用snd_pcm_hw_params_any()对snd_pcm_hw_params_t对象进行初始化操作，调用该函数会使用PCM设备当前的配置参数去初始化snd_pcm_hw_params_t对象，如下所示：
+snd_pcm_hw_params_any(pcm_handle, hwparams);
+复制代码
+
+
+第一个参数为PCM设备的句柄，第二个参数传入snd_pcm_hw_params_t对象的指针。
+对硬件参数进行设置
+alsa-lib提供了一系列的snd_pcm_hw_params_set_xxx函数用于设置PCM设备的硬件参数，同样也提供了一系列的snd_pcm_hw_params_get_xxx函数用于获取硬件参数。
+(1)设置access访问类型：snd_pcm_hw_params_set_access()
+调用snd_pcm_hw_params_set_access设置访问类型，其函数原型如下所示：
+int snd_pcm_hw_params_set_access(snd_pcm_t *pcm,
+                snd_pcm_hw_params_t * params,
+                snd_pcm_access_t access
+)
+复制代码
+
+
+参数access指定设备的访问类型，是一个snd_pcm_access_t类型常量，这是一个枚举类型，如下所示：
+enum snd_pcm_access_t {
+        SND_PCM_ACCESS_MMAP_INTERLEAVED = 0,        //mmap access with simple interleaved channels
+        SND_PCM_ACCESS_MMAP_NONINTERLEAVED,        //mmap access with simple non interleaved channels
+        SND_PCM_ACCESS_MMAP_COMPLEX,                //mmap access with complex placement
+        SND_PCM_ACCESS_RW_INTERLEAVED,                //snd_pcm_readi/snd_pcm_writei access
+        SND_PCM_ACCESS_RW_NONINTERLEAVED,        //snd_pcm_readn/snd_pcm_writen access
+        SND_PCM_ACCESS_LAST = SND_PCM_ACCESS_RW_NONINTERLEAVED
+};
+复制代码
+
+
+通常，将访问类型设置为SND_PCM_ACCESS_RW_INTERLEAVED，交错访问模式，通过snd_pcm_readi/snd_pcm_writei对PCM设备进行读/写操作。
+函数调用成功返回0；失败将返回一个小于0的错误码，可通过snd_strerror()函数获取错误描述信息。
+使用示例：
+ret = snd_pcm_hw_params_set_access(pcm_handle, hwparams, SND_PCM_ACCESS_RW_INTERLEAVED);
+if (0 > ret)
+        fprintf(stderr, "snd_pcm_hw_params_set_access error: %s\n", snd_strerror(ret));
+复制代码
+
+
+(2)设置数据格式：snd_pcm_hw_params_set_format()
+调用snd_pcm_hw_params_set_format()函数设置PCM设备的数据格式，函数原型如下所示：
+int snd_pcm_hw_params_set_format(snd_pcm_t *pcm,
+        snd_pcm_hw_params_t *params,
+        snd_pcm_format_t format
+)
+复制代码
+
+
+参数format指定数据格式，该参数是一个snd_pcm_format_t类型常量，这是一个枚举类型，如下所示：
+enum snd_pcm_format_t {
+  SND_PCM_FORMAT_UNKNOWN = -1,
+  SND_PCM_FORMAT_S8 = 0,
+  SND_PCM_FORMAT_U8,
+  SND_PCM_FORMAT_S16_LE,
+  SND_PCM_FORMAT_S16_BE,
+  SND_PCM_FORMAT_U16_LE,
+  SND_PCM_FORMAT_U16_BE,
+  SND_PCM_FORMAT_S24_LE,
+  SND_PCM_FORMAT_S24_BE,
+  SND_PCM_FORMAT_U24_LE,
+  SND_PCM_FORMAT_U24_BE,
+  SND_PCM_FORMAT_S32_LE,
+  SND_PCM_FORMAT_S32_BE,
+  SND_PCM_FORMAT_U32_LE,
+  SND_PCM_FORMAT_U32_BE,
+  SND_PCM_FORMAT_FLOAT_LE,
+  SND_PCM_FORMAT_FLOAT_BE,
+  SND_PCM_FORMAT_FLOAT64_LE,
+  SND_PCM_FORMAT_FLOAT64_BE,
+  SND_PCM_FORMAT_IEC958_SUBFRAME_LE,
+  SND_PCM_FORMAT_IEC958_SUBFRAME_BE,
+  SND_PCM_FORMAT_MU_LAW,
+  SND_PCM_FORMAT_A_LAW,
+  SND_PCM_FORMAT_IMA_ADPCM,
+  SND_PCM_FORMAT_MPEG,
+  SND_PCM_FORMAT_GSM,
+  SND_PCM_FORMAT_S20_LE,
+  SND_PCM_FORMAT_S20_BE,
+  SND_PCM_FORMAT_U20_LE,
+  SND_PCM_FORMAT_U20_BE,
+  SND_PCM_FORMAT_SPECIAL = 31,
+  SND_PCM_FORMAT_S24_3LE = 32,
+  SND_PCM_FORMAT_S24_3BE,
+  SND_PCM_FORMAT_U24_3LE,
+  SND_PCM_FORMAT_U24_3BE,
+  SND_PCM_FORMAT_S20_3LE,
+  SND_PCM_FORMAT_S20_3BE,
+  SND_PCM_FORMAT_U20_3LE,
+  SND_PCM_FORMAT_U20_3BE,
+  SND_PCM_FORMAT_S18_3LE,
+  SND_PCM_FORMAT_S18_3BE,
+  SND_PCM_FORMAT_U18_3LE,
+  SND_PCM_FORMAT_U18_3BE,
+  SND_PCM_FORMAT_G723_24,
+  SND_PCM_FORMAT_G723_24_1B,
+  SND_PCM_FORMAT_G723_40,
+  SND_PCM_FORMAT_G723_40_1B,
+  SND_PCM_FORMAT_DSD_U8,
+  SND_PCM_FORMAT_DSD_U16_LE,
+  SND_PCM_FORMAT_DSD_U32_LE,
+  SND_PCM_FORMAT_DSD_U16_BE,
+  SND_PCM_FORMAT_DSD_U32_BE,
+  SND_PCM_FORMAT_LAST = SND_PCM_FORMAT_DSD_U32_BE,
+  SND_PCM_FORMAT_S16 = SND_PCM_FORMAT_S16_LE,
+  SND_PCM_FORMAT_U16 = SND_PCM_FORMAT_U16_LE,
+  SND_PCM_FORMAT_S24 = SND_PCM_FORMAT_S24_LE,
+  SND_PCM_FORMAT_U24 = SND_PCM_FORMAT_U24_LE,
+  SND_PCM_FORMAT_S32 = SND_PCM_FORMAT_S32_LE,
+  SND_PCM_FORMAT_U32 = SND_PCM_FORMAT_U32_LE,
+  SND_PCM_FORMAT_FLOAT = SND_PCM_FORMAT_FLOAT_LE,
+  SND_PCM_FORMAT_FLOAT64 = SND_PCM_FORMAT_FLOAT64_LE,
+  SND_PCM_FORMAT_IEC958_SUBFRAME = SND_PCM_FORMAT_IEC958_SUBFRAME_LE,
+  SND_PCM_FORMAT_S20 = SND_PCM_FORMAT_S20_LE,
+  SND_PCM_FORMAT_U20 = SND_PCM_FORMAT_U20_LE
+};
