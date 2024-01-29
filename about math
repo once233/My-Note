@@ -19,3 +19,74 @@
          let isPointIn = GetCross(p1, p2, p) * GetCross(p3, p4, p) >= 0 && GetCross(p2, p3, p) * GetCross(p4, p1, p) >= 0;
          return isPointIn;
      }
+
+
+[点线距离问题]
+#include <iostream>
+#include <cmath>
+using namespace std;
+class Point {
+private:
+    double x, y;
+public:
+    Point(double _x = 0, double _y = 0) : x(_x), y(_y) {}
+    double getX() const { return x; }
+    double getY() const { return y; }
+};
+class Line {
+private:
+    Point p1, p2;
+public:
+    Line(const Point& _p1, const Point& _p2) : p1(_p1), p2(_p2) {}
+    double pointToLineDistance(const Point& p) const {
+        // 计算点到直线的距离
+        double x0 = p.getX();
+        double y0 = p.getY();
+        double x1 = p1.getX();
+        double y1 = p1.getY();
+        double x2 = p2.getX();
+        double y2 = p2.getY();
+        return abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) / sqrt(pow(y2 - y1, 2) + pow(x2 - x1, 2));
+    }
+    double lineToLineDistance(const Line& line) const {
+        // 计算直线与直线的距离
+        double a1 = p2.getY() - p1.getY();
+        double b1 = p1.getX() - p2.getX();
+        double c1 = p2.getX() * p1.getY() - p1.getX() * p2.getY();
+        double a2 = line.p2.getY() - line.p1.getY();
+        double b2 = line.p1.getX() - line.p2.getX();
+        double c2 = line.p2.getX() * line.p1.getY() - line.p1.getX() * line.p2.getY();
+        double denominator = a1 * b2 - a2 * b1;
+        if (denominator != 0) {
+            double x = (b1 * c2 - b2 * c1) / denominator;
+            double y = (a2 * c1 - a1 * c2) / denominator;
+            Point intersectionPoint(x, y);
+            cout << "Intersection Point: (" << x << ", " << y << ")" << endl;
+        }
+        return 0; // 直线相交，距离为0
+    }
+    Point projectionPoint(const Point& p) const {
+        // 计算点在直线上的投影点
+        double x0 = p.getX();
+        double y0 = p.getY();
+        double x1 = p1.getX();
+        double y1 = p1.getY();
+        double x2 = p2.getX();
+        double y2 = p2.getY();
+        double k = ((y2 - y1) * (x0 - x1) - (x2 - x1) * (y0 - y1)) / (pow(y2 - y1, 2) + pow(x2 - x1, 2));
+        double x = x0 - k * (y2 - y1);
+        double y = y0 + k * (x2 - x1);
+        return Point(x, y);
+    }
+};
+int main() {
+    Point p(2, 3);
+    Line line(Point(0, 0), Point(4, 5));
+    double pointToLineDist = line.pointToLineDistance(p);
+    cout << "Point to Line Distance: " << pointToLineDist << endl;
+    double lineToLineDist = line.lineToLineDistance(Line(Point(1, 1), Point(2, 2)));
+    cout << "Line to Line Distance: " << lineToLineDist << endl;
+    Point projection = line.projectionPoint(p);
+    cout << "Projection Point: (" << projection.getX() << ", " << projection.getY() << ")" << endl;
+    return 0;
+}
