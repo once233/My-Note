@@ -5,7 +5,7 @@ bind_ip=0.0.0.0
 fork=true
 logpath = /home/aicrobo/mongodb/mongodb-linux-x86_64-ubuntu2004-7.0.5/log/mongod.log
 
-[mongodb server]
+[把mongodb加入服务]
 在/lib/systemd/system/  下创建 mongodb.service
 文件格式：
 ================================================================================================
@@ -23,6 +23,9 @@ logpath = /home/aicrobo/mongodb/mongodb-linux-x86_64-ubuntu2004-7.0.5/log/mongod
   
 [Install]  
     WantedBy=multi-user.target
+
+创建好执行 sudo systemctl daemon-reload
+再执行 sudo systemctl status mongodb.service
 
 [以配置文件的配置启动]
 mongod -f /etc/mongod.conf
