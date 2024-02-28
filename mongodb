@@ -1,1 +1,28 @@
+[config文件格式]
+dbpath=/home/aicrobo/mongodb/mongodb-linux-x86_64-ubuntu2004-7.0.5/data/db
+port=27017
+bind_ip=0.0.0.0
+fork=true
+logpath = /home/aicrobo/mongodb/mongodb-linux-x86_64-ubuntu2004-7.0.5/log/mongod.log
 
+[mongodb server]
+在/lib/systemd/system/  下创建 mongodb.service
+文件格式：
+================================================================================================
+[Unit]  
+    Description=mongodb  
+    After=network.target remote-fs.target nss-lookup.target  
+  
+[Service]   
+    Type=forking
+    RuntimeDirectory=mongodb
+    RuntimeDirectoryMode=0751
+    ExecStart=/home/aicrobo/mongodb/mongodb-linux-x86_64-ubuntu2004-7.0.5/bin/mongod -f /home/aicrobo/mongodb/mongodb-linux-x86_64-ubuntu2004-7.0.5/conf/mongodb.conf
+    ExecStop=/home/aicrobo/mongodb/mongodb-linux-x86_64-ubuntu2004-7.0.5/bin/mongod --shutdown -f /home/aicrobo/mongodb/mongodb-linux-x86_64-ubuntu2004-7.0.5/conf/mongodb.conf
+    PrivateTmp=false
+  
+[Install]  
+    WantedBy=multi-user.target
+
+[以配置文件的配置启动]
+mongod -f /etc/mongod.conf
