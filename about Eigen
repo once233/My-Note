@@ -1,0 +1,23 @@
+[Eigen中norm、normalize、normalized的区别]
+norm()
+对于Vector，norm返回的是向量的二范数
+例如：
+Vector2d vec(3.0,4.0);
+cout << vec.norm() << endl;	//输出5
+对于Matrix，norm返回的是矩阵的弗罗贝尼乌斯范数（Frobenius Norm），即向量元素绝对值的平方和再开方，matlab调用函数norm(x, 2)。
+例如：
+Matrix2d mat;
+mat << 1,2
+    3,4;
+cout << mat.norm() << endl;    //输出sqrt(1*1+2*2+3*3+4*4),即sqrt(30) = 5.47723
+
+normalize()
+清楚了norm()的定义后，normalize()其实就是把自身的各元素除以它的范数。返回值为void。
+例如：
+vec.normalize();
+cout << vec << endl;    //输出：      0.6
+                       //            0.8
+mat.normalize();        //mat各元素除以mat.norm()
+cout << mat << endl;    
+normalized()
+而normalized()与normalize()类似，只不过normalize()是对自身上做修改，而normalized()返回的是一个新的Vector/Matrix，并不改变原有的矩阵。
