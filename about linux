@@ -5,7 +5,9 @@
 修改后使用source profile使修改生效
 ------------------------------------------------------
 
-
+[清系统缓存]
+ps -aux | grep vscode | awk '{print $2}' | xargs sudo kill -9 直接kill掉车端的vscode相关的所有内容
+切换到root用户下，执行echo 3 > /proc/sys/vm/drop_caches 可以清除缓存
 
 
 
