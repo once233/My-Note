@@ -234,3 +234,6 @@ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
 
 [创建软链接]
 ln -s source dest
+
+[g2o报Eigen对齐问题]
+EIGEN_MAKE_ALIGNED_OPERATOR_NEW
