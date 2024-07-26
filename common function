@@ -1,0 +1,21 @@
+【判断点是在车的前方还是后方】
+tf::StampedTransform transform = getBase2MapTransfrom();
+  Eigen::Vector3d vehicle_pos(transform.getOrigin().getX(), transform.getOrigin().getY(), transform.getOrigin().getZ());
+  Eigen::Quaterniond vehicle_quat(transform.getRotation().w(), transform.getRotation().x(), transform.getRotation().y(),
+                                  transform.getRotation().z());
+  Eigen::Vector3d target_pos(target.x, target.y, target.theta);
+
+  // 获取车辆朝向
+  Eigen::Vector3d vehicle_dir = vehicle_quat.toRotationMatrix().col(0);
+
+  // 计算目标点相对于车辆的位置
+  Eigen::Vector3d target_rel_pos = target_pos - vehicle_pos;
+
+  // 判断目标点是在车的前面还是后面
+  if (target_rel_pos.dot(vehicle_dir) > 0) {
+    INFO_LOG("对接点在车前方");
+    return true;
+  } else {
+    INFO_LOG("对接点在车后方");
+    return false;
+  }
