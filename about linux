@@ -237,3 +237,12 @@ ln -s source dest
 
 [g2o报Eigen对齐问题]
 EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+[命令行打开文件夹]
+在windows中，有下面的语句
+explorer /e, + path
+会自动打开一个文件夹窗口，并自动定位到path的位置。
+ubuntu下也有类似的命令
+nautilus，直接打开Home。
+nautilus . 打开当前文件夹
+nautilus /var/www/aaa/ 打开此文件夹。
