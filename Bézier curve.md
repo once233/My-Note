@@ -20,15 +20,16 @@ $$
 
 ### 合并同类项
 
-**常数项**：
-- \( x_0 \)
-
-**\( t \) 项**：
 $$
+**constant item**:
+\( x_0 \)
+$$
+$$
+**\( t \) item**:
 -2 \cdot x_0 \cdot t + 2 \cdot x_1 \cdot t = (-2 \cdot x_0 + 2 \cdot x_1) \cdot t
 $$
-
-**\( t^2 \) 项**：
 $$
+**\( t^2 \) item**:
+\[
 x_0 \cdot t^2 - 2 \cdot x_1 \cdot t^2 + x_2 \cdot t^2 = (x_0 - 2 \cdot x_1 + x_2) \cdot t^2
 $$
