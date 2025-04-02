@@ -42,5 +42,10 @@ $$
 ## 舵电机角角度 → 舵轮角度
 ### 公式
 $$
-θ = (\frac{\text{steering}_{\text{degree}}}{ReductionRatio} - ZeroBias) * DegreeToRad
+\delta = (\frac{\text{steering}_{\text{degree}}}{ReductionRatio} - ZeroBias) * DegreeToRad
 $$
+
+## 轮速 → 整机速度
+$v_{\text{linear}} = v \times \cos(\delta)$
+
+$v_{\text{angular}} = \frac{v \times \sin(\delta)}{wheelBase}$
