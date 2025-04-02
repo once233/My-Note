@@ -108,5 +108,5 @@ $$
 ### 舵电机角度
 
 $$
-Degree_{\text{steering}}=(\frac{\delta}{DegreeToRad} + ZeroBiasDegree) \cdot ReductionRatio
+Degree_{\text{steering}}=(\frac{\delta_{\text{target}}}{DegreeToRad} + ZeroBiasDegree) \cdot ReductionRatio
 $$
