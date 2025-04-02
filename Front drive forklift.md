@@ -45,50 +45,68 @@ $$
 
 # 逆解
 ## 驱动电机RPM → 轮速
-### 公式
+
 $$
-v = \frac{\text{RPM}_{\text{real}} \times 2\pi r}{60 \times ReductionRatio}
+V_{\text{wheel}} = \frac{\text{RPM}_{\text{real}} \times 2\pi r}{60 \times ReductionRatio}
 $$
 
 
 ## 舵电机角度 → 舵轮角度
-### 公式
+
 $$
-\delta = ( \frac{\text{Degree}_{\text{steering}}}{ReductionRatio} - ZeroBias) * DegreeToRad
+\delta_{\text{real}} = ( \frac{\text{Degree}_{\text{steering}}}{ReductionRatio} - ZeroBiasDegree) * DegreeToRad
 $$
 
 ## 轮速 → 整机速度
-$V_{\text{linear}} = V_{\text{wheel}} \times \cos(\delta)$
 
-$V_{\text{angular}} = \frac{V_{\text{wheel}} \times \sin(\delta)}{WheelBase}$
+$$
+V_{\text{linear}} = V_{\text{wheel}} \times \cos(\delta)
+$$
+
+$$
+V_{\text{angular}} = \frac{V_{\text{wheel}} \times \sin(\delta)}{WheelBase}
+$$
 
 # 正解
 ## 整机速度 → 轮速、轮朝向
 ### 旋转运动
 
 $$
-\delta_{\text{target}} = 0.5 * Π - ZeroBias
+\delta_{\text{target}} = 0.5 * \pi - ZeroBiasDegree * DegreeToRad
 $$
 
 ### 静止
 
 $$
-\delta_{\text{target}} = ZeroBias
+\delta_{\text{target}} = ZeroBiasDegree * DegreeToRad
 $$
 
 ### 常规运动
 #### 角速度 ω 与转向角 δ 之间的关系可以表示为：
 
 $$
-ω=\frac{V_{\text{linear}}}{R}
+V_{\text{angular}}=\frac{V_{\text{linear}}}{R}
 $$
 
 $$
-\delta = \arctan\left(\frac{WheelBase}{R}\right) = \arctan\left(\frac{WheelBase \cdot \omega}{V_{\text{linear}}}\right)
+\delta_{\text{target}} = \arctan\left(\frac{WheelBase}{R}\right) = \arctan\left(\frac{WheelBase \cdot V_{\text{angular}}}{V_{\text{linear}}}\right)
 $$
 
 #### 轮速可以表示为：
 
 $$
 V_{\text{wheel}}=\frac{V_{\text{linear}}}{\cos(\delta)}
+$$
+
+## 轮速、轮朝向 → 驱动电机RPM、舵电机角度
+### 驱动电机RPM
+
+$$
+N_{\text{rpm-real}}=\frac{V_{\text{wheel}} \cdot 60}{Radius_{\text{wheel}} \cdot 2 \cdot \pi} \cdot ReductionRatio
+$$
+
+### 舵电机角度
+
+$$
+Degree_{\text{steering}}=(\frac{\delta}{DegreeToRad} + ZeroBiasDegree) \cdot ReductionRatio
 $$
