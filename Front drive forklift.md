@@ -24,6 +24,10 @@ $$
 N_{\text{rpm-real}} = \frac{N_{\text{rpm}}}{\text{ReductionRatio}}
 $$
 
+## 轴距
+从动轮，到舵轮的直线距离。
+以两个从动轮中心点为坐标轴起点，已知舵轮的坐标为x,y,则轴距为
+
 ## 运动学模型
 ### 系统状态描述
 | 符号 | 描述 |
@@ -35,6 +39,7 @@ $$
 
 ---
 
+# 逆解
 ## 驱动电机RPM → 轮速
 ### 公式
 $$
@@ -52,3 +57,6 @@ $$
 $v_{\text{linear}} = v \times \cos(\delta)$
 
 $v_{\text{angular}} = \frac{v \times \sin(\delta)}{wheelBase}$
+
+# 正解
+
