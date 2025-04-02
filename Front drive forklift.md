@@ -58,9 +58,37 @@ $$
 $$
 
 ## 轮速 → 整机速度
-$v_{\text{linear}} = v \times \cos(\delta)$
+$V_{\text{linear}} = V_{\text{wheel}} \times \cos(\delta)$
 
-$v_{\text{angular}} = \frac{v \times \sin(\delta)}{wheelBase}$
+$V_{\text{angular}} = \frac{V_{\text{wheel}} \times \sin(\delta)}{WheelBase}$
 
 # 正解
+## 整机速度 → 轮速、轮朝向
+### 旋转运动
 
+$$
+\delta_{\text{target}} = 0.5 * Π - ZeroBias
+$$
+
+### 静止
+
+$$
+\delta_{\text{target}} = ZeroBias
+$$
+
+### 常规运动
+#### 角速度 ω 与转向角 δ 之间的关系可以表示为：
+
+$$
+ω=\frac{V_{\text{linear}}}{R}
+$$
+
+$$
+\delta = \arctan\left(\frac{WheelBase}{R}\right) = \arctan\left(\frac{WheelBase \cdot \omega}{V_{\text{linear}}}\right)
+$$
+
+#### 轮速可以表示为：
+
+$$
+V_{\text{wheel}}=\frac{V_{\text{linear}}}{\cos(\delta)}
+$$
