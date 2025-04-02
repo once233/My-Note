@@ -76,6 +76,10 @@ $$
 \delta_{\text{target}} = 0.5 \cdot \pi - ZeroBiasDegree \cdot DegreeToRad
 $$
 
+$$
+V_{\text{wheel}} = V_{\text{angular}} \cdot L
+$$
+
 ### 静止
 
 $$
