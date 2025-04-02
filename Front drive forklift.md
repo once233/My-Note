@@ -32,7 +32,7 @@ $$
 
 ---
 
-## 驱动电机RPM → 线速度
+## 驱动电机RPM → 轮速
 ### 公式
 $$
 v = \frac{\text{RPM}_{\text{real}} \times 2\pi r}{60 \times ReductionRatio}
