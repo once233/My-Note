@@ -47,7 +47,7 @@ $$
 ## 驱动电机RPM → 轮速
 
 $$
-V_{\text{wheel}} = \frac{RPM_{\text{real}} \times 2\pi r} {60 \times Ratio_{\text{reduction}}}
+V_{\text{wheel}} = \frac{N_{\text{rpm-real}} \times 2\pi r} {60 \times Ratio_{\text{reduction}}}
 $$
 
 
