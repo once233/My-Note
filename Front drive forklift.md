@@ -45,7 +45,7 @@ $$
 ## 舵电机角度 → 舵轮角度
 ### 公式
 $$
-\delta = (\frac{\text{steering}_{\text{degree}}}{ReductionRatio} - ZeroBias) * DegreeToRad
+\delta = (\frac{\text{Degree}_{\text{steering}}}{\text{Ratio}_{\text{reduction}}} - ZeroBias) * DegreeToRad
 $$
 
 ## 轮速 → 整机速度
