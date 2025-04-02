@@ -4,7 +4,7 @@
 单舵轮系统 通过驱动电机控制速度，舵电机控制转向角度。需建立运动学模型描述轮速与电机转速的关系。
 
 ## 减速比
-### 降低转速（Speed Reduction）：
+### 降低转速（Speed reduction）：
 减速器通过传动比降低主动轮（电机）的高转速，提供给从动轮一个较低的转速。
 比如，减速比为10：1时，主动轮每旋转10圈，从动轮只会旋转1圈。
 
@@ -21,7 +21,7 @@
 在任何机械传动系统中，实际转速和减速比之间的关系可以用以下公式表示：
 
 $$
-N_{\text{rpm-real}} = \frac{N_{\text{rpm}}}{Ratio_{\text{Reduction}}}
+N_{\text{rpm-real}} = \frac{N_{\text{rpm}}}{Ratio_{\text{reduction}}}
 $$
 
 ## 轴距（旋转半径）
@@ -107,11 +107,11 @@ $$
 ### 驱动电机RPM
 
 $$
-N_{\text{rpm-real}}=\frac{V_{\text{wheel}} \cdot 60}{Radius_{\text{wheel}} \cdot 2 \cdot \pi} \cdot Ratio_{\text{Reduction}}
+N_{\text{rpm-real}}=\frac{V_{\text{wheel}} \cdot 60}{Radius_{\text{wheel}} \cdot 2 \cdot \pi} \cdot Ratio_{\text{reduction}}
 $$
 
 ### 舵电机角度
 
 $$
-Degree_{\text{steering}}=(\frac{\delta_{\text{target}}}{DegreeToRad} + ZeroBiasDegree) \cdot Ratio_{\text{Reduction}}
+Degree_{\text{steering}}=(\frac{\delta_{\text{target}}}{DegreeToRad} + ZeroBiasDegree) \cdot Ratio_{\text{reduction}}
 $$
