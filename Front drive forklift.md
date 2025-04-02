@@ -3,7 +3,7 @@
 ## 背景与初步观察
 单舵轮系统 通过驱动电机控制速度，舵电机控制转向角度。需建立运动学模型描述轮速与电机转速的关系。
 
-## 减速比的核心作用
+## 减速比
 ### 降低转速（Speed Reduction）：
 减速器通过传动比降低主动轮（电机）的高转速，提供给从动轮一个较低的转速。
 比如，减速比为10：1时，主动轮每旋转10圈，从动轮只会旋转1圈。
@@ -21,7 +21,7 @@
 在任何机械传动系统中，实际转速和减速比之间的关系可以用以下公式表示：
 
 $$
-N_{\text{rpm-real}} = \frac{N_{\text{rpm}}}{\text{ReductionRatio}}
+N_{\text{rpm-real}} = \frac{N_{\text{rpm}}}{Ratio_{\text{Reduction}}}
 $$
 
 ## 轴距（旋转半径）
@@ -47,14 +47,15 @@ $$
 ## 驱动电机RPM → 轮速
 
 $$
-V_{\text{wheel}} = \frac{\text{RPM}_{\text{real}} \times 2\pi r}{60 \times ReductionRatio}
+V_{\text{wheel}} = \frac{RPM_{\text{real}} \times 2\pi r} {60 \times Ratio_{\text{reduction}}}
 $$
+
 
 
 ## 舵电机角度 → 舵轮角度
 
 $$
-\delta_{\text{real}} = ( \frac{\text{Degree}_{\text{steering}}}{ReductionRatio} - ZeroBiasDegree) * DegreeToRad
+\delta_{\text{real}} = ( \frac{Degree_{\text{steering}}}{Ratio_{\text{reduction}}} - ZeroBiasDegree) \cdot DegreeToRad
 $$
 
 ## 轮速 → 整机速度
@@ -72,13 +73,13 @@ $$
 ### 旋转运动
 
 $$
-\delta_{\text{target}} = 0.5 * \pi - ZeroBiasDegree * DegreeToRad
+\delta_{\text{target}} = 0.5 \cdot \pi - ZeroBiasDegree \cdot DegreeToRad
 $$
 
 ### 静止
 
 $$
-\delta_{\text{target}} = ZeroBiasDegree * DegreeToRad
+\delta_{\text{target}} = ZeroBiasDegree \cdot DegreeToRad
 $$
 
 ### 常规运动
@@ -102,11 +103,11 @@ $$
 ### 驱动电机RPM
 
 $$
-N_{\text{rpm-real}}=\frac{V_{\text{wheel}} \cdot 60}{Radius_{\text{wheel}} \cdot 2 \cdot \pi} \cdot ReductionRatio
+N_{\text{rpm-real}}=\frac{V_{\text{wheel}} \cdot 60}{Radius_{\text{wheel}} \cdot 2 \cdot \pi} \cdot Ratio_{\text{Reduction}}
 $$
 
 ### 舵电机角度
 
 $$
-Degree_{\text{steering}}=(\frac{\delta_{\text{target}}}{DegreeToRad} + ZeroBiasDegree) \cdot ReductionRatio
+Degree_{\text{steering}}=(\frac{\delta_{\text{target}}}{DegreeToRad} + ZeroBiasDegree) \cdot Ratio_{\text{Reduction}}
 $$
