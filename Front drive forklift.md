@@ -107,7 +107,7 @@ $$
 ### 驱动电机RPM
 
 $$
-N_{\text{rpm-real}}=\frac{V_{\text{wheel}} \cdot 60}{Radius_{\text{wheel}} \cdot 2 \cdot \pi} \cdot Ratio_{\text{reduction}}
+N_{\text{rpm}}=\frac{V_{\text{wheel}} \cdot 60}{Radius_{\text{wheel}} \cdot 2 \cdot \pi} \cdot Ratio_{\text{reduction}}
 $$
 
 ### 舵电机角度
