@@ -33,14 +33,14 @@ $$
 ---
 
 ## 驱动电机RPM → 线速度
-### 转换公式
+### 公式
 $$
 v = \frac{\text{RPM}_{\text{real}} \times 2\pi r}{60 \times ReductionRatio}
 $$
 
 
 ## 舵电机角角度 → 舵轮角度
-### 核心公式
+### 公式
 $$
 θ = (\frac{\text{steering}_{\text{degree}}}{ReductionRatio} - ZeroBias) * DegreeToRad
 $$
