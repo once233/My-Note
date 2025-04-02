@@ -39,7 +39,7 @@ v = \frac{\text{RPM}_{\text{real}} \times 2\pi r}{60 \times ReductionRatio}
 $$
 
 
-## 舵电机角角度 → 舵轮角度
+## 舵电机角度 → 舵轮角度
 ### 公式
 $$
 \delta = (\frac{\text{steering}_{\text{degree}}}{ReductionRatio} - ZeroBias) * DegreeToRad
