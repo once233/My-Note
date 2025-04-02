@@ -21,7 +21,7 @@ $$
 ### 合并同类项
 
 $$
-**constant item**:
+**constant-item**:
 \( x_0 \)
 $$
 $$
