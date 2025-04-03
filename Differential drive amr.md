@@ -51,6 +51,16 @@ $$
 V_{\text{wheel-r}} = \frac{N_{\text{rpm-r}} \times 2\pi Radius_{\text{wheel-r}}} {60 \times Ratio_{\text{reduction}}}
 $$
 
+## 左轮速、右轮速 → 整机速度
+
+$$
+V_{\text{linear}} = \frac{V_{\text{wheel-l}} + V_{\text{wheel-r}}}{2}
+$$
+
+$$
+V_{\text{angular}} = \frac{V_{\text{wheel-r}} - V_{\text{wheel-l}}}{L}
+$$
+
 # 正解
 ## 整机速度 → 左轮速、右轮速
 
