@@ -37,7 +37,19 @@ $$
 ---
 
 # 逆解
-## 驱动电机RPM → 轮速
+## 驱动电机RPM → 左轮速、右轮速
+
+$左轮速 \( V_{wheel-l} \)：$
+
+$$
+V_{\text{wheel-l}} = \frac{N_{\text{rpm-l}} \times 2\pi Radius_{\text{wheel-l}}} {60 \times Ratio_{\text{reduction}}}
+$$
+
+$右轮速 \( V_{wheel-r} \)：$
+
+$$
+V_{\text{wheel-r}} = \frac{N_{\text{rpm-r}} \times 2\pi Radius_{\text{wheel-r}}} {60 \times Ratio_{\text{reduction}}}
+$$
 
 # 正解
 ## 整机速度 → 左轮速、右轮速
