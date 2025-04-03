@@ -45,11 +45,22 @@ $$
 $左轮速 \( V_l \)：$
 
 $$
-V_l = \frac{v - \frac{\omega L}{2}}{r}
+V_l = V_{\text{linear}} - \frac{V_{\text{angular}} \cdot L}{2}
 $$
 
 $右轮速 \( V_r \)：$
 
 $$
-V_r = \frac{v + \frac{\omega L}{2}}{r}
+V_r = V_{\text{linear}} + \frac{V_{\text{angular}} \cdot L}{2}
 $$
+
+## 左轮速、右轮速 → 驱动电机RPM
+
+$$
+N_{rpm-l} = \frac{V_{\text{wheel-l}} \cdot Ratio_{\text{reduction}}}{DegreeToRad \cdot Radius_{\text{wheel-l}}}
+$$
+
+$$
+N_{rpm-r} = \frac{V_{\text{wheel-r}} \cdot Ratio_{\text{reduction}}}{DegreeToRad \cdot Radius_{\text{wheel-r}}}
+$$
+
